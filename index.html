@@ -894,6 +894,14 @@ body.spect #abBtn,body.spect #joy,body.spect #atkBtn{display:none!important}
 @media(max-width:380px){.btn.up{width:122px!important;margin-right:14px!important}.btn .cost{font-size:14px;gap:6px}}
 .arow .btn,.bp-a .btn,.bcard .act .btn{min-width:118px}
 .card::before,.card::after{display:none!important}
+
+/* pitanje posle bitke: dugi odgovori u više redova, jasno tačno/netačno */
+.hqa .btn{white-space:normal!important;text-transform:none!important;letter-spacing:0!important;font-family:'EB Garamond',serif!important;font-weight:700!important;font-size:16px!important;line-height:1.2!important;height:auto!important;min-height:44px;padding:9px 14px!important;width:100%!important}
+.hqa .btn.primary,.hqa .btn.primary:disabled{background:linear-gradient(180deg,#3f7a3a,#24521f)!important;color:#fff6dc!important;border-color:#d6a955!important;text-shadow:0 1px 0 #0c2404!important;box-shadow:inset 0 0 0 1px rgba(0,0,0,.5),0 0 0 2px rgba(120,200,90,.35)!important;opacity:1!important}
+.hqa .btn.primary::after{content:'  ✓';display:inline!important;position:static!important;background:none!important;width:auto;height:auto;transform:none;box-shadow:none}
+.hqa .btn.wrong,.hqa .btn.wrong:disabled{background:linear-gradient(180deg,#b3301b,#661208)!important;color:#fff3dc!important;text-decoration:line-through;opacity:1!important}
+.hqa .btn:disabled:not(.primary):not(.wrong){opacity:.55!important}
+.hqa .btn:not(:disabled){background:linear-gradient(180deg,#fbf1d8,#ead6ac)!important;color:#5e140c!important;text-shadow:none!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),0 2px 0 #9a7038!important}
 </style>
 </head>
 <body>

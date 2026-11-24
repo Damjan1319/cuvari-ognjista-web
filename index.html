@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="color-scheme" content="light only">
 <title>Čuvari Ognjišta</title>
 <meta name="description" content="Strateška igra kroz srpsku istoriju: od Raške do Šumadije, 50 bitaka, junaci, vojska i odbrana ognjišta.">
 <meta name="theme-color" content="#07060b">
@@ -902,6 +903,28 @@ body.spect #abBtn,body.spect #joy,body.spect #atkBtn{display:none!important}
 .hqa .btn.wrong,.hqa .btn.wrong:disabled{background:linear-gradient(180deg,#b3301b,#661208)!important;color:#fff3dc!important;text-decoration:line-through;opacity:1!important}
 .hqa .btn:disabled:not(.primary):not(.wrong){opacity:.55!important}
 .hqa .btn:not(:disabled){background:linear-gradient(180deg,#fbf1d8,#ead6ac)!important;color:#5e140c!important;text-shadow:none!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.7),0 2px 0 #9a7038!important}
+:root{color-scheme:light only}html,body{forced-color-adjust:none}
+
+/* ===== odziv za male ekrane ===== */
+.uprow{grid-template-columns:minmax(0,1fr) auto!important}.uprow>*{min-width:0}.uprow .d{white-space:normal}
+.hhead>div{min-width:0}.hhead .nm{font-size:clamp(19px,6.6vw,26px)!important;line-height:1.1;overflow-wrap:anywhere}
+.uprow .pips,.uprow .t+div{flex-wrap:wrap}
+@media(max-width:400px){
+ .uprow .t{font-size:14px!important}.uprow .pips i,.uprow .pip{width:9px!important;height:9px!important}
+ .btn.up{width:112px!important;margin-right:10px!important;padding:6px 8px!important}.btn.up .cost{font-size:14.5px!important;gap:6px}
+ .btn.sm{font-size:11.5px!important;letter-spacing:.05em!important;padding:7px 10px!important;min-height:36px}
+ .twob .btn,.rival .twob .btn{font-size:10.5px!important;letter-spacing:.03em!important;padding:6px 6px!important;white-space:normal!important;line-height:1.1}
+ #shTitle{font-size:clamp(20px,6.5vw,28px)!important}
+ .stats div b,.stats b{font-size:clamp(20px,6.4vw,28px)}
+}
+@media(max-width:340px){.btn.up{width:100px!important}.hb{width:96px!important}.nav button b{font-size:9.5px!important}}
+@media(max-height:420px) and (orientation:landscape){#sheet .shBody,#shBody{padding-bottom:20px}.nav button{padding-top:2px!important;padding-bottom:2px!important}}
+
+@media(max-height:480px) and (orientation:landscape){
+ #sTitle{overflow-y:auto;align-items:flex-start!important;padding-top:14px}.title-wrap{margin-bottom:10px!important}#sTitle h1{font-size:clamp(30px,9vh,46px)!important}
+ #hubG{top:auto!important;bottom:calc(76px + env(safe-area-inset-bottom));right:10px}
+ .lede{font-size:14px!important;margin:6px 0!important}
+}
 </style>
 </head>
 <body>
@@ -3635,7 +3658,7 @@ function renderHub(){if(!save.tribe)return;const t=save.tribe;
  setBadge('bdUtv',nd||(avail?true:0));setBadge('bdRat',save.war&&save.war.myLeft>0?save.war.myLeft:0);
  const upAvail=HEROES.some(h=>heroOk(h)&&UPS.some(u=>save.heroes[h.id].up[u.id]<maxUp()&&canPay(upCost(save.heroes[h.id].up[u.id]))));setBadge('bdJunaci',upAvail?true:0);
  setBadge('bdPohod',lostCount()?'!':0);if(typeof updateBpop==='function')updateBpop()}
-function renderRes(){$('#resBox').innerHTML=RES.map(k=>{const v=save.res[k],c=cap(k),r=RATE[k](save.b);return`<span class="chipr ${v>=c?'full':''}" title="${RES_N[k]}, skladište za ${num(c)}">${icon(k)}${num(v)}<small>${r?`+${String(r).replace('.',',')}/m`:''}</small><em class="capb"><b style="width:${Math.min(100,v/c*100)}%"></b></em></span>`}).join('')}
+function renderRes(){$('#resBox').innerHTML=RES.map(k=>{const v=save.res[k],c=cap(k),r=RATE[k](save.b);return`<span class="chipr ${v>=c?'full':''}" title="${RES_N[k]}, skladište za ${num(c)}">${icon(k)}${num(v)}<small>${r?`+${String(Math.round(r*10)/10).replace('.',',')}/m`:''}</small><em class="capb"><b style="width:${Math.min(100,v/c*100)}%"></b></em></span>`}).join('')}
 function decorate(root){(root||document).querySelectorAll('[data-ic]').forEach(e=>{if(!e._d){e._d=1;e.insertAdjacentHTML('afterbegin',SVG[e.dataset.ic]||'')}})}
 function setBadge(id,n){const b=$('#'+id);if(!b)return;b.textContent=n===true?'!':n;b.classList.toggle('on',!!n)}
 $('#tabBtn').onclick=()=>{ac();openSheet('tabela')};

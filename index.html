@@ -600,7 +600,7 @@ body.pix #cv{image-rendering:pixelated}
 .unit .ub .btn.off{opacity:.55}
 .seg{display:flex;margin:0 0 12px;border:1px solid rgba(90,50,20,.45);border-radius:4px;overflow:hidden}.seg button{flex:1;padding:9px 6px;font-family:Cinzel,serif;font-weight:700;font-size:14px;color:#5a3418;background:rgba(255,250,235,.3);border:0;border-right:1px solid rgba(90,50,20,.3)}
 .seg button:last-child{border-right:0}.seg button.on{background:#6a1c0c;color:#f6e7c4}
-.hstrip{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 8px;margin:0 0 10px;scrollbar-width:thin}.hstrip .hs{flex:none;width:62px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;border:1px solid rgba(90,50,20,.25);border-radius:4px;background:rgba(255,250,235,.3)}
+.hstrip{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 8px;margin:0 0 10px}.hstrip .hs{flex:none;width:62px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 2px;border:1px solid rgba(90,50,20,.25);border-radius:4px;background:rgba(255,250,235,.3)}
 .hstrip .hs span{font-size:11px;font-weight:700;color:#3a2614;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:58px}.hstrip .hs.on{border-color:#6a1c0c;box-shadow:inset 0 0 0 1.5px #6a1c0c;background:rgba(181,100,28,.16)}.hstrip .hs.lock{opacity:.45}
 .arow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px dashed rgba(90,50,20,.2)}.arow .btn{min-width:92px;flex:none}.arow .req{font-size:12px;font-style:italic;color:#7a4a1c}.arow .cost{font-size:13px;gap:8px}
 .unit .ub{display:block!important}.unames{display:flex;flex-wrap:wrap;gap:4px;margin:0 0 6px}.unames span{font-size:12px;padding:1px 7px;border-radius:10px;background:rgba(106,28,12,.1);color:#5e1a0c;font-weight:600}
@@ -722,6 +722,46 @@ body.spect #abBtn,body.spect #joy,body.spect #atkBtn{display:none!important}
 .btn.primary.sm::before,.btn.primary.sm::after{display:none}
 .tab.on{background:linear-gradient(180deg,#8e2414,var(--fres));box-shadow:inset 0 0 0 1px var(--zlato2)}
 .sec::before{content:'';width:7px;height:7px;background:var(--fres2);transform:rotate(45deg);flex:none;box-shadow:0 0 0 1px var(--zlato2)}
+
+/* junak: list iz rukopisa */
+.hcard{padding:16px 16px 14px;background:radial-gradient(ellipse at 15% 0,rgba(255,250,232,.6),transparent 55%),rgba(255,248,228,.3);border:1px solid rgba(90,50,20,.45);box-shadow:inset 0 0 0 3px rgba(255,250,232,.45),inset 0 0 0 4px rgba(110,26,16,.3)}
+.hhead{gap:14px;padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid rgba(90,50,20,.25);position:relative}
+.hhead::after{content:'';position:absolute;left:50%;bottom:-5px;width:9px;height:9px;margin-left:-4px;background:var(--fres2);transform:rotate(45deg);box-shadow:0 0 0 2px #f1e2bf,0 0 0 3px var(--zlato2)}
+.hhead canvas{border-radius:2px;background:radial-gradient(circle at 50% 35%,#8e2c1a,#4a0e06 75%)!important;box-shadow:0 0 0 2px #1a0e06,0 0 0 4px var(--zlato),0 0 0 5px #1a0e06,0 6px 14px rgba(60,30,0,.35)!important}
+.hhead .nm{font-size:26px;color:#3a1008!important;letter-spacing:.02em}.hhead .nm::first-letter{color:var(--fres2)}
+.hhead .rl{font-family:'EB Garamond',serif;font-style:italic;font-size:16px;color:#7a2410}
+.xp{height:9px;border-radius:0;background:rgba(90,50,20,.2);box-shadow:inset 0 0 0 1px rgba(90,50,20,.45);margin-top:6px}
+.xp b{border-radius:0;background:linear-gradient(180deg,#f0cf86,#c99440 55%,#93611e)!important;box-shadow:inset 0 -1px 0 rgba(80,40,0,.4)}
+.xpt{font-family:'EB Garamond',serif;font-style:italic;color:#6a4a2a}
+.stats{gap:8px}
+.stats div{position:relative;padding:12px 6px 10px;background:linear-gradient(180deg,rgba(255,250,232,.55),rgba(240,222,184,.4));border:0;box-shadow:inset 0 0 0 1px rgba(90,50,20,.4),inset 0 0 0 3px rgba(255,250,232,.6),inset 0 0 0 4px rgba(154,112,56,.4);font-family:'EB Garamond',serif;font-style:italic;font-size:13px;color:#6a4a2a}
+.stats div::before{content:'';position:absolute;left:50%;top:-4px;width:7px;height:7px;margin-left:-3.5px;background:var(--zlato2);transform:rotate(45deg);box-shadow:0 0 0 1.5px #f1e2bf}
+.stats b{font-family:Cinzel,serif;font-style:normal;font-size:24px;color:#5e140c!important}
+.hbio{position:relative;padding:4px 0 4px 14px;border-left:3px solid var(--fres2);font-size:16px}
+.hbio::first-letter{font-family:Cinzel,serif;font-style:normal;font-weight:800;font-size:1.6em;color:var(--fres2);line-height:1}
+.abil{padding:10px 12px;background:rgba(110,26,16,.06);border:1px solid rgba(110,26,16,.3);box-shadow:inset 0 0 0 2px rgba(255,250,232,.5)}
+.abil strong{display:inline-block;margin-right:4px;padding:1px 8px;background:linear-gradient(180deg,#8e2414,#5e140c);color:#f6dc9a!important;-webkit-text-fill-color:#f6dc9a!important;font-family:Cinzel,serif;font-size:13px;letter-spacing:.05em;box-shadow:inset 0 0 0 1px var(--zlato2)}
+.uprow{padding:10px 0;border-top:1px solid rgba(90,50,20,.2)}
+.uprow .t{font-family:Cinzel,serif;font-weight:800;font-size:16px}
+.uprow .t small{font-family:'EB Garamond',serif;font-weight:600}
+.uprow .d{font-family:'EB Garamond',serif;font-style:italic;color:#5a3e22}
+.pips{gap:3px!important;margin-top:5px}
+.pips i{width:9px!important;height:9px!important;border-radius:0!important;transform:rotate(45deg);margin:0 1px;background:rgba(90,50,20,.18)!important;box-shadow:inset 0 0 0 1px rgba(90,50,20,.3)}
+.pips i.on{background:linear-gradient(135deg,#c23a22,#6e1a10)!important;box-shadow:inset 0 0 0 1px #3a0804,0 0 0 1px rgba(216,176,96,.6)}
+.pips i.lock{opacity:.4}
+.btn.up{min-width:120px}
+.btn.up.primary::before,.btn.up.primary::after{display:none}
+.btn.up:not(.primary){color:#7a4a2a;text-shadow:none;background:linear-gradient(180deg,rgba(255,250,232,.6),rgba(230,210,170,.6));box-shadow:inset 0 0 0 1.5px rgba(90,50,20,.55),inset 0 0 0 3px rgba(255,250,232,.7);filter:none!important;opacity:1!important}
+.btn.up:not(.primary) .cost,.btn.up:not(.primary) .cost span{color:#7a4a2a!important}
+.btn.up:not(.primary) .cost .no{color:#a8200c!important}
+/* skrol u stilu igre */
+@-moz-document url-prefix(){*{scrollbar-width:thin;scrollbar-color:#8e2414 rgba(90,50,20,.15)}}
+::-webkit-scrollbar{width:12px;height:10px}
+::-webkit-scrollbar-track{background:linear-gradient(90deg,rgba(90,50,20,.08),rgba(90,50,20,.18),rgba(90,50,20,.08));border-left:1px solid rgba(90,50,20,.25)}
+::-webkit-scrollbar-thumb{background:linear-gradient(90deg,#4a0e06,#a8301a 40%,#6e1a10);border:1px solid #2a0604;box-shadow:inset 0 0 0 1px #d8b060,inset 0 0 0 2px #4a0e06;border-radius:1px;min-height:40px}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(90deg,#5e140c,#c23a22 40%,#7e2416)}
+::-webkit-scrollbar-button{display:none}
+::-webkit-scrollbar-corner{background:transparent}
 </style>
 </head>
 <body>
@@ -3169,7 +3209,7 @@ function sheetJunaci(body){$('#shTitle').textContent='Junaci';$('#shSub').textCo
  else{card.insertAdjacentHTML('beforeend','<div class="sec">Veštine</div>');
   UPS.forEach(u=>{const n=hs.up[u.id],mx=maxUp(),c=upCost(n);const row=document.createElement('div');row.className='uprow';
    row.innerHTML=`<div class="t">${u.name}<small>${n}/12</small><div class="pips">${Array.from({length:12},(_,i)=>`<i class="${i<n?'on':i>=mx?'lock':''}"></i>`).join('')}</div></div>
-    <div>${n>=12?'<span class="tip">Do kraja</span>':n>=mx?'<span class="req">Treba kovačnica</span>':`<button class="btn sm" ${canPay(c)?'':'disabled'} data-cost='${JSON.stringify(c)}'>${costHtml(c)}</button>`}</div><div class="d">${u.d}</div>`;
+    <div>${n>=12?'<span class="tip">Do kraja</span>':n>=mx?'<span class="req">Treba kovačnica</span>':`<button class="btn sm up ${canPay(c)?'primary':''}" ${canPay(c)?'':'disabled'} data-cost='${JSON.stringify(c)}'>${costHtml(c)}</button>`}</div><div class="d">${u.d}</div>`;
    const b=row.querySelector('button');if(b)b.onclick=()=>{if(!canPay(c))return;pay(c);hs.up[u.id]++;persist();sfx.build();renderSheet();renderHub()};card.appendChild(row)});
   const sel=document.createElement('div');sel.style.cssText='margin-top:14px;display:flex;justify-content:flex-end';
   if(save.hero===H.id)sel.innerHTML='<span class="tip" style="margin:0">Ovaj junak predvodi odred</span>';else{const b=document.createElement('button');b.className='btn primary sm';b.textContent='Povedi u boj';b.onclick=()=>{save.hero=H.id;persist();renderSheet();renderHub()};sel.appendChild(b)}

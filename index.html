@@ -962,6 +962,21 @@ body.spect #abBtn,body.spect #joy,body.spect #atkBtn{display:none!important}
 #abBtn:active{transform:scale(.94)}
 @media (max-width:400px){#abBtn{width:76px!important;height:76px!important;bottom:26px!important;right:12px!important}#abBtn #abIc{width:36px!important;height:36px!important}#abBtn::after{font-size:22px}}
 body.manual #abBtn{bottom:104px!important}
+
+/* ===== dugme moći (v3) ===== */
+#abBtn{width:92px!important;height:92px!important;right:18px!important;bottom:34px!important;border-radius:50%!important;padding:0!important;border:0!important;overflow:visible!important;
+ background:radial-gradient(circle at 50% 42%,#b53a22 0,#7a160a 52%,#3a0804 62%,transparent 63%),conic-gradient(from 210deg,#7a5418,#ffe7a6,#c9933a,#5a3a10,#f6d68a,#a8772a,#7a5418)!important;
+ box-shadow:0 0 0 2px #1a0c04,0 10px 20px rgba(0,0,0,.6),inset 0 0 0 9px transparent!important;display:grid!important;place-items:center!important}
+#abBtn::before{inset:10px!important;border-radius:50%!important;z-index:2!important;background:conic-gradient(rgba(8,4,2,.82) var(--cd,0%),transparent 0)!important}
+#abBtn::after{content:attr(data-cd)!important;font:800 30px Cinzel,serif!important;color:#fff7e0!important;text-shadow:0 0 6px #000,0 2px 2px #000!important}
+#abBtn #abIc{width:50px!important;height:50px!important;z-index:1!important;filter:brightness(0) invert(1) drop-shadow(0 0 4px rgba(255,210,120,.9)) drop-shadow(0 2px 2px rgba(0,0,0,.7))!important}
+#abBtn:not(.ready) #abIc{filter:brightness(0) invert(.55) drop-shadow(0 2px 2px rgba(0,0,0,.7))!important}
+#abBtn #abLbl{left:50%!important;right:auto!important;transform:translateX(-50%)!important;bottom:-20px!important;max-width:118px!important;padding:3px 9px!important;font-size:9px!important;letter-spacing:.06em!important}
+#abBtn.ready{animation:abPulse2 1.4s ease-in-out infinite!important}
+@keyframes abPulse2{0%,100%{box-shadow:0 0 0 2px #1a0c04,0 0 10px 2px rgba(255,200,90,.35),0 10px 20px rgba(0,0,0,.6)}50%{box-shadow:0 0 0 2px #1a0c04,0 0 26px 9px rgba(255,200,90,.75),0 10px 20px rgba(0,0,0,.6)}}
+@media (max-width:400px){#abBtn{width:80px!important;height:80px!important;right:16px!important;bottom:30px!important}#abBtn #abIc{width:42px!important;height:42px!important}#abBtn::after{font-size:25px!important}}
+#sbTip{position:fixed;left:10px;right:10px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:90;padding:12px 14px;border-radius:10px;background:#fbf1d8;color:#3a2010;border:2px solid #d6a955;box-shadow:0 8px 24px rgba(0,0,0,.6);font:600 14px/1.35 'EB Garamond',serif}
+#sbTip b{font-family:Cinzel,serif;color:#6e1a10}#sbTip button{margin-top:8px}
 </style>
 </head>
 <body>
@@ -2464,6 +2479,9 @@ function drawWall(f,w,reg){const[sr,sg,sb]=reg.stone;
  f.fillStyle=lt;f.globalAlpha=.25;f.fillRect(w.x,w.y,w.w,3);f.globalAlpha=1;
  if(w.kind==='ruin'){f.fillStyle=`rgba(${reg.moss},.3)`;for(let i=0;i<3;i++){f.beginPath();f.ellipse(w.x+r2()*w.w,w.y+r2()*w.h,8,4,0,0,7);f.fill()}}}
 
+function segRect(ax,ay,bx,by,w,pad){let t0=0,t1=1;const dx=bx-ax,dy=by-ay,x0=w.x-pad,x1=w.x+w.w+pad,y0=w.y-pad,y1=w.y+w.h+pad;
+ for(const[p,q]of[[-dx,ax-x0],[dx,x1-ax],[-dy,ay-y0],[dy,y1-ay]]){if(p===0){if(q<0)return false}else{const r=q/p;if(p<0){if(r>t1)return false;if(r>t0)t0=r}else{if(r<t0)return false;if(r<t1)t1=r}}}return t0<=t1}
+function losBlocked(ax,ay,bx,by){if(!G)return false;for(const w of G.walls)if(segRect(ax,ay,bx,by,w,-2))return w;return null}
 function collide(o){let hit=false;
  for(const r of G.obst){const dx=o.x-r.x,dy=o.y-r.y,d=Math.hypot(dx,dy)||1,m=r.r*.88+o.r;if(d<m){o.x=r.x+dx/d*m;o.y=r.y+dy/d*m;hit=true}}
  for(const w of G.walls){const cx=clamp(o.x,w.x,w.x+w.w),cy=clamp(o.y,w.y,w.y+w.h);const dx=o.x-cx,dy=o.y-cy,d=Math.hypot(dx,dy);
@@ -2519,14 +2537,14 @@ function hurtPlayer(amt,src){const p=G.p;if(G.spect)return;if(p.inv>0||p.dashT>0
 function hurtAlly(a,amt){if(a.hp<=0)return;a.hp-=amt;a.hitT=.12;floatTxt(a.x,a.y-40,'-'+Math.round(amt),'#ff9a8a');sfx.ehit()}
 function autoAttack(dt){const p=G.p,st=G.st;p.atkT-=dt;if(p.atkT>0)return;if(save.manual&&!atkHeld)return;
  let best=null,bd=1e9;const rng=st.range,MEL=MELEE.has(G.hero.weapon);
- for(const e of G.enemies){if(e.hp<=0||e.born>.5)continue;const d=Math.hypot(e.x-p.x,e.y-p.y)-e.r;if(d<rng&&d<bd){bd=d;best=e}}
+ for(const e of G.enemies){if(e.hp<=0||e.born>.5)continue;const d=Math.hypot(e.x-p.x,e.y-p.y)-e.r;if(d<rng&&d<bd&&!losBlocked(p.x,p.y,e.x,e.y)){bd=d;best=e}}
  if(!best)for(const s of G.structs){if(s.hp<=0)continue;const d=Math.hypot(s.x-p.x,s.y-p.y)-s.r;if(d<rng&&d<bd){bd=d;best=s}}
  if(!best)for(const o of G.props){const d=Math.hypot(o.x-p.x,o.y-p.y)-o.r;if(d<Math.min(rng,160)&&d<bd){bd=d;best=o}}
  if(best&&best.kind&&!best.max&&MEL){p.atkT=1/st.rate;p.atkAn=Math.min(.34,p.atkT*.9);p.atkD=p.atkAn;G.swings.push({x:p.x,y:p.y-10,a:Math.atan2(best.y-p.y,best.x-p.x),t:0});breakProp(best);return}
  if(!best)return;p.atkT=1/st.rate;p.atkAn=Math.min(.34,p.atkT*.9);p.atkD=p.atkAn;const tx=best.x,ty=best.y-(best.kind?20:8);const a=Math.atan2(ty-(p.y-14),tx-p.x);G._td=Math.hypot(tx-p.x,ty-(p.y-14));
  p.aimx=Math.cos(a);p.aimy=Math.sin(a);p.aimT=.55; if(Math.abs(Math.cos(a))>.2)p.face=Math.cos(a)>0?1:-1;
  if(MEL){G.swings.push({x:p.x,y:p.y-10,a,t:0});sfx.swing();
-  for(const e of G.enemies){if(e.hp<=0)continue;const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;if(d-e.r<st.range+6&&(dx*Math.cos(a)+dy*Math.sin(a))/d>-.1)dmgEnemy(e,st.dmg,dx/d*(e.boss?40:260),dy/d*(e.boss?40:260))}
+  for(const e of G.enemies){if(e.hp<=0)continue;const dx=e.x-p.x,dy=e.y-p.y,d=Math.hypot(dx,dy)||1;if(d-e.r<st.range+6&&(dx*Math.cos(a)+dy*Math.sin(a))/d>-.1&&!losBlocked(p.x,p.y,e.x,e.y))dmgEnemy(e,st.dmg,dx/d*(e.boss?40:260),dy/d*(e.boss?40:260))}
   for(const s of G.structs)if(s.hp>0&&Math.hypot(s.x-p.x,s.y-p.y)-s.r<st.range+6)dmgStruct(s,st.dmg)}
  else fireShot(a,st.dmg,G.hero.weapon)}
 const MELEE=new Set(['cekic','mac','topuz']);
@@ -2609,7 +2627,8 @@ function update(dt){
   if(collide(e))e.wa+=1.4;
   for(const b of G.beacons)if(b.lit&&!e.boss){const bx=e.x-b.x,by=e.y-b.y,bd=Math.hypot(bx,by)||1,m=118;if(bd<m){e.x=b.x+bx/bd*m;e.y=b.y+by/bd*m;e.wa=Math.atan2(by,bx)}}
   const pd=Math.hypot(p.x-e.x,p.y-e.y);
-  if(e.born<.3&&e.hitCd<=0){if(pd<p.r+e.r-2){e.hitCd=.8-(e.ag||0)*.25;e.atkAn=.3;const dm=e.dmg*(e.bf>0?1.25:1);hurtPlayer(dm,e);if(e.type==='vampir'&&!(p.shieldT>0)&&p.inv>.5){G.poison=3;G.poisonD=e.dmg*.14;floatTxt(p.x,p.y-60,'otrov','#9fe06a',true)}}else if(tg!==p&&d<tg.r+e.r){e.hitCd=.9;e.atkAn=.3;hurtAlly(tg,e.dmg*.8*(e.bf>0?1.25:1))}}}
+  if(e.wind>0){e.vx*=.35;e.vy*=.35;e.wind-=dt;if(e.wind<=0){e.hitCd=.85-(e.ag||0)*.25;e.atkAn=.3;if(pd<p.r+e.r+18&&!losBlocked(e.x,e.y,p.x,p.y)){const dm=e.dmg*(e.bf>0?1.25:1);hurtPlayer(dm,e);if(e.type==='vampir'&&!(p.shieldT>0)&&p.inv>.5){G.poison=3;G.poisonD=e.dmg*.14;floatTxt(p.x,p.y-60,'otrov','#9fe06a',true)}}else if(pd<p.r+e.r+40)floatTxt(p.x,p.y-60,'promašio','#cfe6ff')}}
+  else if(e.born<.3&&e.hitCd<=0){if(pd<p.r+e.r+4&&!losBlocked(e.x,e.y,p.x,p.y)){e.wind=e.boss?.5:e.type==='gutac'?.55:.34;e.wA=Math.atan2(p.y-e.y,p.x-e.x);if(false){if(e.type==='vampir'&&!(p.shieldT>0)&&p.inv>.5){G.poison=3;G.poisonD=e.dmg*.14;floatTxt(p.x,p.y-60,'otrov','#9fe06a',true)}}}else if(tg!==p&&d<tg.r+e.r&&!losBlocked(e.x,e.y,tg.x,tg.y)){e.hitCd=.9;e.atkAn=.3;hurtAlly(tg,e.dmg*.8*(e.bf>0?1.25:1))}}}
  G.enemies=G.enemies.filter(e=>e.hp>0);
  for(let i=0;i<G.enemies.length;i++)for(let j=i+1;j<G.enemies.length;j++){const a=G.enemies[i],b=G.enemies[j];const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,m=a.r+b.r;if(d<m){const o=(m-d)/2;a.x-=dx/d*o;a.y-=dy/d*o;b.x+=dx/d*o;b.y+=dy/d*o}}
  // saborci
@@ -3532,6 +3551,24 @@ function blessOffer(){const pool=BLESS.slice().sort(()=>R()-.5).slice(0,3);G.cho
  d.classList.add('on');if(typeof play==='function')play('bell',.35,1)}
 {const _ua=useAbility;useAbility=function(){const cd0=G?G.p.cd:0;const r=_ua.apply(this,arguments);if(G&&G.cdMul&&G.p.cd>cd0)G.p.cd*=G.cdMul;return r}}
 {const _er=endRun;endRun=function(win){const d=$('#bless');if(d)d.classList.remove('on');if(G)G.choice=null;return _er.apply(this,arguments)}}
+
+/* --- realnije kretanje: obilaženje zidova, strele staju na zidu, najava udarca --- */
+{const _u=update;update=function(dt){const r=_u.call(this,dt);if(!G||state!=='play'||G.choice)return r;const p=G.p;
+ if(G.walls.length){for(const e of G.enemies){if(e.hp<=0||e.stun>0||e.wind>0)continue;const tg=e.tg||p,d=Math.hypot(tg.x-e.x,tg.y-e.y);if(d>650)continue;
+   e.pathT=(e.pathT||0)-dt;if(e.pathT<=0){e.pathT=.25;const w=losBlocked(e.x,e.y,tg.x,tg.y);if(w){const m=e.r+16,cs=[[w.x-m,w.y-m],[w.x+w.w+m,w.y-m],[w.x-m,w.y+w.h+m],[w.x+w.w+m,w.y+w.h+m]];let best=null,bs=1e9;
+     for(const c of cs){if(losBlocked(e.x,e.y,c[0],c[1]))continue;const sc=Math.hypot(c[0]-e.x,c[1]-e.y)+Math.hypot(tg.x-c[0],tg.y-c[1]);if(sc<bs){bs=sc;best=c}}e.via=best}else e.via=null}
+   if(e.via){const dx=e.via[0]-e.x,dy=e.via[1]-e.y,dd=Math.hypot(dx,dy)||1;if(dd<14){e.via=null;continue}const sp=(e.sp&&e.sp[1]||90);e.vx+=(dx/dd*sp-e.vx)*Math.min(1,dt*6);e.vy+=(dy/dd*sp-e.vy)*Math.min(1,dt*6)}}
+  const inW=o=>G.walls.some(w=>o.x>w.x&&o.x<w.x+w.w&&o.y>w.y-20&&o.y<w.y+w.h);
+  for(const L of[G.shots,G.eshots])for(let i=L.length-1;i>=0;i--){if(inW(L[i])){burst(L[i].x,L[i].y,'#c9b08a',5,80,1.8);L.splice(i,1)}}}
+ return r}}
+{const _md=modeDraw;modeDraw=function(g,t){_md(g,t);if(!G)return;g.save();for(const e of G.enemies){if(!(e.wind>0)||e.hp<=0)continue;const k=1-e.wind/.5,a=e.wA||0;
+ g.strokeStyle=`rgba(255,60,40,${.45+.5*k})`;g.lineWidth=3+3*k;g.lineCap='round';g.beginPath();g.arc(e.x,e.y-8,e.r+16,a-.7,a+.7);g.stroke();
+ g.fillStyle=`rgba(255,80,50,${.6+.4*k})`;g.font="800 15px Cinzel,serif";g.textAlign='center';g.fillText('!',e.x,e.y-e.r-40)}g.restore()}}
+
+/* --- Samsung Internet + tamni režim: uputstvo jednom --- */
+setTimeout(()=>{try{const sb=/SamsungBrowser/i.test(navigator.userAgent),dk=matchMedia('(prefers-color-scheme: dark)').matches;if(!sb||save.sbTip>=2)return;
+ const d=document.createElement('div');d.id='sbTip';d.innerHTML=`<b>Boje izgledaju čudno?</b><br>Samsung Internet u tamnom režimu prefarbava igru. Otvori <b>Podešavanja → Labs</b> i uključi <b>„Use website dark theme“</b>. Ili igraj u Chrome-u.<br><button class="btn sm primary">Važi</button>`;
+ document.body.appendChild(d);d.querySelector('button').onclick=()=>{save.sbTip=(save.sbTip||0)+1;persist();d.remove()}}catch(e){}},1500);
 
 /* ---------- kraj misije ---------- */
 function endRun(win){const c=G.cfg,hid=G.hero.id;state='result';

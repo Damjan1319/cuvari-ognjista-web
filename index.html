@@ -762,6 +762,13 @@ body.spect #abBtn,body.spect #joy,body.spect #atkBtn{display:none!important}
 ::-webkit-scrollbar-thumb:hover{background:linear-gradient(90deg,#5e140c,#c23a22 40%,#7e2416)}
 ::-webkit-scrollbar-button{display:none}
 ::-webkit-scrollbar-corner{background:transparent}
+
+.cloud{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;margin:2px 0 14px;padding:11px 13px;background:rgba(110,26,16,.06);border:1px solid rgba(110,26,16,.32);box-shadow:inset 0 0 0 2px rgba(255,250,232,.5)}
+.cloud b{grid-column:1;font-family:Cinzel,serif;color:#5e140c;font-size:14px}.cloud span{grid-column:1;font-size:14px;line-height:1.35;color:#4a3220}
+.cloud .btn{grid-column:2;grid-row:1/3;white-space:nowrap}.cloud.on{background:rgba(47,106,28,.07);border-color:rgba(47,106,28,.35)}.cloud.on b{color:#2f5a1c}
+@media(max-width:520px){.cloud{grid-template-columns:1fr}.cloud .btn{grid-column:1;grid-row:auto;margin-top:6px}}
+.tboard.real li .ty{font-style:italic;font-size:12px;color:#8a3a14;margin-left:4px}
+#clTitle a{color:#f3c870;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -815,7 +822,7 @@ body.spect #abBtn,body.spect #joy,body.spect #atkBtn{display:none!important}
     <h1>Čuvari<span>Ognjišta</span></h1>
     <p class="lede">Kad je tuđin pritisnuo zemlju, ostalo je samo jedno ognjište.<br>Tvoj odred ga čuva.</p>
     <div class="btns"><button class="btn primary" id="enterBtn">Stupi u odred</button></div>
-    <div class="tip" style="margin-top:18px">Napredak se čuva na ovom uređaju.</div>
+    <div class="tip" id="clTitle" style="margin-top:18px">Napredak se čuva na ovom uređaju.</div>
   </div>
 </section>
 
@@ -993,7 +1000,7 @@ try{const o=JSON.parse(localStorage.getItem('cuvari-v2')||'null');if(o&&o.v===2)
 if(save.tribe&&/^Pleme\s/.test(save.tribe.name||''))save.tribe.name=save.tribe.name.replace(/^Pleme\s/,'Odred ');
 save.pix=false;save.manual=false;
 {HEROES.forEach(h=>{if(!save.heroes[h.id]||!save.heroes[h.id].lvl)save.heroes[h.id]=newHero()});if(!save.kn){save.kn=1;const old=Object.entries(save.heroes).filter(([k])=>!HEROES.some(h=>h.id===k)).map(([,v])=>v).sort((a,b)=>(b.lvl||1)-(a.lvl||1))[0];if(old&&old.lvl>save.heroes.strahinja.lvl){save.heroes.strahinja.lvl=old.lvl;save.heroes.strahinja.up={...old.up}}}if(!HEROES.some(h=>h.id===save.hero))save.hero=HEROES[0].id}
-const persist=()=>{try{localStorage.setItem('cuvari-v2',JSON.stringify(save))}catch(e){}};
+let persist=()=>{try{localStorage.setItem('cuvari-v2',JSON.stringify(save))}catch(e){}};
 
 const doneCount=()=>Object.keys(save.stars).filter(k=>save.stars[k]>0).length;
 const topLevel=()=>{let i=0;while(save.stars[i]>0)i++;return i};
@@ -2974,6 +2981,64 @@ function annivLine(){const A=annivToday();if(A)return`<p class="anvl">Danas je g
 {const _in=intro;intro=function(c){_in(c);let el=$('#iTac');if(!el){el=document.createElement('div');el.id='iTac';el.className='tac';$('#iStory').insertAdjacentElement('afterend',el)}
  el.innerHTML=c.sp?`<small>Kako je bilo</small><b>${c.sp.t}</b><span>${c.sp.d}</span>`:'';el.style.display=c.sp?'':'none'}}
 {const _sp=sheetPohod;sheetPohod=function(body){_sp(body);body.insertAdjacentHTML('beforeend',annivLine()+rodView())}}
+/* ---------- nalog (Google), napredak u oblaku i prave tabele (Firebase) ---------- */
+const FB_CFG={apiKey:"AIzaSyC7DY90NstLKvmgYDAyi_WNzpFJZ54IAuw",authDomain:"cuvari-ognjista.firebaseapp.com",projectId:"cuvari-ognjista",storageBucket:"cuvari-ognjista.firebasestorage.app",messagingSenderId:"382943630912",appId:"1:382943630912:web:34f487b85bc47de81171a5"};
+const FBV='10.14.1',FBU=m=>`https://www.gstatic.com/firebasejs/${FBV}/firebase-${m}.js`;
+const CL={st:'off',user:null,fb:null,boards:{},bT:{},err:''};
+const isNative=()=>!!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform());
+function progScore(s){if(!s)return 0;const st=Object.values(s.stars||{}).reduce((a,b)=>a+(b||0),0);const hl=Object.values(s.heroes||{}).reduce((a,h)=>a+((h&&h.lvl)||0),0);return st*10+hl+((s.b&&s.b.ognjiste)||0)*5+(s.tribe?1:0)}
+async function cloudInit(){if(CL.st!=='off')return CL.fb;CL.st='load';
+ try{const [A,U,F]=await Promise.all([import(FBU('app')),import(FBU('auth')),import(FBU('firestore'))]);
+  const app=A.initializeApp(FB_CFG),auth=U.getAuth(app),db=F.getFirestore(app);CL.fb={A,U,F,app,auth,db};CL.st='ready';
+  U.onAuthStateChanged(auth,u=>{const was=CL.user;CL.user=u||null;if(u&&!was)cloudAfterLogin();cloudUI()});
+  U.getRedirectResult(auth).catch(()=>{});return CL.fb}
+ catch(e){CL.st='fail';CL.err=String(e&&e.message||e);cloudUI();return null}}
+async function cloudLogin(){if(isNative()){notify('Prijava Google nalogom za sada radi u web verziji igre. U Android aplikaciji stiže sa sledećim izdanjem.');return}
+ if(CL.st==='fail')CL.st='off';const fb=await cloudInit();if(!fb){notify('Prijava trenutno nije dostupna. Proveri internet i pokušaj ponovo.',true);return}
+ const p=new fb.U.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
+ try{await fb.U.signInWithPopup(fb.auth,p)}catch(e){const c=e&&e.code||'';if(/popup-blocked|operation-not-supported/.test(c))fb.U.signInWithRedirect(fb.auth,p);else if(!/popup-closed|cancelled-popup/.test(c))notify('Prijava nije uspela: '+esc(c||String(e)),true)}}
+async function cloudLogout(){const fb=CL.fb;if(!fb)return;await fb.U.signOut(fb.auth);CL.user=null;cloudUI();notify('Odjavljen si. Napredak ostaje i na ovom uređaju.')}
+async function cloudAfterLogin(){const fb=CL.fb,u=CL.user;if(!fb||!u)return;
+ try{const ref=fb.F.doc(fb.db,'saves',u.uid),snap=await fb.F.getDoc(ref);
+  if(snap.exists()){let rem=null;try{rem=JSON.parse(snap.data().d)}catch(e){}
+   const ls=progScore(save),rs=progScore(rem);
+   if(rem&&rem.v===2&&rs>ls){localStorage.setItem('cuvari-v2',snap.data().d);sessionStorage.setItem('cuvari-cl','Učitan je napredak sa tvog naloga.');location.reload();return}}
+  await cloudPush(true);notify(`Prijavljen si kao <b>${esc(u.displayName||u.email||'igrač')}</b>. Napredak se sada čuva na nalogu i nastavljaš na bilo kom uređaju.`)}
+ catch(e){notify('Napredak sa naloga nije učitan: '+esc(e.code||e.message||String(e)),true)}}
+let _clT=0,_clLast='';
+async function cloudPush(now){const fb=CL.fb,u=CL.user;if(!fb||!u)return;
+ if(!now){clearTimeout(_clT);_clT=setTimeout(()=>cloudPush(true),5000);return}
+ const d=JSON.stringify(save);if(d===_clLast)return;_clLast=d;
+ try{await fb.F.setDoc(fb.F.doc(fb.db,'saves',u.uid),{d,t:Date.now(),v:2});await cloudScores()}catch(e){_clLast=''}}
+async function cloudScores(){const fb=CL.fb,u=CL.user;if(!fb||!u||!save.tribe)return;const nm=String(save.tribe.name).slice(0,40),col=save.tribe.color||'#b8323a';
+ const put=(id,sc,L)=>sc>0?fb.F.setDoc(fb.F.doc(fb.db,'boards',id,'e',u.uid),{name:nm,sc:Math.round(sc),L:L||0,color:col,t:Date.now()}):null;
+ const ds=dlyState(),w=weekState(),wt=Object.values(w.days).reduce((a,b)=>a+b,0);
+ await Promise.all([put('d-'+dayKey(),ds.best||0,ds.L||0),put('w-'+weekKey(),wt,0),put('liga',save.trophies||0,0)].filter(Boolean))}
+async function cloudBoard(id){const fb=CL.fb;if(!fb)return null;const now=Date.now();if(CL.boards[id]&&now-CL.bT[id]<45000)return CL.boards[id];
+ try{const q=fb.F.query(fb.F.collection(fb.db,'boards',id,'e'),fb.F.orderBy('sc','desc'),fb.F.limit(25));const s=await fb.F.getDocs(q);
+  CL.boards[id]=s.docs.map(x=>({...x.data(),uid:x.id,me:CL.user&&x.id===CL.user.uid}));CL.bT[id]=now;return CL.boards[id]}catch(e){return null}}
+const boardId=t=>t==='dan'?'d-'+dayKey():t==='ned'?'w-'+weekKey():'liga';
+function realBoardHtml(rows){return `<ol class="tboard real">${rows.map((x,i)=>`<li class="${x.me?'me':''}"><span>${i+1}.</span><em>${crestSvg(x.color||'#6a5a4a',x.name)}</em>${esc(x.name)}${x.me?' <i class="ty">ti</i>':''}<b>${num(x.sc)}</b></li>`).join('')}</ol>`}
+function cloudBox(){if(isNative())return `<div class="cloud"><b>Nalog i prave tabele</b><span>Prijava Google nalogom za sada radi u web verziji igre. U Android aplikaciji stiže uskoro.</span></div>`;
+ if(CL.user)return `<div class="cloud on"><b>${esc(CL.user.displayName||CL.user.email||'Tvoj nalog')}</b><span>Napredak se čuva na nalogu. Nastavljaš na bilo kom uređaju.</span><button class="btn sm ghost" data-cl="out">Odjavi se</button></div>`;
+ return `<div class="cloud"><b>Igraj na svim uređajima</b><span>Prijavi se Google nalogom: napredak se čuva u oblaku, a tvoj odred ulazi u pravu tabelu sa drugim igračima.</span><button class="btn sm primary" data-cl="in">Google prijava</button></div>`}
+function cloudBind(root){root.querySelectorAll('[data-cl]').forEach(b=>b.onclick=()=>{ac();b.dataset.cl==='in'?cloudLogin():cloudLogout()})}
+function cloudUI(){const t=$('#clTitle');if(t){t.innerHTML=CL.user?`Prijavljen: <b>${esc(CL.user.displayName||CL.user.email)}</b>. Napredak se čuva na nalogu.`:isNative()?'Napredak se čuva na ovom uređaju.':'Napredak se čuva na ovom uređaju. <a href="#" id="clIn">Prijavi se Google nalogom</a> da igraš na više uređaja.';const a=$('#clIn');if(a)a.onclick=e=>{e.preventDefault();ac();cloudLogin()}}
+ try{if(sheetOpen==='tabela')renderSheet()}catch(e){}}
+
+// čuvanje: lokalno odmah, na nalog posle kratke pauze
+{const _p=persist;persist=function(){_p();if(CL.user)cloudPush(false)}}
+// tabela: nalog + pravi igrači
+{const _st=sheetTabela;sheetTabela=function(body){_st(body);body.insertAdjacentHTML('afterbegin',cloudBox());cloudBind(body);
+ if(!CL.fb)return;const id=boardId(tabTab),tt=tabTab;const show=rows=>{if(tt!==tabTab||!rows||!body.isConnected)return;const old=body.querySelector('.realwrap');if(old)old.remove();
+  const ol=body.querySelector('ol.tboard:not(.real)');const h=`<div class="realwrap"><div class="sec">Pravi igrači</div>${rows.length?realBoardHtml(rows):'<p class="tip">Još niko nije upisan danas. Odigraj i budi prvi.</p>'}${ol?'<div class="sec">Odredi iz predanja</div>':''}</div>`;
+  if(ol)ol.insertAdjacentHTML('beforebegin',h);else body.insertAdjacentHTML('beforeend',h)};
+ const c=CL.boards[id];if(c)show(c);cloudBoard(id).then(show)}}
+// posle bitke odmah upiši rezultat
+{const _er=endRun;endRun=function(win){const r=_er(win);if(CL.user)cloudPush(true);return r}}
+// pokretanje
+{const msg=sessionStorage.getItem('cuvari-cl');if(msg){sessionStorage.removeItem('cuvari-cl');setTimeout(()=>notify(msg),800)}}
+if(!isNative())setTimeout(()=>{cloudInit()},400);
 
 /* ---------- kraj misije ---------- */
 function endRun(win){const c=G.cfg,hid=G.hero.id;state='result';
@@ -3003,7 +3068,7 @@ function endRun(win){const c=G.cfg,hid=G.hero.id;state='result';
   const bd=dailyBoard(c.L),me={name:save.tribe?save.tribe.name:'Tvoj odred',sc:ds.best,me:1},all=[...bd,me].sort((a,b)=>b.sc-a.sc),rk=all.indexOf(me)+1,left=DTRIES-ds.tries;
   note.unshift(`<div class="dscore"><small>rezultat</small><b>${num(sc)}</b>${nb&&ds.tries>1?'<em>novi najbolji danas</em>':''}</div>`+
    (nrec?'<div class="drec">Novi lični rekord</div>':`<div class="drec2">Lični rekord ${num(rc.best)}${rc.streak>1?`, ${rc.streak} dana zaredom`:''}</div>`)+`<div class="dbh">Tabela dana, odredi iz igre</div><ol class="dboard">${all.slice(0,Math.max(5,rk)).map((x,i)=>i<5||x.me?`<li class="${x.me?'me':''}"><span>${i+1}.</span>${esc(x.name)}<b>${num(x.sc)}</b></li>`:'').join('')}</ol>`+
-   `<div class="dleft">${left>0?`Još ${left} ${left===1?'pokušaj':'pokušaja'} danas, svaki na novoj mapi`:'Pokušaji za danas su potrošeni. Novi izazovi sutra u zoru'}</div>`);note.push('<span class="dsoon">Tabela sa pravim igračima stiže sa Google Play nalogom</span>')}
+   `<div class="dleft">${left>0?`Još ${left} ${left===1?'pokušaj':'pokušaja'} danas, svaki na novoj mapi`:'Pokušaji za danas su potrošeni. Novi izazovi sutra u zoru'}</div>`);note.push(`<span class="dsoon">${CL.user?'Rezultat je upisan u pravu tabelu sa drugim igračima':'Prijavi se Google nalogom u Tabeli da uđeš u pravu tabelu sa drugim igračima'}</span>`)}
  for(const k of RES)save.res[k]=Math.min(cap(k),save.res[k]+loot[k]);
  const before=hs.lvl;hs.xp+=xp;while(hs.lvl<maxHeroLvl()&&hs.xp>=xpNeed(hs.lvl)){hs.xp-=xpNeed(hs.lvl);hs.lvl++}if(hs.lvl>=maxHeroLvl())hs.xp=Math.min(hs.xp,xpNeed(hs.lvl));
  if(hs.lvl>before){note.unshift(`${G.hero.name} se uzdigao na ${hs.lvl}. nivo`);setTimeout(sfx.lvlup,600)}

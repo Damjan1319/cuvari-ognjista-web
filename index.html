@@ -940,6 +940,24 @@ body.spect #abBtn,body.spect #joy,body.spect #atkBtn{display:none!important}
 @media (max-width:560px){#tabBtn small{display:none!important}}
 #panHint{animation:phOut 1s 7s forwards}@keyframes phOut{to{opacity:0;visibility:hidden}}
 @media (max-width:360px){#tabBtn{width:calc(34% - 14px)!important}#dailyBtn{left:calc(34% + 2px)!important}#tabBtn b,#tabBtn span{font-size:11px}}
+.tempty{margin:18px 0;padding:22px 16px;text-align:center;border:1px dashed rgba(110,26,16,.35);border-radius:8px;background:rgba(255,250,235,.4)}.tempty b{display:block;font:800 15px Cinzel,serif;color:#6e1a10;margin-bottom:6px}.tempty span{font:italic 15px "EB Garamond",serif;color:#5a3e22}
+
+/* ===== dugme moći junaka (v2): medaljon sa crvenim emajlom, odbrojavanje, traka sa imenom ===== */
+#abBtn{width:86px!important;height:86px!important;right:16px!important;bottom:30px!important;overflow:visible!important;border:0!important;border-radius:50%!important;
+ background:radial-gradient(circle at 50% 38%,#3a2a20 0 46%,#160d08 47% 56%,transparent 57%),radial-gradient(circle at 50% 30%,#c23a22,#6a1208 70%,#3a0804)!important;
+ box-shadow:0 0 0 2px #1a0e06,0 0 0 5px #d6a955,0 0 0 6.5px #3a2210,0 8px 18px rgba(0,0,0,.55),inset 0 2px 3px rgba(255,200,160,.35)!important;display:grid!important;place-items:center!important;padding:0!important}
+#abBtn::before{border-radius:50%;inset:9px!important;z-index:2;background:conic-gradient(rgba(10,6,4,.78) var(--cd,0%),transparent 0)!important;pointer-events:none}
+#abBtn::after{content:attr(data-cd);position:absolute;inset:0;display:grid;place-items:center;z-index:3;font:800 26px Cinzel,serif;color:#fff3dc;text-shadow:0 2px 3px #000;pointer-events:none}
+#abBtn #abIc{width:42px!important;height:42px!important;z-index:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6)) sepia(.4) saturate(1.6) brightness(1.15);transition:filter .2s}
+#abBtn:not(.ready) #abIc{filter:grayscale(1) brightness(.6)}
+#abBtn #abLbl{position:absolute!important;right:-6px;bottom:-17px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;z-index:4;padding:3px 10px;font:800 9.5px Cinzel,serif!important;letter-spacing:.08em;color:#fff3dc!important;
+ background:linear-gradient(180deg,#9a2a18,#5e140c);border:1.5px solid #d6a955;border-radius:3px;box-shadow:0 3px 6px rgba(0,0,0,.5);text-transform:uppercase;line-height:1.2}
+#abBtn #abLbl i{display:none}
+#abBtn.ready{animation:abPulse 1.6s ease-in-out infinite}
+@keyframes abPulse{0%,100%{box-shadow:0 0 0 2px #1a0e06,0 0 0 5px #f0cf86,0 0 0 6.5px #3a2210,0 0 14px 2px rgba(255,200,90,.45),0 8px 18px rgba(0,0,0,.55)}50%{box-shadow:0 0 0 2px #1a0e06,0 0 0 5px #ffe7a6,0 0 0 6.5px #3a2210,0 0 30px 8px rgba(255,200,90,.7),0 8px 18px rgba(0,0,0,.55)}}
+#abBtn:active{transform:scale(.94)}
+@media (max-width:400px){#abBtn{width:76px!important;height:76px!important;bottom:26px!important;right:12px!important}#abBtn #abIc{width:36px!important;height:36px!important}#abBtn::after{font-size:22px}}
+body.manual #abBtn{bottom:104px!important}
 </style>
 </head>
 <body>
@@ -2772,7 +2790,7 @@ function hud(){const c=G.cfg;
  if(G.bossRef)$('#bossB').style.width=Math.max(0,G.bossRef.hp/G.bossRef.max*100)+'%';
  $('#lootT').textContent=G.lootZ;if((G._mT=(G._mT||0)+1)%4===0)drawMini();
  if((G._aT=(G._aT||0)+1)%10===0){const all=G.allies,f=G.fallen||[];$('#allyC').innerHTML=(all.length||f.length)?`<i class="ic">${SVG.ally}</i>`+all.map(a=>`<span class="mb" title="${esc(a.name)}"><b style="width:${Math.max(0,a.hp/a.max*100)}%"></b></span>`).join('')+f.map(()=>'<span class="mb dead"><b></b></span>').join(''):''}$('#clock').textContent=fmt(G.t);
- const ab=$('#abBtn');ab.style.setProperty('--cd',(G.p.cd/G.hero.cd*100)+'%');ab.classList.toggle('ready',G.p.cd<=0)}
+ const ab=$('#abBtn');ab.style.setProperty('--cd',(G.p.cd/G.hero.cd*100)+'%');ab.classList.toggle('ready',G.p.cd<=0);{const v=G.p.cd>0?String(Math.ceil(G.p.cd)):'';if(ab.dataset.cd!==v)ab.dataset.cd=v}}
 
 /* ---------- bogatstvo mape ---------- */
 function genDecor(c){const reg=c.reg;G.decor=[];G.glows=[];G.props=[];G.springs=[];G.chests=[];G.paths=[];G.heals=[];
@@ -3259,11 +3277,14 @@ function cloudUI(){const t=$('#clTitle');if(t){t.innerHTML=CL.user?`Prijavljen: 
 // čuvanje: lokalno odmah, na nalog posle kratke pauze
 {const _p=persist;persist=function(){_p();if(CL.user)cloudPush(false)}}
 // tabela: nalog + pravi igrači
-{const _st=sheetTabela;sheetTabela=function(body){_st(body);body.insertAdjacentHTML('afterbegin',cloudBox());cloudBind(body);
- if(!CL.fb)return;const id=boardId(tabTab),tt=tabTab;const show=rows=>{if(tt!==tabTab||!rows||!body.isConnected)return;const old=body.querySelector('.realwrap');if(old)old.remove();
-  const ol=body.querySelector('ol.tboard:not(.real)');const h=`<div class="realwrap"><div class="sec">Pravi igrači</div>${rows.length?realBoardHtml(rows):'<p class="tip">Još niko nije upisan danas. Odigraj i budi prvi.</p>'}${ol?'<div class="sec">Odredi iz predanja</div>':''}</div>`;
-  if(ol)ol.insertAdjacentHTML('beforebegin',h);else body.insertAdjacentHTML('beforeend',h)};
- const c=CL.boards[id];if(c)show(c);cloudBoard(id).then(show)}}
+{const _st=sheetTabela;sheetTabela=function(body){_st(body);body.querySelectorAll('ol.tboard:not(.real)').forEach(o=>o.remove());body.insertAdjacentHTML('afterbegin',cloudBox());cloudBind(body);
+ const id=boardId(tabTab),tt=tabTab;const rk=body.querySelector('.thead div b');if(rk)rk.textContent='-';
+ body.insertAdjacentHTML('beforeend','<div class="realwrap"><p class="tip">Učitavam tabelu…</p></div>');
+ const show=rows=>{if(tt!==tabTab||!body.isConnected)return;const w=body.querySelector('.realwrap');if(!w)return;
+  if(!rows){w.innerHTML='<p class="tip">Tabela trenutno nije dostupna. Proveri internet.</p>';return}
+  w.innerHTML=rows.length?realBoardHtml(rows):`<div class="tempty"><b>Tabela je još prazna</b><span>${tt==='dan'?'Odigraj Bitku dana':'Igraj'} i budi prvi upisan.${CL.user?'':' Za upis u tabelu prijavi se Google nalogom.'}</span></div>`;
+  const me=rows.findIndex(r=>r.me);const rk=body.querySelector('.thead div b');if(rk)rk.textContent=me>=0?(me+1)+'.':'-'};
+ const wf=()=>new Promise(r=>{const t=()=>{if(CL.st==='load')setTimeout(t,200);else r(CL.fb)};cloudInit().then(t,t)});wf().then(fb=>{if(!fb)return show(null);const c=CL.boards[id];if(c)show(c);cloudBoard(id).then(show)})}}
 // posle bitke odmah upiši rezultat
 {const _er=endRun;endRun=function(win){const r=_er(win);if(CL.user)cloudPush(true);return r}}
 // pokretanje
@@ -3288,6 +3309,8 @@ setTimeout(()=>{try{cloudUI()}catch(e){}},0);
 {const _st=sheetTabela;sheetTabela=function(body){_st.apply(this,arguments);body.insertAdjacentHTML('beforeend',`<div style="margin:26px 0 10px;text-align:center;border-top:1px dashed rgba(90,50,20,.3);padding-top:16px"><button class="btn sm ghost" id="newGame">Nova igra od početka</button><div style="font:italic 13px 'EB Garamond',serif;color:#7a5a3a;margin-top:6px">Kreće se samo sa ognjištem, bez žara, kamena i gvožđa.</div></div>`);
  const b=body.querySelector('#newGame');if(b)b.onclick=()=>{if(!confirm('Sigurno počinješ iz početka? Sav napredak (selo, junaci, vojska, zvezde) biće obrisan.'))return;
   try{localStorage.setItem('cuvari-reset','1');localStorage.removeItem('cuvari-v2')}catch(e){}persist=()=>{};location.reload()}}}
+
+dailyRank=function(sc){const rows=CL.boards['d-'+dayKey()];if(!rows||!sc)return 0;return rows.filter(r=>!r.me&&r.sc>sc).length+1};
 /* ---------- osećaj udarca: varnice, rez, zastoj, crvena ivica ---------- */
 {const _dm=dmgEnemy;dmgEnemy=function(e,d,kx=0,ky=0){if(!e||e.hp<=0)return _dm.apply(this,arguments);const hp0=e.hp;const r=_dm.apply(this,arguments);if(!G||window.__quiet)return r;
  const a=Math.atan2(ky||(e.y-G.p.y),kx||(e.x-G.p.x)),y=e.y-14,big=d>=Math.max(30,e.max*.3)||e.hp<=0;
@@ -3677,7 +3700,7 @@ function renderHub(){if(!save.tribe)return;const t=save.tribe;
  {const tb=$('#tabBtn');if(!tb._s){tb._s=1;tb.innerHTML=icon('tr')+'<div>Tabela<small>danas, nedelja, liga</small></div>'}}
  const db=$('#dailyBtn'),ds=dlyState(),left=DTRIES-ds.tries,done=left<=0;db.className='daily'+(done?' done':'');
  const rk=ds.best?dailyRank(ds.best,ds.L||dailyStrength()):0;
- db.innerHTML=icon('daily')+(done?`<div>Bitka dana: ${rk}. mesto<small>rezultat ${num(ds.best)}, nova sutra u zoru</small></div>`:ds.tries?`<div>Bitka dana${rk?`: ${rk}. mesto`:''}<small>još ${left} ${left===1?'pokušaj':'pokušaja'}${ds.best?`, najbolji ${num(ds.best)}`:''}</small></div>`:'<div>Bitka dana<small>3 izazova, isti za sve igrače</small></div>');
+ db.innerHTML=icon('daily')+(done?`<div>Bitka dana${rk?`: ${rk}. mesto`:''}<small>rezultat ${num(ds.best)}, nova sutra u zoru</small></div>`:ds.tries?`<div>Bitka dana${rk?`: ${rk}. mesto`:''}<small>još ${left} ${left===1?'pokušaj':'pokušaja'}${ds.best?`, najbolji ${num(ds.best)}`:''}</small></div>`:'<div>Bitka dana<small>3 izazova, isti za sve igrače</small></div>');
  setBadge('bdUtv',nd||(avail?true:0));setBadge('bdRat',save.war&&save.war.myLeft>0?save.war.myLeft:0);
  const upAvail=HEROES.some(h=>heroOk(h)&&UPS.some(u=>save.heroes[h.id].up[u.id]<maxUp()&&canPay(upCost(save.heroes[h.id].up[u.id]))));setBadge('bdJunaci',upAvail?true:0);
  setBadge('bdPohod',lostCount()?'!':0);if(typeof updateBpop==='function')updateBpop()}
@@ -3685,7 +3708,7 @@ function renderRes(){$('#resBox').innerHTML=RES.map(k=>{const v=save.res[k],c=ca
 function decorate(root){(root||document).querySelectorAll('[data-ic]').forEach(e=>{if(!e._d){e._d=1;e.insertAdjacentHTML('afterbegin',SVG[e.dataset.ic]||'')}})}
 function setBadge(id,n){const b=$('#'+id);if(!b)return;b.textContent=n===true?'!':n;b.classList.toggle('on',!!n)}
 $('#tabBtn').onclick=()=>{ac();openSheet('tabela')};
-$('#dailyBtn').onclick=()=>{ac();const ds=dlyState();if(ds.tries>=DTRIES){notify(`Danas si iskoristio sva tri pokušaja. Najbolji rezultat <b>${num(ds.best)}</b>, ${dailyRank(ds.best,ds.L||dailyStrength())}. mesto među odredima.`);return}intro(dailyCfg())};
+$('#dailyBtn').onclick=()=>{ac();const ds=dlyState();if(ds.tries>=DTRIES){notify(`Danas si iskoristio sva tri pokušaja. Najbolji rezultat <b>${num(ds.best)}</b>${dailyRank(ds.best)?`, ${dailyRank(ds.best)}. mesto među igračima`:''}.`);return}intro(dailyCfg())};
 document.querySelectorAll('[data-sheet]').forEach(b=>b.onclick=()=>{ac();openSheet(b.dataset.sheet)});
 
 /* ---------- paneli ---------- */

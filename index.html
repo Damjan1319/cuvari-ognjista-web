@@ -2138,7 +2138,7 @@ function pxRender(fn,t){
  if(fn===drawFortress){const z=vcam.z;ctx.setTransform(k*z,0,0,k*z,k*(CW/2-vcam.x*z),k*(CH/2-vcam.y*z));fortBadges()}}
 
 /* ---------- misije ---------- */
-function mapSize(L,shape){const W0=Math.min(2500,1300+L*34),A=W0*W0*.66;const asp={wide:.62,square:.92,tall:1.35,long:.44}[shape]||.66;const W=Math.round(Math.sqrt(A/asp));return[W,Math.round(W*asp)]}
+function mapSize(L,shape){const W0=Math.min(3300,1750+L*40),A=W0*W0*.66;const asp={wide:.62,square:.92,tall:1.35,long:.44}[shape]||.66;const W=Math.round(Math.sqrt(A/asp));return[W,Math.round(W*asp)]}
 const SHAPES=['wide','tall','square','long','wide','tall','long','square','tall','wide'];
 function campCfg(i){const L=i+1,reg=Math.floor(i/10),n=i%10,type=(typeof LTYPEX!=='undefined'&&LTYPEX[i])||(reg?LTYPES2:LTYPES)[n];
  const shape=type==='boss'?'square':SHAPES[(n+reg*3)%10],[W,H]=mapSize(L,shape);
@@ -2265,7 +2265,7 @@ function start(c){
  if(c.kind==='camp'&&c.idx===0&&!save.tut){G.tut=[[2.6,touchUI?'Povuci prstom levo dole da se krećeš':'Kreći se strelicama ili WASD'],[7,'Junak sam napada najbližeg dušmana'],[12,'Skupljaj žar, inače fenjer utrne'],[17,'Razbijaj ćupove, u njima ima žara i lekova'],[23,`Pritisni ${touchUI?'dugme':'Space'} za moć junaka`]];save.tut=1;persist()}
 }
 
-function makeFloor(){const reg=REGIONS[G.cfg.reg];const PD=G.PAD;const fs=Math.min(G.zoom*dpr,Math.sqrt(1.1e7/((G.W+2*PD)*(G.H+2*PD))));G.fs=fs;
+function makeFloor(){const reg=REGIONS[G.cfg.reg];const PD=G.PAD;const fs=Math.min(G.zoom*dpr,Math.sqrt(1.6e7/((G.W+2*PD)*(G.H+2*PD))));G.fs=fs;
  floor.width=Math.round((G.W+2*PD)*fs);floor.height=Math.round((G.H+2*PD)*fs);const f=floor.getContext('2d');f.setTransform(fs,0,0,fs,PD*fs,PD*fs);
  const W=G.W+2*PD,H=G.H+2*PD,dl=Math.round(34*(G.day||0)),[sr,sg,sb]=reg.stone.map(v=>v+dl);f.save();f.translate(-PD,-PD);
  f.fillStyle=mixHex(reg.nightf||reg.floor,reg.dayf||reg.floor,G.day||0);f.fillRect(0,0,W,H);

@@ -977,6 +977,12 @@ body.manual #abBtn{bottom:104px!important}
 @media (max-width:400px){#abBtn{width:80px!important;height:80px!important;right:16px!important;bottom:30px!important}#abBtn #abIc{width:42px!important;height:42px!important}#abBtn::after{font-size:25px!important}}
 #sbTip{position:fixed;left:10px;right:10px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:90;padding:12px 14px;border-radius:10px;background:#fbf1d8;color:#3a2010;border:2px solid #d6a955;box-shadow:0 8px 24px rgba(0,0,0,.6);font:600 14px/1.35 'EB Garamond',serif}
 #sbTip b{font-family:Cinzel,serif;color:#6e1a10}#sbTip button{margin-top:8px}
+
+/* dugmad na karticama uvek na istom mestu: cena levo, dugme desno */
+.bcard .act,.arow,.bp-a{display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:space-between!important;gap:8px 10px!important}
+.bcard .act>.cost,.arow>.cost,.bp-a>.cost{flex:1 1 auto;min-width:0;order:0!important;width:auto!important;justify-content:flex-start!important}
+.bcard .act>.btn,.arow>.btn,.bp-a>.btn,.bcard .act>.req,.bcard .act>.tip{margin-left:auto!important;flex:none}
+.bcard .act>.btn,.arow>.btn,.bp-a>.btn{min-width:132px!important}
 </style>
 </head>
 <body>
@@ -1500,7 +1506,7 @@ HOPT.vuk={tunic:'#e8e0d0',vest:'#8a2a22',trim:'#d9a441',pants:'#3a3a48',boots:'#
 HOPT.mila={tunic:'#f0e8d6',vest:'#2a3a2a',trim:'#c9a24a',pants:'#2a2020',boots:'#5a1a1a',dress:'#f3ead8',apron:'#9a2a22',hat:'marama',hatc:'#efe6d2',weapon:'kandilo',sleeve:'#f0e8d6',skin:'#ecc39e',hair:'#4a2c18'};
 const HDRAW={kovac};for(const k in HOPT)HDRAW[k]=(g,b,lg,t,m)=>figure(g,b,lg,t,m,HOPT[k]);
 /* ---------- 3D likovi (KayKit CC0, Kay Lousberg; prerenderovano u Blenderu) ---------- */
-const A3V="1795539468";
+const A3V="1795560232";
 const H3D={"strahinja": {"f": "strahinja", "w": 301, "h": 315, "cx": 125, "fy": 306, "ph": 240}, "dusan": {"f": "dusan", "w": 296, "h": 315, "cx": 120, "fy": 306, "ph": 245}, "milos": {"f": "milos", "w": 304, "h": 315, "cx": 128, "fy": 306, "ph": 251}};
 const A3D={"stit": {"f": "stit", "w": 233, "h": 252, "cx": 89, "fy": 243, "ph": 182}, "koplja": {"f": "koplja", "w": 281, "h": 245, "cx": 137, "fy": 232, "ph": 182}, "strel": {"f": "strel", "w": 245, "h": 219, "cx": 107, "fy": 207, "ph": 190}};
 const F3D={"osm_pesak": {"f": "osm_pesak", "w": 182, "h": 198, "cx": 70, "fy": 190, "ph": 147}, "biz_pesak": {"f": "biz_pesak", "w": 182, "h": 198, "cx": 70, "fy": 190, "ph": 158}, "osm_koplje": {"f": "osm_koplje", "w": 220, "h": 193, "cx": 108, "fy": 182, "ph": 147}, "osm_strel": {"f": "osm_strel", "w": 192, "h": 176, "cx": 84, "fy": 166, "ph": 147}, "osm_teski": {"f": "osm_teski", "w": 172, "h": 182, "cx": 73, "fy": 160, "ph": 145}, "dah_pesak": {"f": "dah_pesak", "w": 182, "h": 198, "cx": 70, "fy": 190, "ph": 145}, "dah_koplje": {"f": "dah_koplje", "w": 220, "h": 193, "cx": 108, "fy": 182, "ph": 145}, "dah_strel": {"f": "dah_strel", "w": 192, "h": 170, "cx": 84, "fy": 160, "ph": 145}, "dah_teski": {"f": "dah_teski", "w": 172, "h": 173, "cx": 73, "fy": 151, "ph": 126}, "krd_pesak": {"f": "krd_pesak", "w": 182, "h": 198, "cx": 70, "fy": 190, "ph": 145}, "krd_koplje": {"f": "krd_koplje", "w": 220, "h": 193, "cx": 108, "fy": 182, "ph": 145}, "krd_strel": {"f": "krd_strel", "w": 192, "h": 170, "cx": 84, "fy": 160, "ph": 145}, "krd_teski": {"f": "krd_teski", "w": 172, "h": 173, "cx": 73, "fy": 151, "ph": 126}, "biz_koplje": {"f": "biz_koplje", "w": 220, "h": 193, "cx": 108, "fy": 182, "ph": 158}, "biz_strel": {"f": "biz_strel", "w": 192, "h": 185, "cx": 84, "fy": 174, "ph": 158}, "biz_teski": {"f": "biz_teski", "w": 172, "h": 174, "cx": 73, "fy": 153, "ph": 139}, "ugr_pesak": {"f": "ugr_pesak", "w": 182, "h": 198, "cx": 70, "fy": 190, "ph": 153}, "ugr_koplje": {"f": "ugr_koplje", "w": 220, "h": 193, "cx": 108, "fy": 182, "ph": 153}, "ugr_strel": {"f": "ugr_strel", "w": 192, "h": 180, "cx": 84, "fy": 169, "ph": 153}, "ugr_teski": {"f": "ugr_teski", "w": 172, "h": 173, "cx": 73, "fy": 152, "ph": 134}, "bug_pesak": {"f": "bug_pesak", "w": 182, "h": 198, "cx": 70, "fy": 190, "ph": 148}, "bug_koplje": {"f": "bug_koplje", "w": 220, "h": 193, "cx": 108, "fy": 182, "ph": 148}, "bug_strel": {"f": "bug_strel", "w": 192, "h": 172, "cx": 84, "fy": 162, "ph": 148}, "bug_teski": {"f": "bug_teski", "w": 172, "h": 173, "cx": 73, "fy": 151, "ph": 130}};
@@ -1532,7 +1538,7 @@ setTimeout(()=>{
    const sp=Math.hypot(e.vx,e.vy),mv=sp>18&&!(e.stun>0);let st='i',f=Math.floor((t+e.seed)*3)%4,vw='s',face=e.face||1;
    if(e.atkAn>0){st='a';f=Math.min(5,Math.floor((1-e.atkAn/.3)*6))}
    else if(mv){st='m';f=Math.floor((t+e.seed)*11)%8;if(Math.abs(e.vy)>Math.abs(e.vx)*1.3){vw=e.vy>0?'f':'b';face=1}else face=e.vx>0?1:-1}
-   const ks=e.vil?1.5:1;g.save();g.translate(e.x,e.y+(e.vil?0:e.r*.9));g.fillStyle='rgba(0,0,0,.4)';ell(g,0,0,11*ks,3.6*ks);g.fill();if(e.hitT>0)g.globalAlpha*=.55;
+   const ks=e.vil?1.2:1;g.save();g.translate(e.x,e.y+(e.vil?0:e.r*.9));g.fillStyle='rgba(0,0,0,.4)';ell(g,0,0,11*ks,3.6*ks);g.fill();if(e.hitT>0)g.globalAlpha*=.55;
    d3blit(g,o,st,f,vw,face,40*ks/o.ph);g.restore();return}
   const o=foe3d(e);if(!o)return _de.apply(this,arguments);
   const H=e._fh,mv=Math.hypot(e.vx,e.vy)>18&&e.stun<=0;let st,f;
@@ -4159,9 +4165,9 @@ function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
  hs.forEach((h,i)=>{const[x,y]=hpos[i];vhit.push({id:'hero:'+h.id,x:cx+x-14,y:gy+y-56,w:28,h:58});items.push({y:gy+y,f:()=>{drawHero(ctx,cx+x,gy+y,1.5,h,x>0?-1:1,0,false,t+i,1);
   if(save.hero===h.id){ctx.fillStyle='rgba(240,181,74,.9)';poly(ctx,[cx+x-4,gy+y-70+Math.sin(t*4)*2,cx+x+4,gy+y-70+Math.sin(t*4)*2,cx+x,gy+y-63+Math.sin(t*4)*2]);ctx.fill()}}})});
  // vojska oko ognjišta
- {const S=soldiers().slice(0,12),n=S.length;S.forEach((sd,i)=>{const an=Math.PI*(1.12+.76*(n<2?.5:i/(n-1))),x=cx+Math.cos(an)*128,y=gy+8+Math.sin(an)*52;
-  items.push({y,f:()=>{const e={type:'ratnik',unit:sd.unit,color:save.tribe?save.tribe.color:'#b8323a',x,y,r:13.5*1.35,vx:0,vy:0,stun:0,seed:i*.37,born:0,hitT:0,face:x<cx?1:-1,boss:false,ally:true,vil:1,tg:{x:cx+(x<cx?30:-30),y:gy+60}};
-   drawEnemy(ctx,e,t);ctx.font="700 11px 'EB Garamond',serif";ctx.textAlign='center';ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillText(sd.name,x+.8,y-66.2);ctx.fillStyle='#f6e7c4';ctx.fillText(sd.name,x,y-67)}})})}
+ {const S=soldiers().slice(0,10),n=S.length;const SPOTS=[[-150,-6],[150,-6],[-205,34],[205,34],[-95,-40],[95,-40],[-170,74],[170,74],[-245,-8],[245,-8]];S.forEach((sd,i)=>{const sp=SPOTS[i],x=cx+sp[0],y=gy+8+sp[1];
+  items.push({y,f:()=>{const e={type:'ratnik',unit:sd.unit,color:save.tribe?save.tribe.color:'#b8323a',x,y,r:13.5*1.15,vx:0,vy:0,stun:0,seed:i*.37,born:0,hitT:0,face:x<cx?1:-1,boss:false,ally:true,vil:1,tg:{x:cx+(x<cx?30:-30),y:gy+60}};
+   drawEnemy(ctx,e,t);if(vcam.z>1.15||n<=4){ctx.font="700 9.5px 'EB Garamond',serif";ctx.textAlign='center';ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillText(sd.name,x+.7,y-56.3);ctx.fillStyle='#f6e7c4';ctx.fillText(sd.name,x,y-57)}}})})}
  // kule
  const ta=[-2.55,-.6,2.72,.4];
  for(let i=0;i<Math.min(4,b.kula);i++){const a=ta[i],x=cx+Math.cos(a)*rx,y=gy+Math.sin(a)*ry;items.push({y:y+1,f:()=>tower(ctx,x,y,.8,t,save.tribe.color,dmgd('kula')&&i===0)});vhit.push({id:'kula',x:x-20,y:y-112,w:44,h:116,bx:x,by:y-122})}

@@ -889,10 +889,11 @@ body.spect #abBtn,body.spect #joy,body.spect #atkBtn{display:none!important}
 .btn .cost{gap:10px}.btn .cost .no{color:#ffb39c!important}.btn:disabled .cost .no,.btn.up:not(.primary) .cost .no{color:#a8200c!important}
 .btn .cost .ic,.btn .cost svg{width:16px;height:16px}
 /* veštine: ista širina u svakom redu, nikad ne izlazi iz kartice */
-.btn.up{width:150px!important;min-width:0!important;max-width:none!important;flex:none!important;padding:8px 10px!important}
+.btn.up{width:132px!important;margin-right:16px!important;min-width:0!important;max-width:none!important;flex:none!important;padding:8px 10px!important}
 .btn.up .cost{flex-wrap:nowrap;font-size:16.5px!important}.btn.up .cost .ic,.btn.up .cost svg{width:19px;height:19px}
-@media(max-width:380px){.btn.up{width:136px!important}.btn .cost{font-size:14px;gap:6px}}
+@media(max-width:380px){.btn.up{width:122px!important;margin-right:14px!important}.btn .cost{font-size:14px;gap:6px}}
 .arow .btn,.bp-a .btn,.bcard .act .btn{min-width:118px}
+.card::before,.card::after{display:none!important}
 </style>
 </head>
 <body>
@@ -3257,15 +3258,15 @@ const PROPS={"hall":[0,0,216,251,105.0,194.8],"tower":[218,0,127,236,63.0,198.6]
 function pdraw(g,n,x,y,wpx,flip){const p=PROPS[n];if(!p||!PROK)return false;const k=wpx/p[2];g.save();g.translate(x,y);if(flip)g.scale(-1,1);g.imageSmoothingQuality='high';g.drawImage(PIMG,p[0],p[1],p[2],p[3],-p[4]*k,-p[5]*k,p[2]*k,p[3]*k);g.restore();return true}
 const phash=(x,y)=>Math.abs(Math.floor(x*13.7+y*7.3))%997;
 function pshadow(g,x,y,rx,ry){g.fillStyle='rgba(0,0,0,.32)';ell(g,x,y,rx,ry);g.fill()}
-{const _h=house;house=function(g,x,y,s,o,t){if(!PROK||save.h3d===0)return _h.apply(this,arguments);const d=o.d||24,w=o.w||52;
+{const _h=house;house=function(g,x,y,s,o,t){if(true)return _h.apply(this,arguments);const d=o.d||24,w=o.w||52;
  const n=o.damaged?'ruin':o.big?'hall':(phash(x,y)%2?'home_a':'home_b');const W=(o.big?165:(w+d*.72+18)*1.25)*s;
  pshadow(g,x+d*.36*s,y-d*.2*s,W*.42,W*.13);pdraw(g,n,x+d*.36*s,y-d*.22*s,W,!o.big&&phash(y,x)%2)}}
-{const _f=forge;forge=function(g,x,y,s,L,t,dm){if(!PROK||save.h3d===0)return _f.apply(this,arguments);pshadow(g,x+10*s,y-6*s,50*s,14*s);pdraw(g,dm?'ruin':'smith',x+10*s,y-8*s,112*s)}}
-{const _q=quarry;quarry=function(g,x,y,s,L,t,dm){if(!PROK||save.h3d===0)return _q.apply(this,arguments);pshadow(g,x,y,58*s,15*s);pdraw(g,dm?'ruin':'quarry',x,y,140*s)}}
-{const _m=mine;mine=function(g,x,y,s,L,t,dm){if(!PROK||save.h3d===0)return _m.apply(this,arguments);pshadow(g,x,y,60*s,16*s);pdraw(g,dm?'ruin':'mine',x,y,150*s)}}
-{const _t=tower;tower=function(g,x,y,s,t,col,dm){if(!PROK||save.h3d===0)return _t.apply(this,arguments);pshadow(g,x,y,24*s,8*s);pdraw(g,dm?'ruin':'tower',x,y,74*s)}}
-{const _p=pine;pine=function(g,x,y,s,v){if(!PROK||save.h3d===0)return _p.apply(this,arguments);pshadow(g,x+3*s,y+1*s,15*s,5*s);pdraw(g,v<.5?'tree_a':'tree_b',x,y,(v<.5?46:52)*s,v>.75)}}
-{const _b=boulder;boulder=function(g,x,y,s){if(!PROK||save.h3d===0)return _b.apply(this,arguments);pdraw(g,['rock_a','rock_b','rock_c','rock_d'][phash(x,y)%4],x,y,32*s)}}
+{const _f=forge;forge=function(g,x,y,s,L,t,dm){if(true)return _f.apply(this,arguments);pshadow(g,x+10*s,y-6*s,50*s,14*s);pdraw(g,dm?'ruin':'smith',x+10*s,y-8*s,112*s)}}
+{const _q=quarry;quarry=function(g,x,y,s,L,t,dm){if(true)return _q.apply(this,arguments);pshadow(g,x,y,58*s,15*s);pdraw(g,dm?'ruin':'quarry',x,y,140*s)}}
+{const _m=mine;mine=function(g,x,y,s,L,t,dm){if(true)return _m.apply(this,arguments);pshadow(g,x,y,60*s,16*s);pdraw(g,dm?'ruin':'mine',x,y,150*s)}}
+{const _t=tower;tower=function(g,x,y,s,t,col,dm){if(true)return _t.apply(this,arguments);pshadow(g,x,y,24*s,8*s);pdraw(g,dm?'ruin':'tower',x,y,74*s)}}
+{const _p=pine;pine=function(g,x,y,s,v){if(true)return _p.apply(this,arguments);pshadow(g,x+3*s,y+1*s,15*s,5*s);pdraw(g,v<.5?'tree_a':'tree_b',x,y,(v<.5?46:52)*s,v>.75)}}
+{const _b=boulder;boulder=function(g,x,y,s){if(true)return _b.apply(this,arguments);pdraw(g,['rock_a','rock_b','rock_c','rock_d'][phash(x,y)%4],x,y,32*s)}}
 {const _o=drawObst;drawObst=function(f,o,reg){if(!PROK||save.h3d===0||(o.kind!=='rock'&&o.kind!=='tree'))return _o.apply(this,arguments);
  if(o.kind==='rock'){f.fillStyle='rgba(0,0,0,.4)';f.beginPath();f.ellipse(o.x+5,o.y+o.r*.35,o.r*1.05,o.r*.45,0,0,7);f.fill();pdraw(f,['rock_a','rock_b','rock_c','rock_d'][phash(o.x,o.y)%4],o.x,o.y+o.r*.45,o.r*2.4,phash(o.y,o.x)%2)}
  else{f.fillStyle='rgba(0,0,0,.4)';f.beginPath();f.ellipse(o.x+6,o.y+o.r*.3,o.r*1.3,o.r*.55,0,0,7);f.fill();pdraw(f,phash(o.x,o.y)%3?'trees_s':'tree_b',o.x,o.y+o.r*.4,o.r*3.4,phash(o.y,o.x)%2)}}}

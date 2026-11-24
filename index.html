@@ -1148,7 +1148,7 @@ const league=t=>LEAGUES.filter(l=>t>=l[0]).pop()[1];
 
 /* ---------- čuvanje ---------- */
 const newHero=()=>({lvl:1,xp:0,up:{snaga:0,zdravlje:0,plamen:0,brzina:0}});
-const DEF=()=>({v:2,tribe:null,res:{zar:300,kamen:200,gvozdje:20},b:{ognjiste:1,kamenolom:1,rudnik:0,kovacnica:0,zidine:0,kula:0},
+const DEF=()=>({v:2,tribe:null,res:{zar:0,kamen:0,gvozdje:0},b:{ognjiste:1,kamenolom:0,rudnik:0,kovacnica:0,zidine:0,kula:0},
  heroes:{strahinja:newHero(),dusan:newHero(),vuk:newHero(),mila:newHero(),kovac:newHero(),vitez:newHero(),strelac:newHero(),milos:newHero(),marko:newHero(),novak:newHero(),ustanik:newHero(),veljko:newHero()},hero:'strahinja',stars:{},best:{},trophies:0,log:[],rivals:[],rivalsDay:'',nextRaid:0,lastTick:Date.now(),daily:'',muted:false,pix:false,members:[],war:null,lastWar:null,dmg:{}});
 function merge(a,b){for(const k in b){if(b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k])&&a[k]&&typeof a[k]==='object')merge(a[k],b[k]);else a[k]=b[k]}return a}
 let save=DEF();
@@ -2975,7 +2975,7 @@ const unitCap=()=>Math.max(1,topHeroLvl()-1);
 const unitMaxN=()=>1+Math.ceil((save.b.ognjiste||1)/2);
 const armySlots=c=>(c&&c.spect?3:0)+Math.min(7,2+Math.floor((save.b.ognjiste||1)/3)+(c&&c.type==='raid'?1:0)+(c&&c.type==='boss'?1:0)+eraB(4));
 function newSoldierName(){const used=new Set();for(const u of UNITS)((save.army&&save.army[u.id]&&save.army[u.id].names)||[]).forEach(n=>used.add(n));const free=UNAMES.filter(n=>!used.has(n));return free.length?free[Math.floor(Math.random()*free.length)]:UNAMES[Math.floor(Math.random()*UNAMES.length)]+' '+(used.size+1)}
-function ensureArmy(){if(!save.army)save.army={stit:{n:0,lvl:1},koplja:{n:2,lvl:1},strel:{n:0,lvl:1}};for(const u of UNITS){if(!save.army[u.id])save.army[u.id]={n:0,lvl:1};const a=save.army[u.id];a.names=a.names||[];while(a.names.length<a.n)a.names.push(newSoldierName());a.names.length=a.n}return save.army}
+function ensureArmy(){if(!save.army)save.army={stit:{n:0,lvl:1},koplja:{n:0,lvl:1},strel:{n:0,lvl:1}};for(const u of UNITS){if(!save.army[u.id])save.army[u.id]={n:0,lvl:1};const a=save.army[u.id];a.names=a.names||[];while(a.names.length<a.n)a.names.push(newSoldierName());a.names.length=a.n}return save.army}
 function soldiers(){const A=ensureArmy(),out=[];for(const u of UNITS)A[u.id].names.forEach(n=>out.push({name:n,unit:u.id,uname:u.name,lvl:A[u.id].lvl}));return out}
 function unitStats(id){const u=UNITS.find(x=>x.id===id),l=ensureArmy()[id].lvl,f=save.b.kovacnica||0;return{hp:Math.round(u.hp*(1+.09*(l-1))*(1+.04*f)),dmg:u.dmg*(1+.07*(l-1))*(1+.05*f),range:u.range,rate:u.rate}}
 const unitUpCost=id=>{const l=ensureArmy()[id].lvl;return{zar:nice(70*Math.pow(1.17,l)),gvozdje:nice(3+l*1.6)}};
@@ -3203,6 +3203,8 @@ async function cloudInit(){if(CL.st!=='off')return CL.fb;CL.st='load';
  catch(e){CL.st='fail';CL.err=String(e&&e.message||e);cloudUI();return null}}
 const nativeAuth=()=>window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.FirebaseAuthentication;
 async function cloudLogin(){
+ if(!isNative()){let framed=false;try{framed=window.top!==window.self}catch(e){framed=true}
+  if(framed){notify('Google prijava ne radi u ovom pregledu. Otvori igru na <a href="https://damjan1319.github.io/cuvari-ognjista-web/" target="_blank" rel="noopener" style="color:#f3c870">sajtu igre</a> i prijavi se tamo.',true);return}}
  if(CL.st==='fail')CL.st='off';const fb=await cloudInit();if(!fb){notify('Prijava trenutno nije dostupna. Proveri internet i pokušaj ponovo.',true);return}
  if(isNative()){const NA=nativeAuth();if(!NA){notify('Prijava nije dostupna u ovoj verziji aplikacije.',true);return}
   try{const r=await NA.signInWithGoogle();const tok=r&&r.credential&&r.credential.idToken;if(!tok)throw new Error('nema tokena');
@@ -3213,6 +3215,7 @@ async function cloudLogin(){
 async function cloudLogout(){const fb=CL.fb;if(!fb)return;try{const NA=nativeAuth();if(isNative()&&NA)await NA.signOut()}catch(e){}await fb.U.signOut(fb.auth);CL.user=null;cloudUI();notify('Odjavljen si. Napredak ostaje i na ovom uređaju.')}
 async function cloudAfterLogin(){const fb=CL.fb,u=CL.user;if(!fb||!u)return;
  try{const ref=fb.F.doc(fb.db,'saves',u.uid),snap=await fb.F.getDoc(ref);
+  if(localStorage.getItem('cuvari-reset')){localStorage.removeItem('cuvari-reset');cloudPush(true);return}
   if(snap.exists()){let rem=null;try{rem=JSON.parse(snap.data().d)}catch(e){}
    const ls=progScore(save),rs=progScore(rem);
    if(rem&&rem.v===2&&rs>ls){localStorage.setItem('cuvari-v2',snap.data().d);sessionStorage.setItem('cuvari-cl','Učitan je napredak sa tvog naloga.');location.reload();return}}
@@ -3265,6 +3268,11 @@ const GLOGO='<svg viewBox="0 0 48 48" width="20" height="20"><path fill="#EA4335
  h.innerHTML=GLOGO+'Prijavi se';h.style.display=CL.user?'none':''}}
 setInterval(()=>{const h=document.getElementById('hubG');if(h)document.body.classList.toggle('hub',state==='hub'&&!sheetOpen&&!screens.some(x=>x.classList.contains('on')))},400);
 setTimeout(()=>{try{cloudUI()}catch(e){}},0);
+
+/* ---------- nova igra ---------- */
+{const _st=sheetTabela;sheetTabela=function(body){_st.apply(this,arguments);body.insertAdjacentHTML('beforeend',`<div style="margin:26px 0 10px;text-align:center;border-top:1px dashed rgba(90,50,20,.3);padding-top:16px"><button class="btn sm ghost" id="newGame">Nova igra od početka</button><div style="font:italic 13px 'EB Garamond',serif;color:#7a5a3a;margin-top:6px">Kreće se samo sa ognjištem, bez žara, kamena i gvožđa.</div></div>`);
+ const b=body.querySelector('#newGame');if(b)b.onclick=()=>{if(!confirm('Sigurno počinješ iz početka? Sav napredak (selo, junaci, vojska, zvezde) biće obrisan.'))return;
+  try{localStorage.setItem('cuvari-reset','1');localStorage.removeItem('cuvari-v2')}catch(e){}persist=()=>{};location.reload()}}}
 /* ---------- osećaj udarca: varnice, rez, zastoj, crvena ivica ---------- */
 {const _dm=dmgEnemy;dmgEnemy=function(e,d,kx=0,ky=0){if(!e||e.hp<=0)return _dm.apply(this,arguments);const hp0=e.hp;const r=_dm.apply(this,arguments);if(!G||window.__quiet)return r;
  const a=Math.atan2(ky||(e.y-G.p.y),kx||(e.x-G.p.x)),y=e.y-14,big=d>=Math.max(30,e.max*.3)||e.hp<=0;

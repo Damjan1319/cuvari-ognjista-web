@@ -1,0 +1,3 @@
+Likovi: KayKit Adventurers 1.0 i KayKit Medieval Hexagon Pack 1.0, Kay Lousberg (kaylousberg.com), CC0.
+Zvuci: Kenney Impact Sounds i RPG Audio (kenney.nl), CC0.
+Muzika: originalna, generisana skriptom snd/music.py.

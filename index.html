@@ -3019,13 +3019,18 @@ async function cloudInit(){if(CL.st!=='off')return CL.fb;CL.st='load';
  try{const [A,U,F]=await Promise.all([import(FBU('app')),import(FBU('auth')),import(FBU('firestore'))]);
   const app=A.initializeApp(FB_CFG),auth=U.getAuth(app),db=F.getFirestore(app);CL.fb={A,U,F,app,auth,db};CL.st='ready';
   U.onAuthStateChanged(auth,u=>{const was=CL.user;CL.user=u||null;if(u&&!was)cloudAfterLogin();cloudUI()});
-  U.getRedirectResult(auth).catch(()=>{});return CL.fb}
+  if(!isNative())U.getRedirectResult(auth).catch(()=>{});return CL.fb}
  catch(e){CL.st='fail';CL.err=String(e&&e.message||e);cloudUI();return null}}
-async function cloudLogin(){if(isNative()){notify('Prijava Google nalogom za sada radi u web verziji igre. U Android aplikaciji stiže sa sledećim izdanjem.');return}
+const nativeAuth=()=>window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.FirebaseAuthentication;
+async function cloudLogin(){
  if(CL.st==='fail')CL.st='off';const fb=await cloudInit();if(!fb){notify('Prijava trenutno nije dostupna. Proveri internet i pokušaj ponovo.',true);return}
+ if(isNative()){const NA=nativeAuth();if(!NA){notify('Prijava nije dostupna u ovoj verziji aplikacije.',true);return}
+  try{const r=await NA.signInWithGoogle();const tok=r&&r.credential&&r.credential.idToken;if(!tok)throw new Error('nema tokena');
+   await fb.U.signInWithCredential(fb.auth,fb.U.GoogleAuthProvider.credential(tok))}
+  catch(e){const m=String(e&&(e.message||e.code)||e);if(!/cancel/i.test(m))notify('Prijava nije uspela: '+esc(m),true)}return}
  const p=new fb.U.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});
  try{await fb.U.signInWithPopup(fb.auth,p)}catch(e){const c=e&&e.code||'';if(/popup-blocked|operation-not-supported/.test(c))fb.U.signInWithRedirect(fb.auth,p);else if(!/popup-closed|cancelled-popup/.test(c))notify('Prijava nije uspela: '+esc(c||String(e)),true)}}
-async function cloudLogout(){const fb=CL.fb;if(!fb)return;await fb.U.signOut(fb.auth);CL.user=null;cloudUI();notify('Odjavljen si. Napredak ostaje i na ovom uređaju.')}
+async function cloudLogout(){const fb=CL.fb;if(!fb)return;try{const NA=nativeAuth();if(isNative()&&NA)await NA.signOut()}catch(e){}await fb.U.signOut(fb.auth);CL.user=null;cloudUI();notify('Odjavljen si. Napredak ostaje i na ovom uređaju.')}
 async function cloudAfterLogin(){const fb=CL.fb,u=CL.user;if(!fb||!u)return;
  try{const ref=fb.F.doc(fb.db,'saves',u.uid),snap=await fb.F.getDoc(ref);
   if(snap.exists()){let rem=null;try{rem=JSON.parse(snap.data().d)}catch(e){}
@@ -3047,11 +3052,10 @@ async function cloudBoard(id){const fb=CL.fb;if(!fb)return null;const now=Date.n
   CL.boards[id]=s.docs.map(x=>({...x.data(),uid:x.id,me:CL.user&&x.id===CL.user.uid}));CL.bT[id]=now;return CL.boards[id]}catch(e){return null}}
 const boardId=t=>t==='dan'?'d-'+dayKey():t==='ned'?'w-'+weekKey():'liga';
 function realBoardHtml(rows){return `<ol class="tboard real">${rows.map((x,i)=>`<li class="${x.me?'me':''}"><span>${i+1}.</span><em>${crestSvg(x.color||'#6a5a4a',x.name)}</em>${esc(x.name)}${x.me?' <i class="ty">ti</i>':''}<b>${num(x.sc)}</b></li>`).join('')}</ol>`}
-function cloudBox(){if(isNative())return `<div class="cloud"><b>Nalog i prave tabele</b><span>Prijava Google nalogom za sada radi u web verziji igre. U Android aplikaciji stiže uskoro.</span></div>`;
- if(CL.user)return `<div class="cloud on"><b>${esc(CL.user.displayName||CL.user.email||'Tvoj nalog')}</b><span>Napredak se čuva na nalogu. Nastavljaš na bilo kom uređaju.</span><button class="btn sm ghost" data-cl="out">Odjavi se</button></div>`;
+function cloudBox(){ if(CL.user)return `<div class="cloud on"><b>${esc(CL.user.displayName||CL.user.email||'Tvoj nalog')}</b><span>Napredak se čuva na nalogu. Nastavljaš na bilo kom uređaju.</span><button class="btn sm ghost" data-cl="out">Odjavi se</button></div>`;
  return `<div class="cloud"><b>Igraj na svim uređajima</b><span>Prijavi se Google nalogom: napredak se čuva u oblaku, a tvoj odred ulazi u pravu tabelu sa drugim igračima.</span><button class="btn sm primary" data-cl="in">Google prijava</button></div>`}
 function cloudBind(root){root.querySelectorAll('[data-cl]').forEach(b=>b.onclick=()=>{ac();b.dataset.cl==='in'?cloudLogin():cloudLogout()})}
-function cloudUI(){const t=$('#clTitle');if(t){t.innerHTML=CL.user?`Prijavljen: <b>${esc(CL.user.displayName||CL.user.email)}</b>. Napredak se čuva na nalogu.`:isNative()?'Napredak se čuva na ovom uređaju.':'Napredak se čuva na ovom uređaju. <a href="#" id="clIn">Prijavi se Google nalogom</a> da igraš na više uređaja.';const a=$('#clIn');if(a)a.onclick=e=>{e.preventDefault();ac();cloudLogin()}}
+function cloudUI(){const t=$('#clTitle');if(t){t.innerHTML=CL.user?`Prijavljen: <b>${esc(CL.user.displayName||CL.user.email)}</b>. Napredak se čuva na nalogu.`:'Napredak se čuva na ovom uređaju. <a href="#" id="clIn">Prijavi se Google nalogom</a> da igraš na više uređaja.';const a=$('#clIn');if(a)a.onclick=e=>{e.preventDefault();ac();cloudLogin()}}
  try{if(sheetOpen==='tabela')renderSheet()}catch(e){}}
 
 // čuvanje: lokalno odmah, na nalog posle kratke pauze
@@ -3066,7 +3070,7 @@ function cloudUI(){const t=$('#clTitle');if(t){t.innerHTML=CL.user?`Prijavljen: 
 {const _er=endRun;endRun=function(win){const r=_er(win);if(CL.user)cloudPush(true);return r}}
 // pokretanje
 {const msg=sessionStorage.getItem('cuvari-cl');if(msg){sessionStorage.removeItem('cuvari-cl');setTimeout(()=>notify(msg),800)}}
-if(!isNative())setTimeout(()=>{cloudInit()},400);
+setTimeout(()=>{cloudInit()},400);
 
 /* ---------- kraj misije ---------- */
 function endRun(win){const c=G.cfg,hid=G.hero.id;state='result';

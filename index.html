@@ -3377,7 +3377,7 @@ function fxSlashes(c){if(!G||!G.slashes)return;c.save();c.lineCap='round';for(co
 function fxVig(){if(!G||!(G.vig>0))return;const c=ctx;c.save();c.setTransform(1,0,0,1,0,0);const W=c.canvas.width,H=c.canvas.height;const g=c.createRadialGradient(W/2,H/2,Math.min(W,H)*.32,W/2,H/2,Math.max(W,H)*.7);
  g.addColorStop(0,'rgba(160,0,0,0)');g.addColorStop(1,`rgba(170,10,0,${(G.vig/.35*.28).toFixed(3)})`);c.fillStyle=g;c.fillRect(0,0,W,H);c.restore()}
 /* ---------- pravi zvuci (Kenney CC0) i muzika (originalna, generisana) ---------- */
-const SNDF=['ehit1','ehit2','hurt','kill','build','shield','bell','swing','coin','draw','click','bow'];const SB={};let sndLoading=false;
+const SNDF=['ehit1','ehit2','hurt','kill','build','shield','swing','coin','draw','click','bow','thud','stun','dash','coin2','tick','pick','latch','rog','pobeda','poraz','nivo','bubanj'];const SB={};let sndLoading=false;
 function sndLoad(){const a=AC;if(!a||sndLoading)return;sndLoading=true;for(const n of SNDF.concat(['selo','boj']))fetch('snd/'+n+'.mp3?v=2').then(r=>r.arrayBuffer()).then(b=>a.decodeAudioData(b)).then(buf=>{SB[n]=buf;if(n==='selo'||n==='boj')musTick()}).catch(()=>{})}
 function play(n,v=.5,rate=1){const a=AC;if(!a||save.muted||window.__quiet||!SB[n])return false;const s=a.createBufferSource(),g=a.createGain();s.buffer=SB[n];s.playbackRate.value=rate;g.gain.value=v;s.connect(g).connect(a.destination);s.start();return true}
 {const _ac=ac;ac=function(){const a=_ac();if(a)sndLoad();return a}}
@@ -3386,6 +3386,12 @@ function play(n,v=.5,rate=1){const a=AC;if(!a||save.muted||window.__quiet||!SB[n
  w('kill',()=>lim('kill2',60)&&play('kill',.5,.9+R()*.2));
  w('swing',()=>lim('swing2',90)&&play('swing',.35,1+R()*.15));
  w('build',()=>play('build',.6));w('coin',()=>lim('coin2',80)&&play('coin',.35));w('shield',()=>play('shield',.6));w('bow',()=>lim('bow2',70)&&play('bow',.3,1.2))}
+
+{const S=sfx,w=(k,fn)=>{const o=S[k];S[k]=function(){if(!fn())return o&&o.apply(this,arguments)}};
+ w('spark',()=>lim('spark2',70)&&play('pick',.35,1.1+R()*.2));w('hit',()=>play('thud',.6,.9));w('beacon',()=>play('rog',.4,1.1));w('dash',()=>lim('dash2',150)&&play('dash',.45,1.1));
+ w('flash',()=>play('shield',.45,1.2));w('stun',()=>lim('stun2',90)&&play('stun',.35,1+R()*.1));w('shoot',()=>lim('shoot2',70)&&play('bow',.22,1.4));w('gun',()=>lim('gun2',90)&&play('thud',.5,1.3));
+ w('orb',()=>lim('orb2',120)&&play('coin2',.25,1.2));w('win',()=>play('pobeda',.55));w('lose',()=>play('poraz',.5));w('tick',()=>play('tick',.4));w('spawn',()=>lim('spawn2',400)&&play('draw',.25,.9+R()*.2));
+ w('lvlup',()=>play('nivo',.45));w('alarm',()=>play('rog',.45,.9))}
 {const _hp=hurtPlayer;hurtPlayer=function(amt,src){const h0=G?G.hp:0;const r=_hp.apply(this,arguments);if(G&&G.hp<h0&&lim('hurt',120))play('hurt',.45,.95+R()*.1);return r}}
 /* muzika */
 const MUS={cur:null,src:null,g:null,want:null};
@@ -3394,7 +3400,7 @@ function musTick(){const a=AC;if(!a)return;const w=musWant();if(w===MUS.cur)retu
  if(MUS.src){const g=MUS.g,s=MUS.src;g.gain.setTargetAtTime(0,a.currentTime,.4);setTimeout(()=>{try{s.stop()}catch(e){}},1800)}
  MUS.cur=null;MUS.src=null;if(!w||!SB[w])return;
  const s=a.createBufferSource(),g=a.createGain();s.buffer=SB[w];s.loop=true;g.gain.value=0;s.connect(g).connect(a.destination);s.start();g.gain.setTargetAtTime(w==='boj'?.22:.18,a.currentTime,.8);MUS.cur=w;MUS.src=s;MUS.g=g;
- if(w==='boj')play('bell',.25,.8)}
+ if(w==='boj')play('rog',.35,1)}
 setInterval(musTick,700);
 function toggleMus(){save.music=save.music===0?1:0;persist();syncMus();musTick()}
 function syncMus(){const b=document.getElementById('musBtn');if(b)b.textContent=save.music===0?'Muzika: isključena':'Muzika: uključena'}
@@ -3537,7 +3543,7 @@ function drawKola(g,o,t){const x=o.x,y=o.y,w=o.wob=(o.wob||0)+.05;g.save();g.tra
  // nema praznog hoda
  if(G.mode!=='dvoboj'&&!G.waves&&G.t>5){const near=G.enemies.filter(e=>Math.hypot(e.x-p.x,e.y-p.y)<560).length;if(near<2){G.quietT+=dt;if(G.quietT>2.6){G.quietT=0;spawnGroup(c)}}else G.quietT=0}
  // talasi
- if(G.waves){const W=G.waves;if(W.state==='break'){W.t-=dt;if(W.t<=0){W.n++;W.state='fight';waveSpawn(W.n);toast(`Talas ${W.n} od ${W.total}`);G.toastT=2.2;if(typeof play==='function')play('bell',.3,1.1)}}
+ if(G.waves){const W=G.waves;if(W.state==='break'){W.t-=dt;if(W.t<=0){W.n++;W.state='fight';waveSpawn(W.n);toast(`Talas ${W.n} od ${W.total}`);G.toastT=2.2;if(typeof play==='function')play('bubanj',.4)}}
   else{W.spawnT=(W.spawnT||0)-dt;if(W.left>0&&W.spawnT<=0){W.spawnT=.7;waveOne();W.left--}
    if(W.left<=0&&!G.enemies.some(e=>e.hp>0&&!e.boss)){G.prog=W.n;if(W.n>=W.total)return endRun(true);W.state='break';W.t=5;toast(`Talas ${W.n} odbijen. Predah.`);G.toastT=2;G.hp=Math.min(G.maxhp,G.hp+G.maxhp*.15)}}}
  // opsada
@@ -3600,8 +3606,8 @@ const BLESS=[
 @keyframes blIn{from{opacity:0}to{opacity:1}}`;document.head.appendChild(st);const d=document.createElement('div');d.id='bless';document.body.appendChild(d)}
 function blessOffer(){const pool=BLESS.slice().sort(()=>R()-.5).slice(0,3);G.choice=pool;const d=$('#bless');
  d.innerHTML=`<h3>SLAVA JUNAKU</h3><div class="sub">Izaberi blagoslov za ovu bitku</div><div class="row">${pool.map((b,i)=>`<div class="bc" data-i="${i}"><i>${b.n[0]}</i><b>${b.n}</b><span>${b.d}</span></div>`).join('')}</div>`;
- d.querySelectorAll('.bc').forEach(el=>el.onclick=()=>{const b=pool[+el.dataset.i];b.f();G.choice=null;d.classList.remove('on');floatTxt(G.p.x,G.p.y-70,b.n,'#ffd27a',true);if(typeof play==='function')play('bell',.3,1.3);last=performance.now()});
- d.classList.add('on');if(typeof play==='function')play('bell',.35,1)}
+ d.querySelectorAll('.bc').forEach(el=>el.onclick=()=>{const b=pool[+el.dataset.i];b.f();G.choice=null;d.classList.remove('on');floatTxt(G.p.x,G.p.y-70,b.n,'#ffd27a',true);if(typeof play==='function')play('nivo',.35,1.1);last=performance.now()});
+ d.classList.add('on');if(typeof play==='function')play('nivo',.4)}
 {const _ua=useAbility;useAbility=function(){const cd0=G?G.p.cd:0;const r=_ua.apply(this,arguments);if(G&&G.cdMul&&G.p.cd>cd0)G.p.cd*=G.cdMul;return r}}
 {const _er=endRun;endRun=function(win){const d=$('#bless');if(d)d.classList.remove('on');if(G)G.choice=null;return _er.apply(this,arguments)}}
 
@@ -3713,6 +3719,11 @@ const fmtMin=ms=>{const m=Math.ceil(ms/60000);return m>=60?Math.floor(m/60)+' h 
 {const st=document.createElement('style');st.textContent=`.conseq{margin-top:10px;padding:9px 12px;border-radius:6px;background:rgba(110,26,16,.08);border:1px solid rgba(110,26,16,.3);font:600 14px/1.35 'EB Garamond',serif;color:#4a2a14;text-align:left}.conseq.bad{background:rgba(160,30,10,.12)}.conseq b{color:#6e1a10}.conseq .ic{width:15px;height:15px;vertical-align:-2px;margin:0 2px 0 6px}
 .wounded{margin-bottom:12px;padding:10px 12px;border:1px solid rgba(110,26,16,.3);border-radius:6px;background:rgba(160,30,10,.06)}.wrow{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;padding:6px 0;border-top:1px dashed rgba(90,50,20,.2)}
 .wrow span b{display:block;font:800 14px Cinzel,serif;color:#3a1a0c}.wrow span small{font:italic 13px 'EB Garamond',serif;color:#7a4a2a}.wrow .cost{grid-column:1/2}.wrow .btn{grid-column:2/3;grid-row:1/3;min-width:90px}`;document.head.appendChild(st)}
+
+/* nalet/glasnik/zbeg brojač ide u ploču zadatka, ne preko HUD-a */
+setInterval(()=>{const n=$('#nalet'),mp=document.querySelector('.mplate');if(!n||!mp)return;const on=n.classList.contains('on')&&state==='play';
+ if(on&&n.parentElement!==mp){mp.appendChild(n)}mp.classList.toggle('hasN',on)},200);
+{const st=document.createElement('style');st.textContent='.mplate #nalet{position:static!important;transform:none!important;box-shadow:none!important;background:none!important;padding:0!important;gap:10px!important}.mplate.hasN>*:not(#nalet){display:none!important}.mplate:not(.hasN) #nalet{display:none!important}';document.head.appendChild(st)}
 
 /* ---------- kraj misije ---------- */
 function endRun(win){const c=G.cfg,hid=G.hero.id;state='result';

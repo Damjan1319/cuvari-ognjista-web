@@ -2426,7 +2426,7 @@ function start(c){
  if(c.boss){const pos={x:sx>G.W/2?140:G.W-160,y:G.H/2};const b=mkEnemy(c.boss.sprite==='rvitez'?'vitez':c.boss.sprite,pos);const m=1+.11*(c.L-1);
   Object.assign(b,{boss:true,sprite:c.boss.sprite,look:c.bossLook||'B'+c.reg,r:c.boss.r,hp:1300*m*(1+c.reg*.3),max:1300*m*(1+c.reg*.3),dmg:26*(1+.06*c.L),sp:[62,62],xp:300+c.L*10,loot:120+c.L*8,ringT:3,sumT:7});
   G.enemies.push(b);G.bossRef=b;G.bossLabel=c.boss.name}
- {const pick=armyPick(c),n=pick.length,A=ensureArmy(),usedI={};for(let i=0;i<n;i++){const id=pick[i],us=unitStats(id),a=i/n*6.283;const k=usedI[id]=(usedI[id]||0)+1;const name=A[id].names[k-1]||UNITS.find(u=>u.id===id).name;
+ {const pick=armyPick(c),n=pick.length,A=ensureArmy(),usedI={};for(let i=0;i<n;i++){const id=pick[i],us=unitStats(id),a=i/n*6.283;const k=usedI[id]=(usedI[id]||0)+1;const name=A[id].names.filter(n=>!isWounded(n))[k-1]||UNITS.find(u=>u.id===id).name;
   G.allies.push({name,unit:id,type:'ratnik',sprite:'ratnik',x:G.p.x-30+Math.cos(a)*40,y:G.p.y+Math.sin(a)*40,r:13,vx:0,vy:0,kx:0,ky:0,face:1,stun:0,seed:R()*10,born:0,hitT:0,boss:false,color:save.tribe?save.tribe.color:'#b8323a',
    hp:us.hp,max:us.hp,dmg:us.dmg,range:us.range,rate:us.rate,taunt:id==='stit',atkT:R(),off:a,ally:true})}}
  $('#allyC').innerHTML=G.allies.length?`<i class="ic">${SVG.ally}</i>${G.allies.length} saborca`:'';
@@ -3400,7 +3400,7 @@ function toggleMus(){save.music=save.music===0?1:0;persist();syncMus();musTick()
 function syncMus(){const b=document.getElementById('musBtn');if(b)b.textContent=save.music===0?'Muzika: isključena':'Muzika: uključena'}
 setTimeout(()=>{const sb=document.getElementById('sndBtn');if(sb&&!document.getElementById('musBtn')){const b=document.createElement('button');b.id='musBtn';b.className=sb.className;b.onclick=toggleMus;sb.after(b);syncMus()}},0);
 /* ---------- 3D zgrade, drveće i kamenje (KayKit Medieval Hexagon, CC0) ---------- */
-const PROPS={"hall":[0,0,216,251,105.0,194.8],"tower":[218,0,127,236,63.0,198.6],"quarry":[347,0,213,204,129.5,123.3],"mine":[562,0,201,190,98.5,131.6],"home_b":[765,0,124,182,58.0,142.7],"trees_m":[891,0,208,175,112.0,127.9],"church":[1101,0,148,172,69.5,133.5],"trees_s":[1251,0,154,157,74.0,119.8],"ruin":[1407,0,174,154,92.0,107.7],"home_a":[0,253,117,138,61.0,107.7],"smith":[119,253,150,136,73.5,101.7],"tree_b":[271,253,79,119,39.5,112.0],"tree_a":[352,253,64,114,32.0,106.6],"well":[418,253,87,96,44.5,82.7],"rock_c":[507,253,83,87,41.5,58.4],"tent":[592,253,79,76,39.5,54.7],"rock_d":[673,253,76,73,41.0,49.2],"rock_b":[751,253,76,68,40.5,43.5],"rock_a":[829,253,81,56,40.5,29.3],"crate":[912,253,33,39,16.5,29.0],"rack":[947,253,28,36,14.0,28.8],"barrel":[977,253,23,29,12.0,23.5],"sack":[1002,253,19,16,9.5,11.4]};const PIMG=new Image();let PROK=0;PIMG.onload=()=>{PROK=1;if(typeof fortDirty!=='undefined')fortDirty=1};PIMG.src='a3d/props.webp?v=2';
+const PROPS={"hall":[0,0,216,251,105.0,194.8],"tower":[218,0,127,236,63.0,198.6],"wall_v":[347,0,91,218,45.5,154.0],"quarry":[440,0,213,204,129.5,123.3],"mine":[655,0,201,190,98.5,131.6],"home_b":[858,0,124,182,58.0,142.7],"trees_m":[984,0,208,175,112.0,127.9],"hay2":[1194,0,240,173,120.0,129.0],"church":[1436,0,148,172,69.5,133.5],"hay":[1586,0,138,164,69.5,124.3],"trees_s":[0,253,154,157,74.0,119.8],"ruin":[156,253,174,154,92.0,107.7],"grain":[332,253,208,148,103.5,87.2],"home_a":[542,253,117,138,61.0,107.7],"smith":[661,253,150,136,73.5,101.7],"wall_h":[813,253,223,134,111.5,107.0],"fw_v":[1038,253,14,124,7.0,86.8],"tree_b":[1054,253,79,119,39.5,112.0],"tree_a":[1135,253,64,114,32.0,106.6],"well":[1201,253,87,96,44.5,82.7],"fs_v":[1290,253,25,96,12.5,59.6],"rock_c":[1317,253,83,87,41.5,58.4],"tent":[1402,253,79,76,39.5,54.7],"rock_d":[1483,253,76,73,41.0,49.2],"rock_b":[1561,253,76,68,40.5,43.5],"rock_a":[1639,253,81,56,40.5,29.3],"fw_h":[0,412,130,55,65.0,50.8],"lumber":[132,412,82,48,41.0,31.4],"wheel":[216,412,45,45,25.5,32.0],"crate":[263,412,33,39,16.5,29.0],"rack":[298,412,28,36,14.0,28.8],"cratel":[328,412,50,33,25.5,23.2],"fs_h":[380,412,129,32,64.5,29.6],"target":[511,412,28,32,14.0,28.6],"barrel":[541,412,23,29,12.0,23.5],"bucket":[566,412,17,18,8.5,14.1],"sack":[585,412,19,16,9.5,11.4]};const PIMG=new Image();let PROK=0;PIMG.onload=()=>{PROK=1;if(typeof fortDirty!=='undefined')fortDirty=1};PIMG.src='a3d/props.webp?v=3';
 function pdraw(g,n,x,y,wpx,flip){const p=PROPS[n];if(!p||!PROK)return false;const k=wpx/p[2];g.save();g.translate(x,y);if(flip)g.scale(-1,1);g.imageSmoothingQuality='high';g.drawImage(PIMG,p[0],p[1],p[2],p[3],-p[4]*k,-p[5]*k,p[2]*k,p[3]*k);g.restore();return true}
 const phash=(x,y)=>Math.abs(Math.floor(x*13.7+y*7.3))%997;
 function pshadow(g,x,y,rx,ry){g.fillStyle='rgba(0,0,0,.32)';ell(g,x,y,rx,ry);g.fill()}
@@ -3416,6 +3416,21 @@ function pshadow(g,x,y,rx,ry){g.fillStyle='rgba(0,0,0,.32)';ell(g,x,y,rx,ry);g.f
 {const _o=drawObst;drawObst=function(f,o,reg){if(!PROK||save.h3d===0||(o.kind!=='rock'&&o.kind!=='tree'))return _o.apply(this,arguments);
  if(o.kind==='rock'){f.fillStyle='rgba(0,0,0,.4)';f.beginPath();f.ellipse(o.x+5,o.y+o.r*.35,o.r*1.05,o.r*.45,0,0,7);f.fill();pdraw(f,['rock_a','rock_b','rock_c','rock_d'][phash(o.x,o.y)%4],o.x,o.y+o.r*.45,o.r*2.4,phash(o.y,o.x)%2)}
  else{f.fillStyle='rgba(0,0,0,.4)';f.beginPath();f.ellipse(o.x+6,o.y+o.r*.3,o.r*1.3,o.r*.55,0,0,7);f.fill();pdraw(f,phash(o.x,o.y)%3?'trees_s':'tree_b',o.x,o.y+o.r*.4,o.r*3.4,phash(o.y,o.x)%2)}}}
+
+/* --- realni zidovi, ograde, plastovi --- */
+function pdrawFit(f,n,x,y,w,h){const p=PROPS[n];if(!p||!PROK)return false;f.drawImage(PIMG,p[0],p[1],p[2],p[3],x,y,w,h);return true}
+{const _w=drawWall;drawWall=function(f,w,reg){if(!PROK||save.h3d===0||w.kind==='stake')return _w.apply(this,arguments);
+ const hor=w.w>=w.h,base=w.kind==='log'?'fw':w.kind==='ridge'?'fs':'wall';const n=base+(hor?'_h':'_v');const p=PROPS[n];if(!p)return _w.apply(this,arguments);
+ f.fillStyle='rgba(0,0,0,.35)';f.fillRect(w.x+4,w.y+6,w.w,w.h);
+ if(hor){const th=w.h,segW=th*3.2,cnt=Math.max(1,Math.round(w.w/segW)),sw=w.w/cnt,sh=sw*p[3]/p[2];for(let i=0;i<cnt;i++)pdrawFit(f,n,w.x+i*sw-sw*.04,w.y+w.h-sh*.92,sw*1.08,sh)}
+ else{const tw=w.w,segH=tw*3.2,cnt=Math.max(1,Math.round(w.h/segH)),sh=w.h/cnt,sw=Math.max(tw*1.25,sh*p[2]/p[3]);for(let i=0;i<cnt;i++)pdrawFit(f,n,w.x+w.w/2-sw/2,w.y+i*sh-sh*.25,sw,sh*1.3)}}}
+{const _d=drawDecor;drawDecor=function(f,d,reg){if(!PROK||save.h3d===0)return _d.apply(this,arguments);const k=d.k;
+ if(k==='plast'){pdraw(f,d.v<.5?'hay':'hay2',d.x,d.y,(d.v<.5?34:52)*d.s,d.v>.75);return}
+ if(k==='palisada'||k==='pleter'){pdraw(f,'fw_h',d.x,d.y,46*d.s);return}
+ if(k==='zidina'){pdraw(f,'fs_h',d.x,d.y,48*d.s);return}
+ if(k==='ruina'){pdraw(f,'ruin',d.x,d.y,60*d.s,d.v>.5);return}
+ if(k==='kamencici'&&d.v>.7){pdraw(f,['crate','barrel','sack','lumber','cratel','wheel','bucket'][Math.floor(d.v*70)%7],d.x,d.y,20*d.s);return}
+ return _d.apply(this,arguments)}}
 /* ---------- vođenje za novog igrača ---------- */
 const TUT_CSS=`#tutBox{position:fixed;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;width:min(88vw,380px);display:none;gap:12px;align-items:center;
  padding:12px 16px;background:linear-gradient(180deg,#fbf1d8,#ead6ac);border:2px solid #d6a955;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,255,255,.6);color:#3a2010;font:600 15px/1.3 'EB Garamond',serif}
@@ -3674,6 +3689,30 @@ const ZNAMES=['Stana','Mara','Jelica','starac Ilija','Milica','Sava','kaluđer P
  g.restore()}}
 {const _ds2=modeDs;modeDs=function(ds,t){_ds2(ds,t);if(G&&G.zbeg)for(const z of G.zbeg)if(z.hp>0&&!z.ok)ds.push({y:z.y,f:()=>{drawEnemy(ctx,z,t);ctx.save();ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(z.x-12,z.y-44,24,4);ctx.fillStyle='#9fe08a';ctx.fillRect(z.x-12,z.y-44,24*Math.max(0,z.hp/z.max),4);ctx.restore()}})}}
 {const _er=endRun;endRun=function(win){const n=$('#nalet');if(n)n.classList.remove('on');return _er.apply(this,arguments)}}
+
+/* --- posledice: ranjeni vojnici, gubitak resursa --- */
+function isWounded(n){const w=save.wounded&&save.wounded[n];return !!(w&&w>Date.now())}
+function woundLeft(n){const w=save.wounded&&save.wounded[n];return w?Math.max(0,w-Date.now()):0}
+const fmtMin=ms=>{const m=Math.ceil(ms/60000);return m>=60?Math.floor(m/60)+' h '+(m%60)+' min':m+' min'};
+{const _ap=armyPick;armyPick=function(c){const A=ensureArmy(),saveN={};for(const u of UNITS){saveN[u.id]=A[u.id].n;A[u.id].n=Math.max(0,A[u.id].n-(A[u.id].names||[]).filter(isWounded).length)}
+ try{return _ap.apply(this,arguments)}finally{for(const u of UNITS)A[u.id].n=saveN[u.id]}}}
+{const _er=endRun;endRun=function(win){const c=G&&G.cfg;let lostRes=null,wounded=[];
+ if(G&&c&&!c.spect){save.wounded=save.wounded||{};for(const k in save.wounded)if(save.wounded[k]<Date.now())delete save.wounded[k];
+  const mins=win?4:12;for(const n of (G.fallen||[]))if(soldiers().some(s=>s.name===n)){save.wounded[n]=Date.now()+mins*60000;wounded.push(n)}
+  if(!win&&(c.kind==='camp'||c.kind==='raid'||c.kind==='war')){lostRes={};for(const k of RES){const l=Math.floor((save.res[k]||0)*.1);if(l>0){save.res[k]-=l;lostRes[k]=l}}}
+  persist()}
+ const r=_er.apply(this,arguments);
+ try{const el=$('#rNote');let h='';if(lostRes&&Object.keys(lostRes).length)h+=`<div class="conseq bad"><b>Poraz ima cenu.</b> Dušmani su odneli: ${RES.map(k=>lostRes[k]?icon(k)+num(lostRes[k]):'').join(' ')}</div>`;
+  if(wounded.length)h+=`<div class="conseq"><b>Ranjeni:</b> ${wounded.map(esc).join(', ')}. ${wounded.length>1?"Oporavljaju":"Oporavlja"} se ${win?'4':'12'} min i do tada ne idu u boj.</div>`;
+  if(h&&el)el.insertAdjacentHTML('beforeend',h)}catch(e){}
+ return r}}
+{const _as=armySheet;armySheet=function(el){_as.apply(this,arguments);const W=soldiers().filter(s=>isWounded(s.name));if(!W.length)return;
+ const cost=n=>({zar:nice(40+Math.ceil(woundLeft(n)/60000)*25)});
+ el.insertAdjacentHTML('afterbegin',`<div class="wounded"><div class="sec">Na oporavku</div>${W.map(s=>`<div class="wrow"><span><b>${esc(s.name)}</b><small>${s.uname}, još ${fmtMin(woundLeft(s.name))}</small></span>${costHtml(cost(s.name))}<button class="btn sm primary" data-heal="${esc(s.name)}" ${canPay(cost(s.name))?'':'disabled'}>Leči</button></div>`).join('')}</div>`);
+ el.querySelectorAll('[data-heal]').forEach(b=>b.onclick=()=>{const n=b.dataset.heal,c=cost(n);if(!canPay(c))return;pay(c);delete save.wounded[n];persist();sfx.build&&sfx.build();renderSheet()})}}
+{const st=document.createElement('style');st.textContent=`.conseq{margin-top:10px;padding:9px 12px;border-radius:6px;background:rgba(110,26,16,.08);border:1px solid rgba(110,26,16,.3);font:600 14px/1.35 'EB Garamond',serif;color:#4a2a14;text-align:left}.conseq.bad{background:rgba(160,30,10,.12)}.conseq b{color:#6e1a10}.conseq .ic{width:15px;height:15px;vertical-align:-2px;margin:0 2px 0 6px}
+.wounded{margin-bottom:12px;padding:10px 12px;border:1px solid rgba(110,26,16,.3);border-radius:6px;background:rgba(160,30,10,.06)}.wrow{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;padding:6px 0;border-top:1px dashed rgba(90,50,20,.2)}
+.wrow span b{display:block;font:800 14px Cinzel,serif;color:#3a1a0c}.wrow span small{font:italic 13px 'EB Garamond',serif;color:#7a4a2a}.wrow .cost{grid-column:1/2}.wrow .btn{grid-column:2/3;grid-row:1/3;min-width:90px}`;document.head.appendChild(st)}
 
 /* ---------- kraj misije ---------- */
 function endRun(win){const c=G.cfg,hid=G.hero.id;state='result';

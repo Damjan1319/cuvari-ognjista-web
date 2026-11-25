@@ -992,6 +992,20 @@ body.manual #abBtn{bottom:104px!important}
 #bpAct>.btn.ghost:last-child{grid-column:1/-1}
 .bcard .act>.cost,#bpAct>.cost{font-size:15px}
 @media (max-width:340px){.bcard .act>.btn,.arow>.btn,#bpAct>.btn{font-size:11.5px!important}}
+
+/* ===== zbijeno zaglavlje sela ===== */
+#tribeBox{padding:4px 8px 4px 6px!important;gap:8px!important;border-radius:4px!important}
+#tribeBox>svg{width:28px!important;height:32px!important}
+#tribeBox b{font-size:14px!important;line-height:1.05!important;max-width:52vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#tribeBox small{font-size:11px!important;gap:4px!important}#tribeBox small .ic{width:13px!important;height:13px!important}
+#hubSnd{width:30px!important;height:30px!important;min-width:0!important;padding:5px!important;margin-left:4px!important}#hubSnd svg{width:16px!important;height:16px!important}
+#resBox{gap:16px!important;padding-left:14px!important;margin-top:6px!important}
+#resBox .chipr{font-size:13px!important;padding:3px 9px 5px 20px!important;min-width:0!important}
+#resBox .chipr .ic{width:27px!important;height:27px!important;margin-top:-13.5px!important;left:-12px!important;padding:5px!important}
+#resBox .chipr .capb{left:18px!important;right:8px!important;bottom:2px!important;height:2px!important}
+#resBox .chipr small{font-size:10px!important}
+@media (max-width:560px){#dailyBtn{left:calc(36% + 14px)!important}#tabBtn{width:calc(36% - 12px)!important}}
+@media (max-width:360px){#dailyBtn{left:calc(34% + 14px)!important}#tabBtn{width:calc(34% - 12px)!important}}
 </style>
 </head>
 <body>
@@ -2801,7 +2815,7 @@ function renderGame(t){const k=scale*dpr,p=G.p;
  ctx.setTransform(k,0,0,k,0,0);
  const targets=G.beacons.filter(b=>!b.lit).map(b=>({x:b.x,y:b.y,c:'#f0b54a',big:true}));
  for(const s of G.structs)if(s.hp>0&&s.kind==='totem')targets.push({x:s.x,y:s.y,c:'#ff6a4a',big:true});
- for(const e of G.enemies)if(e.jb&&e.hp>0)targets.push({x:e.x,y:e.y,c:'#ffd27a'});if(G.kola)for(const k of G.kola)if(k.hp>0&&k.x>0)targets.push({x:k.x,y:k.y,c:'#ffb648'}); if(G.bossRef&&G.bossRef.hp>0&&!G.bossRef.kind)targets.push({x:G.bossRef.x,y:G.bossRef.y,c:'#ff4d6a',big:true});
+ for(const e of G.enemies)if((e.jb||e.gold)&&e.hp>0)targets.push({x:e.x,y:e.y,c:'#ffd27a'});if(G.kola)for(const k of G.kola)if(k.hp>0&&k.x>0)targets.push({x:k.x,y:k.y,c:'#ffb648'}); if(G.bossRef&&G.bossRef.hp>0&&!G.bossRef.kind)targets.push({x:G.bossRef.x,y:G.bossRef.y,c:'#ff4d6a',big:true});
  const fs=G.sparks.filter(s=>!s.drop);if(fs.length&&(G.cfg.type==='collect'||G.oil<40)){let best=null,bd=1e9;for(const q of fs){const d=Math.hypot(q.x-p.x,q.y-p.y);if(d<bd){bd=d;best=q}}targets.push({x:best.x,y:best.y,c:'#ffd27a',big:false})}
  for(const q of targets){const px=(q.x-camX)*Z,py=(q.y-camY)*Z;const m=36;if(px>m&&px<CW-m&&py>m+50&&py<CH-m)continue;
   const cx=CW/2,cy=CH/2,dx=px-cx,dy=py-cy;const f=Math.min((CW/2-m)/Math.abs(dx||1e-6),(CH/2-m-24)/Math.abs(dy||1e-6));const ax=cx+dx*f,ay=cy+dy*f+12;const a=Math.atan2(dy,dx);
@@ -3444,21 +3458,22 @@ const MODE_TXT={opsada:'Opsada. Braniš grad: dušmani nadiru u talasima i juri�
  dvoboj:'Dvoboj. Jedan na jedan, kao u pesmi. Kad protivnik zamahne, pojavi se crveni luk: skloni se, pa udri dok je iscrpljen.',
  juris:'Juriš konjice. Junak je brz kao vihor i gazi sve pred sobom. Obori njihove barjaktare pre nego što se vojska pribere.',
  zaseda:'Zaseda. Karavan sa plenom prolazi drumom pod stražom. Razbij kola pre nego što umaknu sa druge strane mape.',
- talasi:'Talasi. Dušmani dolaze sve jači, talas za talasom. Izdrži što duže.'};
+ talasi:'Talasi. Dušmani dolaze sve jači, talas za talasom. Izdrži što duže.',
+ nalet:'Nalet: 90 sekundi, dušmani navaljuju sa svih strana. Obaraj ih brzo jedne za drugim da raste niz i množilac poena. Zlatni barjaktar nosi veliki bonus. Isti uslovi za sve igrače.'};
 {const _cc=campCfg;campCfg=function(i){const c=_cc(i);const m=MODEX[i];if(!m)return c;c.type=m;c.mode=m;c.need=0;const L=c.L;
  if(m==='opsada'){c.goal=Math.min(8,4+Math.floor(L/8));c.par=c.goal*38;c.bonus=0;c.shape='square';[c.W,c.H]=[1900,1500];c.walls=0;c.rocks=Math.round(c.rocks*.5)}
  if(m==='dvoboj'){c.goal=1;c.par=55;c.boss={name:CHAMP[i]||'Šampion',sprite:'vitez',r:20};c.roster={};c.pool=[['senka',1]];c.spawnEvery=999;c.shape='square';[c.W,c.H]=[1300,1000];c.walls=0;c.rocks=4}
  if(m==='juris'){c.goal=Math.min(7,3+Math.floor(L/10));c.par=70+c.goal*10;c.spawnEvery=Math.max(2,c.spawnEvery*.5);for(const k in c.roster)c.roster[k]=Math.ceil(c.roster[k]*1.5)}
  if(m==='zaseda'){c.goal=4+Math.floor(L/20);c.par=150;c.shape='wide';[c.W,c.H]=[3000,1500];c.spawnEvery=Math.max(6,c.spawnEvery*1.4);for(const k in c.roster)c.roster[k]=Math.ceil(c.roster[k]*.5)}
  c.story=MODE_TXT[m]+' '+c.story;return c}}
-{const _dc=dailyCfg;dailyCfg=function(){const c=_dc();c.type='talasi';c.mode='talasi';c.goal=12;c.need=0;c.par=0;c.bonus=0;
- const mods=DMODS,h=hashStr(dayKey()+'mod');c.dmod=mods[h%mods.length];c.story=`Pravilo dana: ${c.dmod.n}. ${c.dmod.d} `+MODE_TXT.talasi+' Svaki pređeni talas donosi bodove u tabelu.';return c}}
+{const _dc=dailyCfg;dailyCfg=function(){const c=_dc();c.type='nalet';c.mode='nalet';c.goal=90;c.need=0;c.par=0;c.bonus=0;
+ const mods=DMODS,h=hashStr(dayKey()+'mod');c.dmod=mods[h%mods.length];c.story=`Pravilo dana: ${c.dmod.n}. ${c.dmod.d} `+MODE_TXT.nalet;return c}}
 const DMODS=[{k:'magla',n:'Magla',d:'Fenjer vidi kraće, dušmani iskaču iz mraka.'},{k:'zar2',n:'Dvostruki žar',d:'Iz svakog palog dušmana ispada duplo više žara.'},
  {k:'strel',n:'Kiša strela',d:'Mnogo više strelaca u njihovim redovima.'},{k:'brzi',n:'Brzi dušmani',d:'Neprijatelj je brži za petinu.'},
  {k:'krv',n:'Krvav dan',d:'Svi udaraju duplo jače, i ti i oni.'},{k:'odred',n:'Ceo odred',d:'Sa tobom ide dvostruko više vojnika.'}];
 {const _g=goalTxt;goalTxt=function(c){if(c.type==='opsada')return `Odbrani grad: ${c.goal} talasa`;if(c.type==='dvoboj')return `Pobedi u dvoboju: ${c.boss.name}`;
- if(c.type==='juris')return `Obori ${c.goal} barjaktara`;if(c.type==='zaseda')return `Razbij ${c.goal} kola karavana`;if(c.type==='talasi')return `Izdrži ${c.goal} talasa`;return _g.apply(this,arguments)}}
-{const _cl=critList;critList=function(c){const l=_cl.apply(this,arguments);if(c.type==='opsada')l[2]='Kapija ostane bar napola cela';if(c.type==='zaseda')l[2]='Nijedna kola ne umaknu';if(c.type==='talasi')l[2]='Izdrži sve talase';return l}}
+ if(c.type==='juris')return `Obori ${c.goal} barjaktara`;if(c.type==='zaseda')return `Razbij ${c.goal} kola karavana`;if(c.type==='talasi')return `Izdrži ${c.goal} talasa`;if(c.type==='nalet')return 'Nalet: što više poena za 90 sekundi';return _g.apply(this,arguments)}}
+{const _cl=critList;critList=function(c){const l=_cl.apply(this,arguments);if(c.type==='opsada')l[2]='Kapija ostane bar napola cela';if(c.type==='zaseda')l[2]='Nijedna kola ne umaknu';if(c.type==='talasi')l[2]='Izdrži sve talase';if(c.type==='nalet'){l[0]='Izdrži 90 sekundi';l[2]='Napravi niz od bar ×3'}return l}}
 
 /* --- pokretanje --- */
 {const _s=start;start=function(c){const r=_s.apply(this,arguments);if(!G||!c)return r;const m=c.type;G.mode=m;G.slava=0;G.slNext=9;G.bl={};G.quietT=0;
@@ -3585,12 +3600,35 @@ setTimeout(()=>{try{const sb=/SamsungBrowser/i.test(navigator.userAgent),dk=matc
  const d=document.createElement('div');d.id='sbTip';d.innerHTML=`<b>Boje izgledaju čudno?</b><br>Samsung Internet u tamnom režimu prefarbava igru. Otvori <b>Podešavanja → Labs</b> i uključi <b>„Use website dark theme“</b>. Ili igraj u Chrome-u.<br><button class="btn sm primary">Važi</button>`;
  document.body.appendChild(d);d.querySelector('button').onclick=()=>{save.sbTip=(save.sbTip||0)+1;persist();d.remove()}}catch(e){}},1500);
 
+/* --- Bitka dana: NALET (90 s, niz i množilac) --- */
+{const st=document.createElement('style');st.textContent=`#nalet{position:fixed;left:50%;top:calc(64px + env(safe-area-inset-top));transform:translateX(-50%);z-index:20;display:none;align-items:center;gap:12px;padding:5px 14px;border-radius:4px;
+ background:linear-gradient(180deg,#3e2a18,#22160c);box-shadow:0 0 0 2px #1a0e06,0 0 0 3px #8a6430,0 6px 14px rgba(0,0,0,.5);color:#f6e6c2;font:800 15px Cinzel,serif;pointer-events:none}
+#nalet.on{display:flex}#nalet .t{font-size:20px;color:#fff3dc;min-width:38px;text-align:center}#nalet .t.low{color:#ff7a5a}#nalet .sc{font-size:17px;color:#ffd27a}#nalet .m{font-size:13px;color:#fff;background:#8a1c0e;border-radius:3px;padding:1px 6px;transition:transform .1s}
+#nalet .m.pop{transform:scale(1.35)}body.playing.nalet #mission{display:none!important}`;document.head.appendChild(st);const d=document.createElement('div');d.id='nalet';d.innerHTML='<span class="t">90</span><span class="sc">0</span><span class="m">×1</span>';document.body.appendChild(d)}
+{const _s=start;start=function(c){const r=_s.apply(this,arguments);document.body.classList.toggle('nalet',!!(G&&c&&c.type==='nalet'));$('#nalet').classList.toggle('on',!!(G&&c&&c.type==='nalet'));
+ if(G&&c&&c.type==='nalet'){G.score=0;G.mult=1;G.chain=0;G.bestChain=0;G.chainT=0;G.nSpawn=1;G.goldT=14;G.waves=null;c.spawnEvery=1e9;G.nextSpawn=1e9;G.prog=0}return r}}
+{const _u=update;update=function(dt){if(!G||state!=='play'||G.cfg.type!=='nalet'||G.choice)return _u.call(this,dt);const c=G.cfg;const r=_u.call(this,dt);if(!G||state!=='play')return r;
+ G.prog=Math.min(G.t,c.goal-0.01);G.chainT-=dt;if(G.chainT<=0&&G.chain){G.chain=0;G.mult=1}
+ G.nSpawn-=dt;const alive=G.enemies.filter(e=>e.hp>0).length;if(G.nSpawn<=0&&alive<34){G.nSpawn=Math.max(.45,1.3-G.t*.009);const n=2+Math.floor(G.t/25);for(let i=0;i<n;i++){const a=R()*6.283,dd=380+R()*160;
+   const t=R()<.12+G.t*.002?'gutac':R()<.25?'lovac':R()<.15?'vrac':'senka';const e=spawnEnemy(t,{x:clamp(G.p.x+Math.cos(a)*dd,40,G.W-40),y:clamp(G.p.y+Math.sin(a)*dd,40,G.H-40)});if(e){e.hp*=.7;e.max*=.7;e.hunt=99}}}
+ G.goldT-=dt;if(G.goldT<=0){G.goldT=18;const a=R()*6.283;const e=spawnEnemy('barjaktar',{x:clamp(G.p.x+Math.cos(a)*420,40,G.W-40),y:clamp(G.p.y+Math.sin(a)*420,40,G.H-40)},{gold:1});if(e){toast('Zlatni barjaktar! Obori ga za veliki bonus');G.toastT=2.2}}
+ if(G.t>=c.goal){G.prog=c.goal;return endRun(true)}
+ const el=$('#nalet');if(el){const left=Math.max(0,Math.ceil(c.goal-G.t));const t=el.querySelector('.t');t.textContent=left;t.classList.toggle('low',left<=10);el.querySelector('.sc').textContent=num(Math.round(G.score));const m=el.querySelector('.m');const mt='×'+(Math.round(G.mult*4)/4);if(m.textContent!==mt){m.textContent=mt;m.classList.add('pop');setTimeout(()=>m.classList.remove('pop'),120)}}
+ return r}}
+{const _dm=dmgEnemy;dmgEnemy=function(e,d,kx,ky){const was=e&&e.hp>0;const r=_dm.apply(this,arguments);if(G&&G.cfg.type==='nalet'&&was&&e.hp<=0&&!e.ally){G.chain++;G.bestChain=Math.max(G.bestChain,G.chain);G.chainT=2.6;G.mult=Math.min(5,1+Math.floor(G.chain/4)*.5);
+  const base=e.gold?400:e.type==='gutac'?40:e.type==='vrac'?25:15;const pts=Math.round(base*G.mult);G.score+=pts;floatTxt(e.x,e.y-50,'+'+pts,e.gold?'#ffe36a':'#ffd27a',e.gold||G.mult>=3)}return r}}
+{const _ds=dailyScore;dailyScore=function(win,c){if(c&&c.type==='nalet')return Math.round(G.score||0);return _ds.apply(this,arguments)}}
+{const _er=endRun;endRun=function(win){document.body.classList.remove('nalet');const n=$('#nalet');if(n)n.classList.remove('on');return _er.apply(this,arguments)}}
+{const _g=goHub;goHub=function(){document.body.classList.remove('nalet');const n=$('#nalet');if(n)n.classList.remove('on');return _g.apply(this,arguments)}}
+
+{const _md=modeDraw;modeDraw=function(g,t){_md(g,t);if(!G)return;for(const e of G.enemies){if(!e.gold||e.hp<=0)continue;g.save();g.strokeStyle=`rgba(255,215,90,${.6+.4*Math.sin(t*8)})`;g.lineWidth=3;ell(g,e.x,e.y+8,26,9);g.stroke();g.shadowColor='#ffd27a';g.shadowBlur=16;g.fillStyle='rgba(255,220,120,.25)';ell(g,e.x,e.y+8,22,7);g.fill();g.restore()}}}
+
 /* ---------- kraj misije ---------- */
 function endRun(win){const c=G.cfg,hid=G.hero.id;state='result';
  $('#hud').classList.remove('on');$('#toast').classList.remove('on');joyEl.style.display='none';document.body.classList.remove('playing');
  const hs=save.heroes[hid];document.body.classList.remove('spect');let stars=0,crit=[],loot={zar:0,kamen:0,gvozdje:0},xp=0,note=[],tip='';
  if(win){sfx.win();
-  crit=[true,G.spect?G.allies.length>=G.spect0/2:G.hp>=G.maxhp*.5,c.type==='survive'?G.kills>=c.bonus:c.type==='raid'?G.structs.filter(s=>s.kind==='tower').every(s=>s.hp<=0):G.t<=c.par];stars=crit.filter(Boolean).length;
+  crit=[true,G.spect?G.allies.length>=G.spect0/2:G.hp>=G.maxhp*.5,c.type==='nalet'?(G.bestChain||0)>=16:c.type==='opsada'?(G.castle&&G.castle.hp>=G.castle.max*.5):c.type==='zaseda'?!G.escaped:c.type==='survive'?G.kills>=c.bonus:c.type==='raid'?G.structs.filter(s=>s.kind==='tower').every(s=>s.hp<=0):G.t<=c.par];stars=crit.filter(Boolean).length;
   let mult=.7+.15*stars;
   if(c.kind==='camp'){const first=!(save.stars[c.idx]>0);if(!first)mult*=.4;const prevTop=topLevel();
    save.stars[c.idx]=Math.max(save.stars[c.idx]||0,stars);save.best[c.idx]=save.best[c.idx]?Math.min(save.best[c.idx],G.t):G.t;
@@ -3610,9 +3648,9 @@ function endRun(win){const c=G.cfg,hid=G.hero.id;state='result';
  if(c.kind==='war'&&G.warNote)note.push(G.warNote);
  if(c.kind==='daily'){const ds=dlyState(),sc=dailyScore(win,c),nb=sc>ds.best;if(nb)ds.best=sc;if(win)ds.won=true;ds.L=c.L;
   const rc=save.rec=save.rec||{best:0,days:0,streak:0,last:''};const today=dayKey();if(rc.last!==today){const y=new Date(Date.now()-864e5);const yk=dayKeyOf(y);rc.streak=rc.last===yk?rc.streak+1:1;rc.days++;rc.last=today}const nrec=sc>rc.best;if(nrec)rc.best=sc;const wk=weekState();wk.days[today]=Math.max(wk.days[today]||0,sc);
-  const bd=dailyBoard(c.L),me={name:save.tribe?save.tribe.name:'Tvoj odred',sc:ds.best,me:1},all=[...bd,me].sort((a,b)=>b.sc-a.sc),rk=all.indexOf(me)+1,left=DTRIES-ds.tries;
+  const bd=((typeof CL!=='undefined'&&CL.boards['d-'+dayKey()])||[]).filter(x=>!x.me).map(x=>({name:x.name,sc:x.sc})),me={name:save.tribe?save.tribe.name:'Tvoj odred',sc:ds.best,me:1},all=[...bd,me].sort((a,b)=>b.sc-a.sc),rk=all.indexOf(me)+1,left=DTRIES-ds.tries;
   note.unshift(`<div class="dscore"><small>rezultat</small><b>${num(sc)}</b>${nb&&ds.tries>1?'<em>novi najbolji danas</em>':''}</div>`+
-   (nrec?'<div class="drec">Novi lični rekord</div>':`<div class="drec2">Lični rekord ${num(rc.best)}${rc.streak>1?`, ${rc.streak} dana zaredom`:''}</div>`)+`<div class="dbh">Tabela dana, odredi iz igre</div><ol class="dboard">${all.slice(0,Math.max(5,rk)).map((x,i)=>i<5||x.me?`<li class="${x.me?'me':''}"><span>${i+1}.</span>${esc(x.name)}<b>${num(x.sc)}</b></li>`:'').join('')}</ol>`+
+   (nrec?'<div class="drec">Novi lični rekord</div>':`<div class="drec2">Lični rekord ${num(rc.best)}${rc.streak>1?`, ${rc.streak} dana zaredom`:''}</div>`)+`<div class="dbh">Tabela dana, pravi igrači</div><ol class="dboard">${all.slice(0,Math.max(5,rk)).map((x,i)=>i<5||x.me?`<li class="${x.me?'me':''}"><span>${i+1}.</span>${esc(x.name)}<b>${num(x.sc)}</b></li>`:'').join('')}</ol>`+
    `<div class="dleft">${left>0?`Još ${left} ${left===1?'pokušaj':'pokušaja'} danas, svaki na novoj mapi`:'Pokušaji za danas su potrošeni. Novi izazovi sutra u zoru'}</div>`);note.push(`<span class="dsoon">${CL.user?'Rezultat je upisan u pravu tabelu sa drugim igračima':'Prijavi se Google nalogom u Tabeli da uđeš u pravu tabelu sa drugim igračima'}</span>`)}
  for(const k of RES)save.res[k]=Math.min(cap(k),save.res[k]+loot[k]);
  const before=hs.lvl;hs.xp+=xp;while(hs.lvl<maxHeroLvl()&&hs.xp>=xpNeed(hs.lvl)){hs.xp-=xpNeed(hs.lvl);hs.lvl++}if(hs.lvl>=maxHeroLvl())hs.xp=Math.min(hs.xp,xpNeed(hs.lvl));

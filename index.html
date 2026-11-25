@@ -983,6 +983,15 @@ body.manual #abBtn{bottom:104px!important}
 .bcard .act>.cost,.arow>.cost,.bp-a>.cost{flex:1 1 auto;min-width:0;order:0!important;width:auto!important;justify-content:flex-start!important}
 .bcard .act>.btn,.arow>.btn,.bp-a>.btn,.bcard .act>.req,.bcard .act>.tip{margin-left:auto!important;flex:none}
 .bcard .act>.btn,.arow>.btn,.bp-a>.btn{min-width:132px!important}
+
+/* ===== jedan raspored za cenu i dugmad, na svim veličinama ===== */
+.bcard .act,.arow,.bp-a,#bpAct{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px 10px!important;align-items:center!important;justify-items:stretch!important}
+.bcard .act>.cost,.arow>.cost,.bp-a>.cost,#bpAct>.cost,.bcard .act>.req,.arow>.req,.bp-a>.req,#bpAct>.req,.bcard .act>.tip{grid-column:1/-1!important;order:-1!important;justify-content:center!important;text-align:center!important;margin:0!important;width:auto!important;flex-wrap:wrap}
+.bcard .act>.btn,.arow>.btn,.bp-a>.btn,#bpAct>.btn{grid-column:1/-1;width:100%!important;min-width:0!important;margin:0!important;min-height:44px!important;font-size:13px!important}
+#bpAct>.btn.ghost{grid-column:1/2}#bpAct>.btn.ghost+.btn,#bpAct>.btn:not(.ghost){grid-column:2/3}
+#bpAct>.btn.ghost:last-child{grid-column:1/-1}
+.bcard .act>.cost,#bpAct>.cost{font-size:15px}
+@media (max-width:340px){.bcard .act>.btn,.arow>.btn,#bpAct>.btn{font-size:11.5px!important}}
 </style>
 </head>
 <body>
@@ -3856,7 +3865,7 @@ function sheetUtv(body){$('#shTitle').textContent='Utvrđenje';$('#shSub').textC
   const d=document.createElement('div');d.className='bcard';
   const dm=dmgd(B.id);if(dm){const rc=repairCost(B.id);d.style.borderColor='#6a2a26';
    d.innerHTML=`<h3>${B.name} <small style="color:#a01a0a">NIVO ${l}, OŠTEĆENO</small></h3><div></div><p>Dušmani su je zapalili. Ne radi dok je zanatlije ne poprave.</p><div class="act">${costHtml(rc)}<button class="btn green sm" ${canPay(rc)?'':'disabled'} data-cost='${JSON.stringify(rc)}'>Popravi</button></div>`;
-   d.querySelector('button').onclick=()=>{if(!canPay(rc))return;pay(rc);delete save.dmg[B.id];persist();sfx.build();fortFx=1.2;notify(`<b>${B.name}</b> je popravljena.`);renderSheet();renderHub()};body.appendChild(d);return}
+   d.querySelector('button').onclick=()=>{if(!canPay(rc))return;pay(rc);delete save.dmg[B.id];persist();sfx.build();fortFx=1.2;notify(`Popravljeno: <b>${B.name}</b>.`);renderSheet();renderHub()};body.appendChild(d);return}
   d.innerHTML=`<h3>${B.name} <small>${l?'NIVO '+l:'NIJE IZGRAĐENO'}</small></h3><div></div><p>${B.desc}</p>
    <div class="eff">${l?`Sada: ${B.eff(l)}`:''}${!maxed?`${l?'<br>':''}Sledeći nivo: ${B.eff(l+1)}`:''}</div>
    <div class="act">${maxed?'<span class="tip" style="margin:0">Dograđeno do kraja</span>':costHtml(c)}${maxed?'':capOk?`<button class="btn primary sm" ${canPay(c)?'':'disabled'} data-cost='${JSON.stringify(c)}'>${l?'Dogradi':'Sagradi'}</button>`:`<span class="req">Najpre dogradi ognjište</span>`}</div>`;
@@ -4077,7 +4086,7 @@ function vTap(px,py){const w=s2w(px,py);let hit=null;for(let i=vhit.length-1;i>=
  vsel=hit.id;sfx.coin();updateBpop()}
 function upgradeBuilding(id){const B=BUILD.find(b=>b.id===id),l=save.b[id];const c=B.cost(l);if(l>=B.max||dmgd(id)||!(id==='ognjiste'||l<save.b.ognjiste)||!canPay(c))return;
  pay(c);save.b[id]++;persist();sfx.build();fortFx=1.2;notify(`<b>${B.name}</b> je sada nivo ${save.b[id]}.`);renderHub();if(sheetOpen)renderSheet()}
-function repairBuilding(id){const B=BUILD.find(b=>b.id===id),rc=repairCost(id);if(!dmgd(id)||!canPay(rc))return;pay(rc);delete save.dmg[id];persist();sfx.build();fortFx=1.2;notify(`<b>${B.name}</b> je popravljena.`);renderHub();if(sheetOpen)renderSheet()}
+function repairBuilding(id){const B=BUILD.find(b=>b.id===id),rc=repairCost(id);if(!dmgd(id)||!canPay(rc))return;pay(rc);delete save.dmg[id];persist();sfx.build();fortFx=1.2;notify(`Popravljeno: <b>${B.name}</b>.`);renderHub();if(sheetOpen)renderSheet()}
 function updateBpop(){const el=$('#bpop');if(!vsel||state!=='hub'||sheetOpen){el.classList.remove('on');return}
  const B=BUILD.find(b=>b.id===vsel),l=save.b[vsel],dm=dmgd(vsel),maxed=l>=B.max,capOk=vsel==='ognjiste'||l<save.b.ognjiste,c=B.cost(l);
  $('#bpName').textContent=B.name;$('#bpLvl').innerHTML=dm?'<span style="color:#a01a0a">OŠTEĆENO</span>':l?`NIVO ${l}${maxed?', DOGRAĐENO':''}`:'NIJE IZGRAĐENO';

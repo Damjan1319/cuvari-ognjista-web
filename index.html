@@ -3485,6 +3485,102 @@ function tutHide(){$('#tutBox').classList.remove('on');$('#tutHand').style.displ
 {const _g=goHub;goHub=function(){const r=_g.apply(this,arguments);if(save.tut&&!save.tutHub&&save.stars&&Object.keys(save.stars).length){TUT.hub=1;
  setTimeout(()=>tutShow('★','Odbranio si prvu bitku! Uloži žar u selo: otvori <b style="display:inline;font-size:13px">Utvrđenje</b> i dogradi zgrade.','.nav [data-sheet="utvrdjenje"]'),600)}return r}}
 {const _o=openSheet;openSheet=function(k){if(TUT.hub&&k==='utvrdjenje'){TUT.hub=0;save.tutHub=1;persist();tutHide()}return _o.apply(this,arguments)}}
+/* ---------- vođeni obilazak: osvetljen deo ekrana + strelica + objašnjenje ---------- */
+const TOUR_CSS=`#tour{position:fixed;inset:0;z-index:90;display:none;touch-action:none}
+#tour.on{display:block}
+#tourHole{position:fixed;border-radius:14px;pointer-events:none;transition:all .35s cubic-bezier(.3,.8,.3,1);box-shadow:0 0 0 9999px rgba(6,4,10,.72);outline:2px solid #f3c870;outline-offset:2px;animation:tourGlow 1.4s ease-in-out infinite}
+#tourHole.none{left:50%!important;top:45%!important;width:0!important;height:0!important;outline:0;animation:none}
+@keyframes tourGlow{0%,100%{outline-color:rgba(243,200,112,1)}50%{outline-color:rgba(243,200,112,.35)}}
+#tourTip{position:fixed;width:min(88vw,360px);padding:14px 16px 12px;background:linear-gradient(180deg,#fbf1d8,#ead6ac);border:2px solid #d6a955;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.6);color:#3a2010;font:500 15.5px/1.38 'EB Garamond',serif;transition:top .35s,left .35s;box-sizing:border-box}
+#tourTip h4{margin:0 0 6px;font:700 14px Cinzel,serif;letter-spacing:.08em;color:#6e1a10;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+#tourTip h4 small{font:600 12px 'EB Garamond',serif;color:#8a5a30;letter-spacing:0;white-space:nowrap}
+#tourTip p{margin:0}#tourTip p b{color:#6e1a10}
+#tourTip .tb{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:10px}
+#tourTip .tsk{background:none;border:0;color:#8a5a30;font:600 13px 'EB Garamond',serif;text-decoration:underline;cursor:pointer;padding:6px 2px}
+#tourTip .tnx{min-width:110px;padding:9px 18px;border-radius:8px;border:0;cursor:pointer;background:linear-gradient(180deg,#b3301b,#661208);color:#fff3dc;font:700 13px Cinzel,serif;letter-spacing:.06em;box-shadow:0 0 0 2px #d6a955,0 3px 8px rgba(0,0,0,.4)}
+#tourTip .dots{display:flex;gap:4px}#tourTip .dots i{width:6px;height:6px;border-radius:50%;background:#d8bf8c}#tourTip .dots i.on{background:#8a1e10}
+#tourArr{position:fixed;width:34px;height:34px;margin-left:-17px;pointer-events:none;color:#f3c870;font-size:30px;line-height:34px;text-align:center;text-shadow:0 2px 6px #000,0 0 12px rgba(243,200,112,.8);transition:left .35s,top .35s}
+#tourArr.dn{animation:tourDn .9s ease-in-out infinite}#tourArr.up{animation:tourUp .9s ease-in-out infinite}
+@keyframes tourDn{0%,100%{transform:translateY(-4px)}50%{transform:translateY(6px)}}
+@keyframes tourUp{0%,100%{transform:translateY(4px)}50%{transform:translateY(-6px)}}
+#tourFinger{position:fixed;width:54px;height:54px;border-radius:50%;border:3px solid rgba(255,230,170,.95);background:rgba(255,230,170,.18);pointer-events:none;display:none;animation:tourDrag 1.8s ease-in-out infinite}
+@keyframes tourDrag{0%{transform:translate(0,0);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translate(70px,-50px);opacity:0}}
+.snd.help{font:800 16px Cinzel,serif;color:#f3dca4;line-height:20px;padding:0}`;
+{const st=document.createElement('style');st.textContent=TOUR_CSS;document.head.appendChild(st);
+ const d=document.createElement('div');d.id='tour';d.innerHTML='<div id="tourHole"></div><div id="tourArr"></div><div id="tourFinger"></div><div id="tourTip"><h4><span class="tt"></span><small class="tc"></small></h4><p class="tx"></p><div class="tb"><button class="tsk">Preskoči</button><div class="dots"></div><button class="tnx">Dalje</button></div></div>';
+ document.body.appendChild(d);
+ d.querySelector('.tsk').onclick=e=>{e.stopPropagation();tourEnd(true)};
+ d.querySelector('.tnx').onclick=e=>{e.stopPropagation();tourNext()};
+ d.addEventListener('click',e=>{if(e.target===d)tourNext()});
+ addEventListener('resize',()=>{if(TOUR.on)tourPlace()})}
+const TOUR={on:false,steps:[],i:0,done:null,key:null};
+const tVis=e=>{if(!e)return null;const r=e.getBoundingClientRect();if(r.width<2||r.height<2)return null;const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity===0)return null;return r};
+function tRect(sel){if(!sel)return null;if(typeof sel==='function')return sel();
+ const rs=sel.split(',').map(s=>tVis(document.querySelector(s.trim()))).filter(Boolean);if(!rs.length)return null;
+ const l=Math.min(...rs.map(r=>r.left)),t=Math.min(...rs.map(r=>r.top)),r=Math.max(...rs.map(r=>r.right)),b=Math.max(...rs.map(r=>r.bottom));return {left:l,top:t,width:r-l,height:b-t}}
+function tourStart(key,steps,done){steps=steps.filter(s=>!s.el||s.opt!==true||tRect(s.el));if(!steps.length)return;
+ if(typeof tutHide==='function')tutHide();TOUR.on=true;TOUR.key=key;TOUR.steps=steps;TOUR.i=0;TOUR.done=done||null;
+ const d=$('#tour');d.querySelector('.dots').innerHTML=steps.map(()=>'<i></i>').join('');d.classList.add('on');tourPlace()}
+function tourPlace(){const s=TOUR.steps[TOUR.i];if(!s)return;const d=$('#tour'),h=$('#tourHole'),tip=$('#tourTip'),ar=$('#tourArr'),fg=$('#tourFinger');
+ tip.querySelector('.tt').textContent=s.t;tip.querySelector('.tc').textContent=(TOUR.i+1)+' / '+TOUR.steps.length;tip.querySelector('.tx').innerHTML=s.x;
+ tip.querySelector('.tnx').textContent=s.btn||(TOUR.i===TOUR.steps.length-1?'Kreni!':'Dalje');
+ tip.querySelector('.tsk').style.visibility=TOUR.i===TOUR.steps.length-1?'hidden':'';
+ [...tip.querySelectorAll('.dots i')].forEach((e,i)=>e.classList.toggle('on',i===TOUR.i));
+ const W=innerWidth,H=innerHeight,r=tRect(s.el),pad=s.pad??8;fg.style.display='none';
+ if(!r){h.classList.add('none');ar.style.display='none';tip.style.left=Math.max(8,(W-tip.offsetWidth)/2)+'px';tip.style.top=Math.max(12,(H-tip.offsetHeight)/2)+'px';return}
+ h.classList.remove('none');const x=r.left-pad,y=r.top-pad,w=r.width+pad*2,hh=r.height+pad*2;
+ Object.assign(h.style,{left:x+'px',top:y+'px',width:w+'px',height:hh+'px',borderRadius:(s.round?Math.max(w,hh)/2:14)+'px'});
+ const th=tip.offsetHeight,tw=tip.offsetWidth,cx=x+w/2;let tl=Math.min(W-tw-8,Math.max(8,cx-tw/2)),tt;
+ const below=y+hh+50+th<H-8,above=y-50-th>8;
+ if(below&&(!above||y+hh/2<H/2)){tt=y+hh+46;ar.textContent='▲';ar.className='up';ar.style.top=(y+hh+8)+'px'}
+ else if(above){tt=y-46-th;ar.textContent='▼';ar.className='dn';ar.style.top=(y-42)+'px'}
+ else{tt=Math.max(8,Math.min(H-th-8,(H-th)/2));ar.style.display='none';tip.style.left=tl+'px';tip.style.top=tt+'px';return}
+ ar.style.display='block';ar.style.left=Math.min(W-20,Math.max(20,cx))+'px';tip.style.left=tl+'px';tip.style.top=tt+'px';
+ if(s.finger){fg.style.display='block';fg.style.left=(x+w*.25)+'px';fg.style.top=(y+hh*.55)+'px'}}
+function tourNext(){if(!TOUR.on)return;if(typeof sfx!=='undefined'&&sfx.click)try{sfx.click()}catch(e){}TOUR.i++;if(TOUR.i>=TOUR.steps.length)tourEnd(false);else tourPlace()}
+function tourEnd(skipped){const d=TOUR.done;TOUR.on=false;TOUR.steps=[];$('#tour').classList.remove('on');if(d)d(skipped)}
+
+/* ----- selo ----- */
+function hearthRect(){if(state!=='hub'||typeof vhit==='undefined')return null;const h=vhit.find(v=>v.id==='ognjiste');if(!h)return null;
+ const z=vcam.z,sx=x=>((x-vcam.x)*z+CW/2)*scale,sy=y=>((y-vcam.y)*z+CH/2)*scale;
+ const l=sx(h.x),t=sy(h.y),r=sx(h.x+h.w),b=sy(h.y+h.h);return {left:l,top:t,width:r-l,height:b-t}}
+function hubTourSteps(){const tu=typeof touchUI!=='undefined'&&touchUI;return [
+ {t:'Dobrodošao, branioče',x:'Ovo je tvoje selo. Dušmani kroz vekove napadaju srpske zemlje, a ti braniš <b>ognjište</b>, gradiš utvrđenje i vodiš junake kroz istorijske bitke. Pokazaću ti gde je šta.'},
+ {t:'Ognjište',x:`Srce sela. Dok ognjište gori, selo živi. ${tu?'Prevuci prstom':'Prevuci mišem'} po selu da ga razgledaš, a <b>dodirni zgradu</b> da vidiš šta radi i da je dograđuješ.`,el:hearthRect,pad:14,round:1},
+ {t:'Zalihe',x:'<b>Žar</b>, <b>kamen</b> i <b>gvožđe</b>. Na početku imaš nula. Zarađuješ ih u bitkama i od zgrada, a trošiš na gradnju, junake i vojsku.',el:'#resBox'},
+ {t:'Tvoj odred',x:'Ime i grb tvog odreda, <b>trofeji</b> i <b>liga</b>. Pobede u ratu odreda donose trofeje i penju te u jaču ligu.',el:'#tribeBox'},
+ {t:'Pohod',x:'<b>Ovde počinje igra.</b> 50 bitaka kroz srpsku istoriju, od Nemanjića do ustanaka. Svaka bitka je drugačija: braniš grad, nosiš vest, spasavaš zarobljene, ideš na megdan…',el:'.nav [data-sheet="pohod"]'},
+ {t:'Junaci',x:'Strahinja, Dušan, Miloš i drugi. Svaki ima svoju <b>moć</b>. Ovde ih biraš i jačaš.',el:'.nav [data-sheet="junaci"]'},
+ {t:'Utvrđenje',x:'Gradi i dograđuj: kamenolom, kovačnicu, kasarnu, zidine. Jače selo daje više zaliha i bolju vojsku. <b>Ranjeni vojnici</b> se ovde leče.',el:'.nav [data-sheet="utvrdjenje"]'},
+ {t:'Rat odreda',x:'Napadaj okupatore i druge odrede, pošalji vojsku u pohod i brani se od njihovih napada.',el:'.nav [data-sheet="rat"]'},
+ {t:'Bitka dana',x:'Svaki dan nova brza bitka od 90 sekundi, <b>ista za sve igrače</b>. Ruši dušmane u nizu za množilac i takmiči se za prvo mesto.',el:'#dailyBtn'},
+ {t:'Tabela',x:'Rang lista pravih igrača: bitka dana, nedeljni poredak i lige.',el:'#tabBtn'},
+ {t:'Prijava',x:'Prijavi se Google nalogom da ti se napredak čuva i na drugom telefonu i da se vidiš na tabeli.',el:'#hubG',opt:true},
+ {t:'Spreman si',x:'Kreni u prvu bitku u <b>Pohodu</b>. Kad god zatreba, uputstvo ponovo otvaraš dugmetom <b>?</b> pored imena odreda.',btn:'U Pohod'}]}
+function hubTour(auto){if(state!=='hub')return;if(typeof closeSheet==='function'&&sheetOpen)closeSheet();if(typeof vfit==='function'&&auto)vfit();
+ setTimeout(()=>tourStart('hub',hubTourSteps(),sk=>{save.tourHub=1;persist();if(!sk&&state==='hub'&&typeof openSheet==='function')openSheet('pohod')}),auto?700:50)}
+{const _g=goHub;goHub=function(){const r=_g.apply(this,arguments);
+ if(save.tribe&&!save.tourHub&&!(save.stars&&Object.keys(save.stars).length)){if(typeof TUT!=='undefined')TUT.hub=0;hubTour(true)}
+ else if(save.tribe&&!save.tourHub){save.tourHub=1;save.tourBoj=1;persist()}return r}}
+{const _rh=renderHub;renderHub=function(){const r=_rh.apply(this,arguments);const tb=$('#tribeBox');if(tb&&!tb.querySelector('.help')){const b=document.createElement('button');b.className='snd help';b.title='Uputstvo';b.textContent='?';b.onclick=e=>{e.stopPropagation();hubTour(false)};tb.appendChild(b)}return r}}
+
+/* ----- bitka ----- */
+function joyRect(){const j=tVis(document.getElementById('joy'));if(j){const c=Math.max(j.width,j.height)*1.5;return {left:j.left+j.width/2-c/2,top:j.top+j.height/2-c/2,width:c,height:c}}const W=innerWidth,H=innerHeight;return {left:W*.04,top:H*.6,width:W*.42,height:H*.28}}
+function battleTourSteps(){const tu=typeof touchUI!=='undefined'&&touchUI;return [
+ {t:'Tvoj junak',x:'Gore levo je tvoj junak. <b>Crvena traka</b> je zdravlje. Kad se isprazni, bitka je izgubljena, a gubiš i deo zaliha.',el:'.hcard2 .portw,.hcard2 .brow'},
+ {t:'Žar fenjera',x:'Druga traka je <b>žar</b>. Troši se dok se boriš. Skupljaj žar koji ostaje za palim dušmanima i iz razbijenih ćupova.',el:'#oil'},
+ {t:'Cilj bitke',x:'Ovde piše <b>šta moraš da uradiš</b> i koliko ti je ostalo. Na ivici ekrana zlatne strelice pokazuju kuda da ideš.',el:'.mplate'},
+ tu?{t:'Kretanje',x:'<b>Prevuci prstom</b> po levoj strani ekrana da povedeš junaka. Pusti prst i junak staje.',el:joyRect,finger:1,round:1}
+   :{t:'Kretanje',x:'Kreći se <b>strelicama</b> ili tasterima <b>W A S D</b>. Moć junaka pokrećeš <b>razmaknicom</b> (Space).'},
+ {t:'Napad',x:'Junak <b>sam udara</b> najbližeg dušmana kad mu priđeš. Pazi: dušmanin zamahne pre udarca, pa se pomeri na vreme i promašiće.',el:'#atkBtn',opt:true},
+ {t:'Moć junaka',x:'Kad se zlatni prsten napuni, pritisni dugme za <b>moć</b>. Najjači udarac u bici, koristi ga kad te opkole.',el:'#abBtn',round:1},
+ {t:'Pauza',x:'Ovde zaustavljaš bitku, menjaš zvuk ili pismo (ćirilica/latinica) i ponovo otvaraš ovo uputstvo.',el:'#pauseBtn',round:1},
+ {t:'U boj!',x:'To je sve. Prati cilj, skupljaj žar i čuvaj zdravlje. Srećno, junače!',btn:'U boj!'}]}
+function battleTour(){if(!G||(state!=='play'&&state!=='pause'))return;const was=state;state='pause';if(typeof show==='function')show(null);
+ setTimeout(()=>tourStart('boj',battleTourSteps(),()=>{save.tourBoj=1;persist();if(G&&state==='pause'){state='play';if(typeof last!=='undefined')last=performance.now()}}),was==='play'?450:50)}
+{const _s=start;start=function(c){const first=c&&c.kind==='camp'&&c.idx===0&&!save.tourBoj;const r=_s.apply(this,arguments);if(first&&G&&state==='play')battleTour();return r}}
+setTimeout(()=>{const sb=document.getElementById('sndBtn');if(sb&&!document.getElementById('helpBtn')){const b=document.createElement('button');b.id='helpBtn';b.className=sb.className;b.textContent='Uputstvo za bitku';
+ b.onclick=()=>{if(typeof show==='function')show(null);battleTour()};const after=document.getElementById('cirBtn')||document.getElementById('vibBtn')||document.getElementById('musBtn')||sb;after.after(b)}},120);
 /* ---------- vrste bitaka po istoriji: opsada, dvoboj, juriš, zaseda; talasi; blagoslovi ---------- */
 const MODEX={13:'glasnik',35:'glasnik',32:'zbeg',36:'zbeg',40:'oslobodi',45:'oslobodi',20:'drzi',47:'drzi',1:'dvoboj',16:'juris',18:'dvoboj',22:'opsada',27:'opsada',28:'opsada',30:'zaseda',33:'dvoboj',34:'zaseda',37:'zaseda',46:'juris'};
 const CHAMP={1:'Tihomir, Nemanjin brat',18:'Sultanov telohranitelj',33:'Turski delija'};

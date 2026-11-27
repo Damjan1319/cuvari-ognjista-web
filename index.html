@@ -1067,7 +1067,7 @@ body.manual #abBtn{bottom:104px!important}
   <div class="card found">
     <div class="kicker">Zavet odreda</div>
     <h2>Osnuj odred</h2>
-    <p class="story">Daj odredu ime i barjak. Po njima će te znati i brat i dušmanin.</p>
+    <p class="story">Daj odredu ime i barjak. Po njima će te znati i brat i neprijatelj.</p>
     <div class="crestprev" id="crestPrev"></div>
     <input id="tribeName" maxlength="22" placeholder="Ime odreda" value="Odred Vukova">
     <div class="swatches" id="swatches"></div>
@@ -1148,7 +1148,7 @@ const HEROES=[
   ab:'Gvozdeni zid',abDesc:'Zabije se u zemlju kao bedem: tri sekunde ga ništa ne rani, a sve oko njega odbaci i omami.',cd:8,unlock:-1,
   bio:'Junak iz kosovskih pesama koji je sam pošao preko granice da vrati svoju ljubu. Pesma ga pamti kao viteza koji ne odustaje.'},
  {id:'dusan',name:'Car Dušan',short:'Dušan',role:'Silni, car Srba i Grka',color:'#d4a640',hp:205,dmg:30,rate:1.35,range:90,speed:200,light:165,weapon:'mac',
-  ab:'Carski barjak',abDesc:'Podiže carski barjak: cela vojska kreće u juriš, svi se malo zaleče, a dušmani u blizini popadaju.',cd:11,unlock:9,
+  ab:'Carski barjak',abDesc:'Podiže carski barjak: cela vojska kreće u juriš, svi se malo zaleče, a neprijatelji u blizini popadaju.',cd:11,unlock:9,
   bio:'Kao mladi kralj borio se kod Velbužda 1330, a 1346. u Skoplju je krunisan za cara. Doneo je Dušanov zakonik.'},
  {id:'milos',name:'Miloš Obilić',short:'Miloš',role:'Kosovski vitez',color:'#c9a24a',hp:190,dmg:38,rate:1.3,range:88,speed:212,light:155,weapon:'mac',
   ab:'Zavet',abDesc:'Strašan udar mačem u krug i dve sekunde kad ga ništa ne može raniti.',cd:8,unlock:18,
@@ -1192,7 +1192,7 @@ const BUILD=[
   cost:l=>({zar:nice(160*1.65**l),kamen:nice(120*1.6**l)}),eff:l=>`<b>${(l*1.5).toFixed(1).replace('.0','').replace('.',',')}</b> gvožđa u minuti`},
  {id:'kovacnica',name:'Kovačnica',desc:'Majstor kuje oštrije sečivo za svakog junaka odreda.',max:12,
   cost:l=>({zar:nice(180*1.7**l),kamen:nice(80*1.6**l),gvozdje:nice(15*1.75**l)}),eff:l=>`oružje oštrije za <b>${l*5}%</b>, do <b>${3+l*2}</b> veština po junaku`},
- {id:'zidine',name:'Zidine',desc:'Što su zidine više, to je dušmaninu teže da provali.',max:12,
+ {id:'zidine',name:'Zidine',desc:'Što su zidine više, to je neprijatelju teže da provali.',max:12,
   cost:l=>({zar:nice(100*1.65**l),kamen:nice(160*1.7**l)}),eff:l=>`odbrana jača za <b>${l*35}</b>`},
  {id:'kula',name:'Stražarska kula',desc:'Strelci sa kula gađaju napadače i trubom dižu selo na noge.',max:12,
   cost:l=>({zar:nice(160*1.7**l),kamen:nice(120*1.65**l),gvozdje:nice(10*1.75**l)}),eff:l=>`odbrana jača za <b>${l*45}</b>`},
@@ -2344,7 +2344,7 @@ function dailyCfg(){const ds=dlyState(),d=dayKey(),h=hashStr(d),t=ds.tries,hs=ha
  c.need=c.type==='mix'?Math.round(10+L*.7):c.type==='beacons'&&L>=20?Math.round(L*.45):0;
  c.par={collect:40+c.goal*3,mix:45+c.goal*3+c.need*2,hunt:30+c.goal*3,beacons:35+c.goal*20+c.need*2,survive:0}[c.type];c.bonus=Math.round(c.goal*.35);
  c.kind='daily';c.try=t;c.name=LNAMES[(hs>>>3)%NL];c.boss=null;
- c.story=`Danas su tri izazova, isti za sve igrače: ista mapa, isti zadatak, isto vreme. Snaga dušmana prati tvoje junake, a teža bitka nosi više bodova. Ovo je ${t+1}. od ${DTRIES}.`;
+ c.story=`Danas su tri izazova, isti za sve igrače: ista mapa, isti zadatak, isto vreme. Snaga neprijatelja prati tvoje junake, a teža bitka nosi više bodova. Ovo je ${t+1}. od ${DTRIES}.`;
  c.reward={zar:c.reward.zar*2,kamen:c.reward.kamen*2,gvozdje:Math.max(10,c.reward.gvozdje*2),xp:c.reward.xp*2};c.seed=hs;c.rec=Math.ceil(L*1.1);c.drain*=1.2;return c}
 function dailyScore(win,c){const prog=c.type==='survive'?Math.min(1,G.t/c.goal):c.goal?Math.min(1,G.prog/c.goal):0;
  const sc=(win?1000:0)+G.kills*25+prog*600+(win&&c.par?Math.max(0,c.par-G.t)*8:0)+(win?G.hp/G.maxhp*300:0);return Math.round(sc*(1+(c.L-8)*.04)/10)*10}
@@ -2426,9 +2426,9 @@ function start(c){
  if(c.boss){const pos={x:sx>G.W/2?140:G.W-160,y:G.H/2};const b=mkEnemy(c.boss.sprite==='rvitez'?'vitez':c.boss.sprite,pos);const m=1+.11*(c.L-1);
   Object.assign(b,{boss:true,sprite:c.boss.sprite,look:c.bossLook||'B'+c.reg,r:c.boss.r,hp:1300*m*(1+c.reg*.3),max:1300*m*(1+c.reg*.3),dmg:26*(1+.06*c.L),sp:[62,62],xp:300+c.L*10,loot:120+c.L*8,ringT:3,sumT:7});
   G.enemies.push(b);G.bossRef=b;G.bossLabel=c.boss.name}
- {const pick=armyPick(c),n=pick.length,A=ensureArmy(),usedI={};for(let i=0;i<n;i++){const id=pick[i],us=unitStats(id),a=i/n*6.283;const k=usedI[id]=(usedI[id]||0)+1;const name=A[id].names.slice(0,A[id].n).filter(n=>!isWounded(n))[k-1]||UNITS.find(u=>u.id===id).name;
+ {const pick=armyPick(c),n=pick.length,A=ensureArmy(),usedI={};for(let i=0;i<n;i++){const id=pick[i],us=unitStats(id),a=i/n*6.283;const k=usedI[id]=(usedI[id]||0)+1;const name=A[id].names.slice(0,A[id].n).filter(n=>!(typeof isBusy==='function'?isBusy:isWounded)(n))[k-1]||UNITS.find(u=>u.id===id).name;
   G.allies.push({name,army:1,unit:id,type:'ratnik',sprite:'ratnik',x:G.p.x-30+Math.cos(a)*40,y:G.p.y+Math.sin(a)*40,r:13,vx:0,vy:0,kx:0,ky:0,face:1,stun:0,seed:R()*10,born:0,hitT:0,boss:false,color:save.tribe?save.tribe.color:'#b8323a',
-   hp:us.hp,max:us.hp,dmg:us.dmg,range:us.range,rate:us.rate,taunt:id==='stit',atkT:R(),off:a,ally:true})}}
+   hp:us.hp*(typeof fedMul==='function'?fedMul():1),max:us.hp*(typeof fedMul==='function'?fedMul():1),dmg:us.dmg,range:us.range,rate:us.rate,taunt:id==='stit',atkT:R(),off:a,ally:true})}}
  $('#allyC').innerHTML=G.allies.length?`<i class="ic">${SVG.ally}</i>${G.allies.length} ${G.allies.length===1?'vojnik':'vojnika'}`:'';
  G.spect=!!c.spect&&G.allies.length>0;G.spect0=G.allies.length;document.body.classList.toggle('spect',G.spect);if(G.spect)G.p.inv=1e9;
  for(const k in keys)keys[k]=0;joy.on=false;joy.x=joy.y=0;
@@ -2438,7 +2438,7 @@ function start(c){
  state='play';show(null);closeSheet();$('#hubUI').classList.remove('on');$('#hud').classList.add('on');document.body.classList.add('playing');
  $('#bossbar').classList.toggle('on',!!G.bossRef);if(G.bossRef)$('#bossName').textContent=G.bossLabel;
  last=performance.now();joyIdle();syncMan();
- if(c.kind==='camp'&&c.idx===0&&!save.tut){G.tut=[[2.6,touchUI?'Povuci prstom levo dole da se krećeš':'Kreći se strelicama ili WASD'],[7,'Junak sam napada najbližeg dušmana'],[12,'Skupljaj žar, inače fenjer utrne'],[17,'Razbijaj ćupove, u njima ima žara i lekova'],[23,`Pritisni ${touchUI?'dugme':'Space'} za moć junaka`]];save.tut=1;persist()}
+ if(c.kind==='camp'&&c.idx===0&&!save.tut){G.tut=[[2.6,touchUI?'Povuci prstom levo dole da se krećeš':'Kreći se strelicama ili WASD'],[7,'Junak sam napada najbližeg neprijatelja'],[12,'Skupljaj žar, inače fenjer utrne'],[17,'Razbijaj ćupove, u njima ima žara i lekova'],[23,`Pritisni ${touchUI?'dugme':'Space'} za moć junaka`]];save.tut=1;persist()}
 }
 
 function makeFloor(){const reg=REGIONS[G.cfg.reg];const PD=G.PAD;const fs=Math.min(G.zoom*dpr,Math.sqrt(1.6e7/((G.W+2*PD)*(G.H+2*PD))));G.fs=fs;
@@ -2525,7 +2525,7 @@ function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');i
 function dmgEnemy(e,d,kx=0,ky=0){if(e.hp<=0)return;e.hp-=d;e.hitT=.12;e.kx+=kx;e.ky+=ky;floatTxt(e.x,enemyTop(e)+4,Math.round(d),'#ffd9a0');sfx.ehit();
  if(e.home)e.aggro=4;
  if(e.hp<=0){G.kills++;if(G.cfg.need&&G.kills===G.cfg.need&&G.prog<G.cfg.goal)toast(G.cfg.type==='mix'?'Neprijatelj je razbijen. Još žar':'Neprijatelj je razbijen. Još vatre');G.xp+=e.xp;G.lootZ+=Math.round(e.loot);sfx.kill();burst(e.x,e.y,e.boss?'#ff4d6a':e.type==='ratnik'?'#ffb648':'#9b7cff',e.boss?60:14,e.boss?300:150,e.boss?4:2.4);
-  if(R()<((G.cfg.type==='collect'||G.cfg.type==='mix')?.6:.3)||e.boss)G.sparks.push({x:e.x,y:e.y,ph:0,drop:true});
+  if(R()<((G.cfg.type==='collect'||G.cfg.type==='mix')?.6:.3)||e.boss){G.sparks.push({x:e.x,y:e.y,ph:0,drop:true});if(G.bl&&G.bl.zlato)G.sparks.push({x:e.x+14,y:e.y+6,ph:0,drop:true})}
   if(G.cfg.type==='hunt')G.prog++;if(e.boss){G.prog=1;G.shake=16}}}
 function dmgStruct(s,d){if(s.hp<=0)return;s.hp-=d;s.hitT=.12;floatTxt(s.x,s.y-(s.kind==='totem'?70:72),Math.round(d),'#ffd9a0');sfx.ehit();
  if(s.hp<=0){burst(s.x,s.y-30,'#ffb648',s.kind==='totem'?80:30,s.kind==='totem'?320:200,3.5,1.1);G.shake=s.kind==='totem'?18:8;sfx.hit();
@@ -2756,7 +2756,7 @@ function renderGame(t){const k=scale*dpr,p=G.p;
  for(const e of G.enemies)if(inView(e.x,e.y))ds.push({y:e.y,f:()=>{ctx.globalAlpha=1-e.born;drawEnemy(ctx,e,t);ctx.globalAlpha=1}});
  if(typeof modeDs==='function')modeDs(ds,t);for(const s of G.structs)if(s.hp>0&&inView(s.x,s.y,120))ds.push({y:s.y,f:()=>s.kind==='tower'?drawTower(ctx,s,t):drawTotem(ctx,s,t)});
  for(const a of G.allies)if(inView(a.x,a.y))ds.push({y:a.y,f:()=>{ctx.globalAlpha=1;drawEnemy(ctx,a,t);if(a.rage>0){ctx.strokeStyle=`rgba(255,190,80,${.35+.25*Math.sin(t*14)})`;ctx.lineWidth=2;ell(ctx,a.x,a.y+11,15,5);ctx.stroke()}if(a.swing>0&&a.jx!==undefined){const k=a.swing/.2,L=10+22*(1-k);ctx.strokeStyle=`rgba(235,240,250,${k})`;ctx.lineWidth=2.2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(a.x+a.jx*8,a.y-16+a.jy*8);ctx.lineTo(a.x+a.jx*(8+L),a.y-16+a.jy*(8+L));ctx.stroke()}}});
- if(!G.spect)ds.push({y:p.y,f:()=>{{const pu=.5+.5*Math.sin(t*5);ctx.strokeStyle=`rgba(255,210,120,${.45+.3*pu})`;ctx.lineWidth=1.6;ell(ctx,p.x,p.y+12,17+pu*1.5,6);ctx.stroke();ctx.fillStyle='rgba(255,200,110,.12)';ctx.fill()}const blinkA=p.inv>0&&p.dashT<=0&&G.t>2?(Math.sin(t*40)>0?.45:1):1;heroAura(ctx,p.x,p.y+12,1.28,G.hero.id,t,0,false);drawHero(ctx,p.x,p.y+12,1.28,G.hero,p.face,p.walk,Math.hypot(p.vx,p.vy)>25,t,blinkA,{a:p.atkAn>0?1-p.atkAn/(p.atkD||.3):-1,mv:[p.vx,p.vy],hurt:p.hurtAn||0,dir:(p.atkAn>0||p.aimT>0)&&p.aimx!==undefined?[p.aimx,p.aimy]:Math.hypot(p.vx,p.vy)>25?[p.vx,p.vy]:[p.fx,p.fy]});
+ if(!G.spect)ds.push({y:p.y,f:()=>{{const pu=.5+.5*Math.sin(t*5);ctx.strokeStyle=`rgba(255,210,120,${.45+.3*pu})`;ctx.lineWidth=1.6;ell(ctx,p.x,p.y+12,17+pu*1.5,6);ctx.stroke();ctx.fillStyle='rgba(255,200,110,.12)';ctx.fill()}const blinkA=!G.choice&&p.inv>0&&p.dashT<=0&&G.t>2?(Math.sin(t*40)>0?.45:1):1;heroAura(ctx,p.x,p.y+12,1.28,G.hero.id,t,0,false);drawHero(ctx,p.x,p.y+12,1.28,G.hero,p.face,p.walk,Math.hypot(p.vx,p.vy)>25,t,blinkA,{a:p.atkAn>0?1-p.atkAn/(p.atkD||.3):-1,mv:[p.vx,p.vy],hurt:p.hurtAn||0,dir:(p.atkAn>0||p.aimT>0)&&p.aimx!==undefined?[p.aimx,p.aimy]:Math.hypot(p.vx,p.vy)>25?[p.vx,p.vy]:[p.fx,p.fy]});
   if(p.shieldT>0){ctx.strokeStyle=`rgba(160,200,255,${.45+.3*Math.sin(t*12)})`;ctx.lineWidth=2.5;ctx.beginPath();ctx.ellipse(p.x,p.y-8,20,28,0,0,7);ctx.stroke();ctx.fillStyle='rgba(160,200,255,.08)';ctx.fill()}}});
  drawStuck(ctx,inView);if(G.banner)ds.push({y:G.banner.y+10,f:()=>drawBanner(ctx,G.banner,t)});
  ds.sort((a,b)=>a.y-b.y).forEach(d=>d.f());
@@ -3037,22 +3037,22 @@ function terrInfo(reg){const inc=RES.map(k=>[k,terrRate(k)]).filter(q=>q[1]>0);
  const done=eraDone(reg);
  return `<div class="tinfo"><div class="tb ${done?'on':''}"><b>${done?'Oslobođeno':'Kad oslobodiš celo doba'}</b>${ERA_BONUS[reg]}</div>`+
   `<div class="ti">Prihod teritorije: ${inc.length?inc.map(([k,v])=>`<span>${icon(k)}+${String(Math.round(v*10)/10).replace('.',',')}/m</span>`).join(''):'<span>osvoji prvo mesto</span>'}</div>`+
-  (lostCount()?`<div class="ti bad">Dušmani drže ${lostCount()} ${lostCount()===1?'mesto':'mesta'}. Dodirni mesto sa znakom ! i odbrani ga.</div>`:'')+'</div>'}
+  (lostCount()?`<div class="ti bad">Neprijatelji drže ${lostCount()} ${lostCount()===1?'mesto':'mesta'}. Dodirni mesto sa znakom ! i odbrani ga.</div>`:'')+'</div>'}
 function defCfg(i){const top=topLevel();const c=campCfg(clamp(Math.max(i,top-3),0,NL-1));const L=c.L;
  Object.assign(c,{kind:'def',idx:i,reg:Math.floor(i/10),type:'survive',goal:Math.round(35+L*.8),need:0,boss:null,name:`Odbrana: ${LNAMES[i]}`,
-  story:`${(LFOE[i]||[0,'Dušmani'])[1]} udara na mesto koje si oslobodio. Izdrži do svitanja i vrati ga pod svoj barjak.`,fac:(LFOE[i]||['osm'])[0],par:0,seed:hashStr('def'+i+(save.lost?save.lost[i]:0))});
+  story:`${(LFOE[i]||[0,'Neprijatelji'])[1]} udara na mesto koje si oslobodio. Izdrži do svitanja i vrati ga pod svoj barjak.`,fac:(LFOE[i]||['osm'])[0],par:0,seed:hashStr('def'+i+(save.lost?save.lost[i]:0))});
  c.bonus=Math.round(c.goal*.3);c.reward={zar:nice(c.reward.zar*.6),kamen:nice(c.reward.kamen*.6),gvozdje:nice(c.reward.gvozdje*.6),xp:Math.round(c.reward.xp*.6)};return c}
 function darkTick(now,silent){if(!save.tribe)return;save.lost=save.lost||{};const own=[];for(let i=0;i<NL;i++)if(owned(i)&&i%10!==9&&!isLost(i))own.push(i);
  if(own.length+lostCount()<3)return;if(!save.darkNext){save.darkNext=now+(20+R()*25)*60000;return}
  if(now<save.darkNext)return;save.darkNext=now+(25+R()*30)*60000;if(lostCount()>=2||!own.length)return;
  const i=own[Math.floor(R()*own.length)];save.lost[i]=now;
- if(!silent&&state==='hub'){notify(`Dušmani su udarili na <b>${LNAMES[i]}</b>. Mesto ne donosi prihod dok ga ne odbraniš u Pohodu.`,true);sfx.alarm()}}
+ if(!silent&&state==='hub'){notify(`Neprijatelji su udarili na <b>${LNAMES[i]}</b>. Mesto ne donosi prihod dok ga ne odbraniš u Pohodu.`,true);sfx.alarm()}}
 // bonusi oslobođenih doba
 function eraB(r){return eraDone(r)?1:0}
 
 /* ---------- vojska ---------- */
 const UNITS=[
- {id:'stit',name:'Štitonoša',d:'Veliki štit i mač. Mnogo izdrži i navlači dušmane na sebe.',hp:165,dmg:9,range:0,rate:.9,cost:{zar:160,kamen:90,gvozdje:6}},
+ {id:'stit',name:'Štitonoša',d:'Veliki štit i mač. Mnogo izdrži i navlači neprijatelje na sebe.',hp:165,dmg:9,range:0,rate:.9,cost:{zar:160,kamen:90,gvozdje:6}},
  {id:'koplja',name:'Kopljanik',d:'Drži red kopljem i dobro udara. Najbolji protiv zveri i aveti.',hp:100,dmg:14,range:0,rate:.75,cost:{zar:120,kamen:60}},
  {id:'strel',name:'Strelac',d:'Gađa iz daljine i drži se iza junaka.',hp:65,dmg:12,range:250,rate:1.05,cost:{zar:140,kamen:40,gvozdje:4}}];
 const topHeroLvl=()=>Math.max(...HEROES.filter(heroOk).map(h=>save.heroes[h.id].lvl));
@@ -3211,11 +3211,11 @@ const TACT={
  16:{k:'zas',t:'Udar na razbijene odrede',d:'Turci su se raširili po kraju. Udari pre nego što se skupe: iznenađeni primaju dvostruki udarac.'},
  19:{k:'kos',t:'Put do sultana',d:'Sultana čuva garda. Dok garda stoji, sultan je zaklonjen. Probij se kroz nju.'},
  28:{k:'zvona',t:'Do podneva',d:'Izdrži opsadu. Pred kraj stižu Kapistranovi krstaši i zajedno udarate na turski logor. Podnevna zvona se po Evropi vezuju za ovu pobedu.'},
- 41:{k:'sanac',t:'Šanac',d:'Ustanici su ukopani iza šanca od kolja. Drži se unutra i dočekaj dušmane na prolazima.'},
- 42:{k:'misar',t:'Šanac i konjica',d:'Karađorđe drži pešadiju u šancu, a konjicu krije sa strane. Kad pobediš dovoljno dušmana, konjica udara s boka.'},
- 43:{k:'sanac',t:'Šanac',d:'Deligradski šanci zatvaraju put dolinom Morave. Drži se iza kolja i dočekaj dušmane na prolazima.'},
- 44:{k:'cegar',t:'Šanac i barut',d:'Stevan Sinđelić brani šanac na Čegru. Pred kraj boja pali barut: eksplozija nosi dušmane oko šanca.'},
- 49:{k:'dub',t:'Zbijen red',d:'Drži red. Vojnici staju u zid, primaju manje udaraca i navlače dušmane na sebe.'}};
+ 41:{k:'sanac',t:'Šanac',d:'Ustanici su ukopani iza šanca od kolja. Drži se unutra i dočekaj neprijatelje na prolazima.'},
+ 42:{k:'misar',t:'Šanac i konjica',d:'Karađorđe drži pešadiju u šancu, a konjicu krije sa strane. Kad pobediš dovoljno neprijatelja, konjica udara s boka.'},
+ 43:{k:'sanac',t:'Šanac',d:'Deligradski šanci zatvaraju put dolinom Morave. Drži se iza kolja i dočekaj neprijatelje na prolazima.'},
+ 44:{k:'cegar',t:'Šanac i barut',d:'Stevan Sinđelić brani šanac na Čegru. Pred kraj boja pali barut: eksplozija nosi neprijatelje oko šanca.'},
+ 49:{k:'dub',t:'Zbijen red',d:'Drži red. Vojnici staju u zid, primaju manje udaraca i navlače neprijatelje na sebe.'}};
 
 function mkAlly(name,x,y,ttl,rage){const st=G.st;return{name,type:'ratnik',sprite:'ratnik',x,y,r:13,vx:0,vy:0,kx:0,ky:0,face:1,stun:0,seed:R()*10,born:0,hitT:0,boss:false,color:save.tribe?save.tribe.color:'#b8323a',
  hp:Math.round(st.hp*.6),max:Math.round(st.hp*.6),dmg:st.dmg*.7,atkT:R(),off:R()*6.283,ally:true,ttl,rage:rage||4}}
@@ -3232,7 +3232,7 @@ function tacSetup(c){const T=c.sp,p=G.p;G.tac={};
  if(T.k==='kos'&&G.bossRef){const b=G.bossRef;for(let i=0;i<6;i++){const a=i/6*6.283,e=mkEnemy('lovac',{x:clamp(b.x+Math.cos(a)*70,30,G.W-30),y:clamp(b.y+Math.sin(a)*60,30,G.H-30)});e.guard=1;G.enemies.push(e)}}
  if(T.k==='dub')for(const a of G.allies){a.taunt=true;a.dr=.6}}
 function tacTick(dt){const c=G.cfg,T=c.sp,p=G.p,S=G.tac;if(!T||!S)return;
- if(T.k==='zas'){for(const e of G.enemies){if(!e.calm)continue;if(e.hp<e.max||Math.hypot(e.x-p.x,e.y-p.y)<190||G.t>14){e.calm=0;if(!S.alarm){S.alarm=1;toast('Uzbuna! Dušmani su vas primetili');for(const o of G.enemies)if(o.calm&&Math.hypot(o.x-e.x,o.y-e.y)<260)o.calm=0}continue}
+ if(T.k==='zas'){for(const e of G.enemies){if(!e.calm)continue;if(e.hp<e.max||Math.hypot(e.x-p.x,e.y-p.y)<190||G.t>14){e.calm=0;if(!S.alarm){S.alarm=1;toast('Uzbuna! Neprijatelji su vas primetili');for(const o of G.enemies)if(o.calm&&Math.hypot(o.x-e.x,o.y-e.y)<260)o.calm=0}continue}
   e.x=e.cx;e.y=e.cy;e.vx=e.vy=0;e.atkT=Math.max(e.atkT||0,1)}}
  if(T.k==='velb'){if(!S.a&&G.t>=16){S.a=1;toast('Mladi Dušan stiže sa konjicom');tacHelp(['Konjanik','Konjanik','Konjanik'],Math.PI)}
   if(!S.b&&G.t>=90&&G.bossRef&&G.bossRef.hp>0){S.b=1;toast('Bugarima je stiglo pojačanje');spawnGroup(c);spawnGroup(c);sfx.spawn()}}
@@ -3477,7 +3477,7 @@ function tutHide(){$('#tutBox').classList.remove('on');$('#tutHand').style.displ
 {const _s=start;start=function(c){const first=c&&c.kind==='camp'&&c.idx===0&&!save.tut;const r=_s.apply(this,arguments);
  if(first&&G){G.tut=null;const p0={x:G.p.x,y:G.p.y};
   TUT.steps=[[touchUI?'Prevuci prstom po levoj strani ekrana da povedeš junaka.':'Kreći se strelicama ili tasterima WASD.',()=>Math.hypot(G.p.x-p0.x,G.p.y-p0.y)>90,null,1],
-   ['Junak sam udara najbližeg dušmana. Priđi im i oboriš prvog.',()=>G.kills>=1],
+   ['Junak sam udara najbližeg neprijatelja. Priđi im i oboriš prvog.',()=>G.kills>=1],
    ['Fenjer troši ulje. Skupljaj žar koji ostaje za palima da ne utrne.',()=>G.sparksGot>=1||G.t-TUT.t0>14],
    [`Moć junaka je spremna. Pritisni ${touchUI?'veliko dugme dole desno':'Space'}.`,()=>G.abUsed||G.t-TUT.t0>16,'#abBtn']];
   TUT.i=0;TUT.t0=0;save.tut=1;persist()}else{TUT.steps=[];tutHide()}return r}}
@@ -3548,7 +3548,7 @@ function hearthRect(){if(state!=='hub'||typeof vhit==='undefined')return null;co
  const z=vcam.z,sx=x=>((x-vcam.x)*z+CW/2)*scale,sy=y=>((y-vcam.y)*z+CH/2)*scale;
  const l=sx(h.x),t=sy(h.y),r=sx(h.x+h.w),b=sy(h.y+h.h);return {left:l,top:t,width:r-l,height:b-t}}
 function hubTourSteps(){const tu=typeof touchUI!=='undefined'&&touchUI;return [
- {t:'Dobrodošao, branioče',x:'Ovo je tvoje selo. Dušmani kroz vekove napadaju srpske zemlje, a ti braniš <b>ognjište</b>, gradiš utvrđenje i vodiš junake kroz istorijske bitke. Pokazaću ti gde je šta.'},
+ {t:'Dobrodošao, branioče',x:'Ovo je tvoje selo. Neprijatelji kroz vekove napadaju srpske zemlje, a ti braniš <b>ognjište</b>, gradiš utvrđenje i vodiš junake kroz istorijske bitke. Pokazaću ti gde je šta.'},
  {t:'Ognjište',x:`Srce sela. Dok ognjište gori, selo živi. ${tu?'Prevuci prstom':'Prevuci mišem'} po selu da ga razgledaš, a <b>dodirni zgradu</b> da vidiš šta radi i da je dograđuješ.`,el:hearthRect,pad:14,round:1},
  {t:'Zalihe',x:'<b>Žar</b>, <b>kamen</b> i <b>gvožđe</b>. Na početku imaš nula. Zarađuješ ih u bitkama i od zgrada, a trošiš na gradnju, junake i vojsku.',el:'#resBox'},
  {t:'Tvoj odred',x:'Ime i grb tvog odreda, <b>trofeji</b> i <b>liga</b>. Pobede u ratu odreda donose trofeje i penju te u jaču ligu.',el:'#tribeBox'},
@@ -3557,7 +3557,7 @@ function hubTourSteps(){const tu=typeof touchUI!=='undefined'&&touchUI;return [
  {t:'Junaci',x:'Strahinja, Dušan, Miloš i drugi. Svaki ima svoju <b>moć</b>. Ovde ih biraš i jačaš.',el:'.nav [data-sheet="junaci"]'},
  {t:'Utvrđenje',x:'Gradi i dograđuj: kamenolom, kovačnicu, kasarnu, zidine. Jače selo daje više zaliha i bolju vojsku. <b>Ranjeni vojnici</b> se ovde leče.',el:'.nav [data-sheet="utvrdjenje"]'},
  {t:'Rat odreda',x:'Napadaj okupatore i druge odrede, pošalji vojsku u pohod i brani se od njihovih napada.',el:'.nav [data-sheet="rat"]'},
- {t:'Bitka dana',x:'Svaki dan nova brza bitka od 90 sekundi, <b>ista za sve igrače</b>. Ruši dušmane u nizu za množilac i takmiči se za prvo mesto.',el:'#dailyBtn'},
+ {t:'Bitka dana',x:'Svaki dan nova brza bitka od 90 sekundi, <b>ista za sve igrače</b>. Ruši neprijatelje u nizu za množilac i takmiči se za prvo mesto.',el:'#dailyBtn'},
  {t:'Tabela',x:'Rang lista pravih igrača: bitka dana, nedeljni poredak i lige.',el:'#tabBtn'},
  {t:'Prijava',x:'Prijavi se Google nalogom da ti se napredak čuva i na drugom telefonu i da se vidiš na tabeli.',el:'#hubG',opt:true},
  {t:'Spreman si',x:'Kreni u prvu bitku u <b>Pohodu</b>. Kad god zatreba, uputstvo ponovo otvaraš dugmetom <b>?</b> pored imena odreda.',btn:'U Pohod'}]}
@@ -3571,11 +3571,11 @@ function hubTour(auto){if(state!=='hub')return;if(typeof closeSheet==='function'
 function joyRect(){const j=tVis(document.getElementById('joy'));if(j){const c=Math.max(j.width,j.height)*1.5;return {left:j.left+j.width/2-c/2,top:j.top+j.height/2-c/2,width:c,height:c}}const W=innerWidth,H=innerHeight;return {left:W*.04,top:H*.6,width:W*.42,height:H*.28}}
 function battleTourSteps(){const tu=typeof touchUI!=='undefined'&&touchUI;return [
  {t:'Tvoj junak',x:'Gore levo je tvoj junak. <b>Crvena traka</b> je zdravlje. Kad se isprazni, bitka je izgubljena, a gubiš i deo zaliha.',el:'.hcard2 .portw,.hcard2 .brow'},
- {t:'Žar fenjera',x:'Druga traka je <b>žar</b>. Troši se dok se boriš. Skupljaj žar koji ostaje za palim dušmanima i iz razbijenih ćupova.',el:'#oil'},
+ {t:'Žar fenjera',x:'Druga traka je <b>žar</b>. Troši se dok se boriš. Skupljaj žar koji ostaje za palim neprijateljima i iz razbijenih ćupova.',el:'#oil'},
  {t:'Cilj bitke',x:'Ovde piše <b>šta moraš da uradiš</b> i koliko ti je ostalo. Na ivici ekrana zlatne strelice pokazuju kuda da ideš.',el:'.mplate'},
  tu?{t:'Kretanje',x:'<b>Prevuci prstom</b> po levoj strani ekrana da povedeš junaka. Pusti prst i junak staje.',el:joyRect,finger:1,round:1}
    :{t:'Kretanje',x:'Kreći se <b>strelicama</b> ili tasterima <b>W A S D</b>. Moć junaka pokrećeš <b>razmaknicom</b> (Space).'},
- {t:'Napad',x:'Junak <b>sam udara</b> najbližeg dušmana kad mu priđeš. Pazi: dušmanin zamahne pre udarca, pa se pomeri na vreme i promašiće.',el:'#atkBtn',opt:true},
+ {t:'Napad',x:'Junak <b>sam udara</b> najbližeg neprijatelja kad mu priđeš. Pazi: neprijatelj zamahne pre udarca, pa se pomeri na vreme i promašiće.',el:'#atkBtn',opt:true},
  {t:'Moć junaka',x:'Kad se zlatni prsten napuni, pritisni dugme za <b>moć</b>. Najjači udarac u bici, koristi ga kad te opkole.',el:'#abBtn',round:1},
  {t:'Pauza',x:'Ovde zaustavljaš bitku, menjaš zvuk ili pismo (ćirilica/latinica) i ponovo otvaraš ovo uputstvo.',el:'#pauseBtn',round:1},
  {t:'U boj!',x:'To je sve. Prati cilj, skupljaj žar i čuvaj zdravlje. Srećno, junače!',btn:'U boj!'}]}
@@ -3639,7 +3639,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795805580';
+const BUILD_ID='1795806581';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
@@ -3685,23 +3685,275 @@ function btnDecor(root){if(!root)return;root.querySelectorAll('button[data-cost]
  if(b.classList.contains('need')){b.classList.remove('need');delete b.dataset.need;b.textContent=b.dataset.lbl}})}
 function dmgSheet(){const body=$('#shBody');if(!body)return;const cards=[...body.querySelectorAll('.bcard')];const dm=cards.filter((d,i)=>BUILD[i]&&dmgd(BUILD[i].id));
  if(!dm.length)return;dm.forEach(d=>{d.classList.add('dmgc');d.insertAdjacentHTML('afterbegin','<div class="dmgr">OŠTEĆENO · POPRAVI DA BI RADILO</div>');body.insertBefore(d,body.firstChild)});
- const names=BUILD.filter(B=>dmgd(B.id)).map(B=>B.name);const s=document.createElement('div');s.className='dmgsum';s.innerHTML=`<b>Dušmani su oštetili selo.</b><br>Ne radi dok ne popraviš: ${names.join(', ')}.`;body.insertBefore(s,body.firstChild)}
+ const names=BUILD.filter(B=>dmgd(B.id)).map(B=>B.name);const s=document.createElement('div');s.className='dmgsum';s.innerHTML=`<b>Neprijatelji su oštetili selo.</b><br>Ne radi dok ne popraviš: ${names.join(', ')}.`;body.insertBefore(s,body.firstChild)}
 {const _rs=renderSheet;renderSheet=function(){const r=_rs.apply(this,arguments);try{if(sheetOpen==='utvrdjenje')dmgSheet();btnDecor($('#shBody'))}catch(e){}return r}}
 {const _ra=refreshAfford;refreshAfford=function(){const r=_ra.apply(this,arguments);btnDecor($('#shBody'));return r}}
 if(typeof updateBpop==='function'){const _ub=updateBpop;updateBpop=function(){const r=_ub.apply(this,arguments);try{const bp=$('#bpop');if(bp&&vsel){const B=BUILD.find(x=>x.id===vsel);if(B){const btn=[...bp.querySelectorAll('button')].find(b=>/Dogradi|Sagradi|Popravi/.test(b.dataset.lbl||b.textContent));if(btn){btn._cost=dmgd(vsel)?repairCost(vsel):B.cost(save.b[vsel]);btnDecor(bp)}}}}catch(e){}return r}}
+/* ---------- BAŠTA (probna verzija): plac, leje, baštovan, melem i hrana ---------- */
+const BASTA={unlockOg:3,buy:{zar:400,kamen:300},maxLvl:5,
+ up:l=>({zar:nice(500*1.9**(l-1)),kamen:nice(350*1.8**(l-1)),gvozdje:l>=2?nice(20*1.8**(l-2)):0}),
+ beds:l=>1+l,cap:l=>10+l*10,upk:.6};
+/* g = vreme rasta u minutima, y = prinos, p = proizvod */
+const CROPS=[
+ {id:'kamilica',n:'Kamilica',p:'melem',g:60,y:3,seed:{zar:40},lvl:1,col:'#f6f0c8',d:'Brzo raste, daje melem za rane.'},
+ {id:'zito',n:'Žito',p:'hrana',g:90,y:4,seed:{zar:60},lvl:1,col:'#e3b94a',d:'Hleb za vojsku.'},
+ {id:'hajducka',n:'Hajdučka trava',p:'melem',g:180,y:8,seed:{zar:110,kamen:20},lvl:2,col:'#f2f2f2',d:'Jaka trava za teške rane.'},
+ {id:'proso',n:'Proso',p:'hrana',g:240,y:11,seed:{zar:140,kamen:30},lvl:3,col:'#c9a24a',d:'Hrani vojsku dugo.'},
+ {id:'nana',n:'Nana',p:'melem',g:120,y:5,seed:{zar:80},lvl:2,col:'#6fbf5a',d:'Melem i čaj za oporavak.'}];
+const FED={mul:1.25,battles:3};
+const CROP_SVG={kamilica:'<svg viewBox="0 0 40 40"><path d="M20 38V22" stroke="#4f8a34" stroke-width="2.5"/>'+[0,45,90,135,180,225,270,315].map(a=>`<ellipse cx="20" cy="9" rx="3.2" ry="7" fill="#fbf6e2" stroke="#c9bd90" stroke-width=".6" transform="rotate(${a} 20 16)"/>`).join('')+'<circle cx="20" cy="16" r="4.2" fill="#e8b830"/></svg>',
+ zito:'<svg viewBox="0 0 40 40"><path d="M20 39V6" stroke="#9a8a3a" stroke-width="2"/>'+[8,13,18,23].map(y=>`<ellipse cx="16" cy="${y}" rx="3" ry="5" fill="#e3b94a" transform="rotate(-25 16 ${y})"/><ellipse cx="24" cy="${y}" rx="3" ry="5" fill="#d8aa3a" transform="rotate(25 24 ${y})"/>`).join('')+'</svg>',
+ proso:'<svg viewBox="0 0 40 40"><path d="M20 39C20 25 22 14 30 6" stroke="#8a9a3a" stroke-width="2" fill="none"/>'+[[27,8],[25,12],[23,16],[30,12],[28,16],[26,20],[22,20]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.6" fill="#c9a24a"/>`).join('')+'</svg>',
+ nana:'<svg viewBox="0 0 40 40"><path d="M20 39V8" stroke="#3f7a2a" stroke-width="2"/>'+[[10,1],[18,-1],[26,1]].map(([y,d])=>`<ellipse cx="14" cy="${y}" rx="6" ry="3.6" fill="#5fae4a" transform="rotate(-30 14 ${y})"/><ellipse cx="26" cy="${y}" rx="6" ry="3.6" fill="#6fbf5a" transform="rotate(30 26 ${y})"/>`).join('')+'</svg>',
+ hajducka:'<svg viewBox="0 0 40 40"><path d="M20 39V16M20 16L11 8M20 16L29 8M20 16V6" stroke="#4f8a34" stroke-width="2" fill="none"/>'+[[11,8],[29,8],[20,6]].map(([x,y])=>[[-3,0],[3,0],[0,-3],[0,2]].map(([a,b])=>`<circle cx="${x+a}" cy="${y+b}" r="2.4" fill="#fbf8ee" stroke="#cfc6a8" stroke-width=".5"/>`).join('')).join('')+'</svg>'};
+function bState(){return save.basta||null}
+function bInit(){if(!save.basta)save.basta={lvl:1,beds:[],worker:null,melem:0,hrana:0,last:Date.now(),fed:0};const B=save.basta;while(B.beds.length<BASTA.beds(B.lvl))B.beds.push({c:null});return B}
+function isBusy(n){return (typeof isWounded==='function'&&isWounded(n))||!!(save.basta&&save.basta.worker===n)}
+function fedMul(){return save.basta&&save.basta.fed>0?FED.mul:1}
+function cropOf(id){return CROPS.find(c=>c.id===id)}
+function bedPct(b){const c=cropOf(b.c);return c?Math.min(1,(b.p||0)/(c.g*60)):0}
+function bedRipe(b){return b.c&&bedPct(b)>=1}
+/* rast: radi samo kad je baštovan na placu i kad ima žara za njegov hleb */
+const CARE=[{k:'zal',n:'Zalivanje',ic:'💧',d:'Leje rastu normalno do ponoći.',cost:{zar:40},mul:1},
+ {k:'dju',n:'Đubrenje',ic:'🌱',d:'Leje rastu 40% brže do ponoći.',cost:{zar:90,kamen:30},mul:1.4},
+ {k:'ple',n:'Plevljenje',ic:'🌿',d:'Leje rastu normalno, a zrelo bilje ne vene do ponoći.',cost:{zar:50,kamen:20},mul:1,keep:1}];
+function nextMidnight(){const d=new Date();d.setHours(24,0,0,0);return d.getTime()}
+function careNow(){const B=save.basta;return B&&B.careUntil&&B.careUntil>Date.now()?CARE.find(c=>c.k===B.care):null}
+function bSetCare(k){const B=save.basta,C=CARE.find(c=>c.k===k);if(!B||!B.worker||careNow()||!C||!canPay(C.cost))return;bTick();pay(C.cost);B.care=k;B.careUntil=nextMidnight();B.last=Date.now();B._warned=0;persist();sfx.build&&sfx.build();notify(`<b>Bašta</b>: ${esc(B.worker)} danas radi ${C.n.toLowerCase()}.`);renderSheet()}
+function bTick(){const B=save.basta;if(!B)return;const now=Date.now(),last=B.last||now;B.last=now;if(now<=last)return;
+ const end=Math.min(now,B.careUntil||0),dt=B.worker?Math.max(0,(end-last)/1000):0,C=CARE.find(c=>c.k===B.care)||CARE[0];
+ const keep=C.keep&&B.careUntil>now;
+ for(const b of B.beds){if(!b.c)continue;const c=cropOf(b.c);if(!bedRipe(b)){b.p=(b.p||0)+dt*C.mul;if(bedRipe(b)){b.ripeAt=now;typeof logAdd==='function'&&logAdd(`<b>Bašta</b>: ${c.n} je zrela, oberi je.`,'good')}}
+  else if(!keep&&b.ripeAt&&now-b.ripeAt>Math.max(3*3600*1000,c.g*60*1000)){typeof logAdd==='function'&&logAdd(`<b>Bašta</b>: ${c.n} je uvela jer nije obrana na vreme.`,'bad');b.c=null;b.p=0;b.ripeAt=0}}
+ const growing=B.beds.filter(b=>b.c&&!bedRipe(b));
+ if(growing.length&&B.careUntil&&now>B.careUntil+24*3600*1000){for(const b of growing){b.c=null;b.p=0}typeof logAdd==='function'&&logAdd('<b>Bašta</b>: leje su propale jer ceo dan niko nije radio u bašti.','bad');B.careUntil=0}
+ else if(growing.length&&(!B.careUntil||now>B.careUntil)&&!B._warned){B._warned=1;typeof logAdd==='function'&&logAdd('<b>Bašta</b>: novi dan je, odredi baštovanu današnji posao da leje ne stanu.','bad')}}
+setInterval(()=>{if(save.basta){bTick();if(sheetOpen==='basta'&&state==='hub'){const k=bSig();if(k!==bTick._k){bTick._k=k;renderSheet()}else bLive()}}},2000);
+function bSig(){const B=save.basta;return B?B.beds.map(b=>b.c+(bedRipe(b)?'r':'')).join()+B.worker+B.melem+B.hrana+B.fed+(B.care||'')+(careNow()?1:0)+Math.floor(save.res.zar/20):''}
+function bLive(){document.querySelectorAll('#shBody [data-bed]').forEach(el=>{const b=save.basta.beds[+el.dataset.bed];if(!b||!b.c)return;const c=cropOf(b.c),p=bedPct(b);const bar=el.querySelector('.bbar b');if(bar)bar.style.width=(p*100)+'%';
+ const t=el.querySelector('.bt');if(t&&!bedRipe(b)){const left=Math.max(0,c.g*60-(b.p||0));t.textContent=!save.basta.worker?'stoji, nema baštovana':!careNow()?'stoji, danas niko nije radio':`zri još ${fmtT(left/(careNow().mul||1))}`}})}
+function fmtT(s){const M=Math.max(1,Math.ceil(s/60)),h=Math.floor(M/60),m=M%60;return h?(m?`${h} h ${m} min`:`${h} h`):`${m} min`}
+function bHarvest(i){const B=save.basta,b=B.beds[i];if(!bedRipe(b))return;const c=cropOf(b.c),cap=BASTA.cap(B.lvl);const room=cap-(B[c.p]||0);const got=Math.min(c.y,room);
+ if(got<=0){notify(`Ambar je pun (${cap}). Potroši ${c.p==='melem'?'melem':'hranu'} ili dogradi baštu.`,true);return}
+ B[c.p]=(B[c.p]||0)+got;b.c=null;b.p=0;b.ripeAt=0;persist();sfx.coin&&sfx.coin();notify(`Obrano: <b>${c.n}</b>, +${got} ${c.p==='melem'?'melema':'hrane'}.`);renderSheet()}
+function bPlant(i,id){const B=save.basta,b=B.beds[i],c=cropOf(id);if(!c||b.c||!canPay(c.seed)||B.lvl<c.lvl)return;pay(c.seed);b.c=id;b.p=0;b.ripeAt=0;B.last=Date.now();persist();sfx.build&&sfx.build();renderSheet();renderHub()}
+function bFeed(){const B=save.basta,S=soldiers().filter(s=>!isBusy(s.name)),need=Math.max(1,S.length);if(B.fed>0||B.hrana<need)return;B.hrana-=need;B.fed=FED.battles;persist();sfx.build&&sfx.build();notify(`Vojska je nahranjena: <b>+${Math.round((FED.mul-1)*100)}% zdravlja</b> u sledeće ${FED.battles} bitke.`);renderSheet()}
+function melemCost(n){return Math.max(1,Math.ceil(woundLeft(n)/60000/4))}
+function bHealM(n){const B=save.basta,c=melemCost(n);if(!B||B.melem<c||!isWounded(n))return;B.melem-=c;delete save.wounded[n];persist();sfx.build&&sfx.build();notify(`<b>${esc(n)}</b> je izlečen melemom.`);renderSheet()}
+/* posle bitke: troši se obrok */
+setTimeout(()=>{const _er=endRun;endRun=function(win){const c=G&&G.cfg;const had=G&&G.allies&&G.allies.some(a=>a.army);const r=_er.apply(this,arguments);try{if(save.basta&&save.basta.fed>0&&c&&!c.spect&&had){save.basta.fed--;persist();if(!save.basta.fed)logAdd('Vojska je ponovo gladna. Nahrani je u bašti.','')}}catch(e){}return r}},250);
+/* ---- ekran bašte ---- */
+const BASTA_CSS=`.bsum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.bsum div{padding:8px 6px;border-radius:6px;background:rgba(255,250,232,.35);border:1px solid rgba(90,50,20,.25);text-align:center;font:600 12px 'Alegreya Sans',sans-serif;color:#5a3e22}
+.bsum b{display:block;font:700 18px Cinzel,serif;color:#2e1c0e}.bsum .fed b{color:#2f6a22}
+.bwork{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}.bwork select{flex:1;min-width:150px;padding:8px;border-radius:6px;border:1px solid #b08850;background:#fbf1d8;font:600 14px 'EB Garamond',serif;color:#3a2010}
+.bed{display:grid;grid-template-columns:54px 1fr;gap:10px;align-items:center}.bed .ic{width:54px;height:54px;border-radius:8px;background:linear-gradient(180deg,#7a5634,#4a3220);display:grid;place-items:center;box-shadow:inset 0 0 0 2px rgba(0,0,0,.3)}
+.bed .ic i{display:block;width:30px;height:30px;border-radius:50%;box-shadow:0 0 0 3px rgba(0,0,0,.15)}.bed .bt{font:600 12.5px 'Alegreya Sans',sans-serif;color:#7a5232}
+.bbar{height:7px;border-radius:4px;background:rgba(90,50,20,.18);overflow:hidden;margin:5px 0}.bbar b{display:block;height:100%;background:linear-gradient(90deg,#6fb64e,#c9e07a)}
+.bhelp{grid-column:1/-1;margin:0 0 4px;font:500 14px/1.35 'EB Garamond',serif;color:#5a3e22}
+.bseeds{display:flex;flex-direction:column;gap:8px;grid-column:1/-1}
+.seed{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid rgba(90,50,20,.25);border-radius:8px;background:rgba(255,250,232,.45)}
+.seed .si{width:44px;height:44px;border-radius:8px;background:#5a3a22;display:grid;place-items:center}.seed .si svg{width:36px;height:36px}
+.seed b{display:block;font:700 14px Cinzel,serif;color:#2e1c0e}.seed small{display:block;font:600 12px/1.35 'Alegreya Sans',sans-serif;color:#6a4a2c}.seed small i{font-style:normal;color:#2f6a22}
+.seed .btn{min-width:84px;max-width:118px;white-space:nowrap!important;padding:8px 12px!important}.seed.lock{opacity:.6}
+.bed .ic svg{width:40px;height:40px}
+.clist{display:flex;flex-direction:column;gap:8px}.cdone{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;padding:10px;border-radius:8px;background:rgba(80,150,60,.15);border:1px solid rgba(60,120,40,.4)}.cdone span{font-size:28px;text-align:center}.cdone b{display:block;font:700 15px Cinzel,serif;color:#2f5a22}.cdone small{font:600 12.5px/1.35 'Alegreya Sans',sans-serif;color:#4a6a3a}
+.btest{margin:0 0 10px;padding:6px 10px;border-radius:6px;background:#2f5d8a;color:#fff;font:700 11px Cinzel,serif;letter-spacing:.06em;text-align:center}`;
+{const st=document.createElement('style');st.textContent=BASTA_CSS;document.head.appendChild(st)}
+function sheetBasta(body){$('#shTitle').textContent='Bašta';const B=save.basta;
+ if(!B){const ok=save.b.ognjiste>=BASTA.unlockOg;$('#shSub').textContent='Plac uz selo za lekovito bilje i hranu';
+  body.innerHTML=`<div class="bcard"><h3>Plac uz selo <small>NIJE KUPLJEN</small></h3><div></div><p>Kupi plac pored sela i napravi baštu. Lekovito bilje daje <b>melem</b> kojim brže lečiš ranjene vojnike, a žito i proso daju <b>hranu</b>: nahranjena vojska ima više zdravlja. Bašti treba baštovan (jedan vojnik, koji tada ne ide u boj) i svakodnevna briga: jednom dnevno mu odrediš posao, inače leje stanu i propadnu.</p>
+  <div class="act">${ok?costHtml(BASTA.buy)+`<button class="btn primary sm" data-cost='${JSON.stringify(BASTA.buy)}' id="bBuy">Kupi plac</button>`:`<span class="req">Najpre dogradi ognjište do ${BASTA.unlockOg}. nivoa</span>`}</div></div>`;
+  const bb=$('#bBuy');if(bb)bb.onclick=()=>{if(!canPay(BASTA.buy))return;pay(BASTA.buy);bInit();persist();sfx.build&&sfx.build();fortFx=1.2;notify('Kupljen je plac. Posadi prve leje i pošalji baštovana.');renderSheet();renderHub()};return}
+ bInit();bTick();const cap=BASTA.cap(B.lvl);$('#shSub').textContent=`Bašta ${B.lvl}. nivo · ${B.beds.length} leje · ambar ${cap}`;
+ const S=soldiers().filter(s=>!(typeof isWounded==='function'&&isWounded(s.name)));
+ let h=`<div class="bsum"><div><b>${B.melem}</b>melem / ${cap}</div><div><b>${B.hrana}</b>hrana / ${cap}</div><div class="${B.fed?'fed':''}"><b>${B.fed?'+'+Math.round((FED.mul-1)*100)+'%':'—'}</b>${B.fed?`još ${B.fed} ${B.fed===1?'bitka':'bitke'}`:'vojska gladna'}</div></div>`;
+ h+=`<p class="bhelp" style="margin:0 0 12px">Obrano bilje ide u <b>ambar</b> (brojevi gore). <b>Melem</b> trošiš da ranjenog vojnika odmah vratiš u boj (dole, „Leči melemom“, ili u ambulanti). <b>Hranu</b> trošiš dugmetom „Nahrani vojsku“: sita vojska ima +25% zdravlja u sledeće 3 bitke.</p>`;
+ const CN=careNow();
+ h+=`<div class="bcard"><h3>Baštovan <small>${B.worker?'U BAŠTI':'NEMA GA'}</small></h3><div></div><p>${B.worker?`<b>${esc(B.worker)}</b> brine o bašti i za to vreme ne ide u boj.`:'Pošalji jednog vojnika u baštu. Dok je baštovan, ne ide u boj.'}</p>
+  <div class="act bwork"><select id="bWk"><option value="">— niko —</option>${S.map(s=>`<option ${B.worker===s.name?'selected':''} value="${esc(s.name)}">${esc(s.name)} (${s.uname})</option>`).join('')}</select></div></div>`;
+ h+=`<div class="bcard care"><h3>Današnji posao <small>${CN?'URAĐENO':'NIJE ODREĐEN'}</small></h3><div></div>
+  <p>Bašta traži brigu <b>svakog dana</b>. Jednom dnevno odrediš baštovanu šta radi i to važi do ponoći. Bez toga leje stoje, a ako prođe ceo dan bez nege, zasađeno propada.</p>
+  ${CN?`<div class="cdone" style="grid-column:1/-1"><span>${CN.ic}</span><div><b>${CN.n}</b><small>${CN.d} Novi posao sutra.</small></div></div>`:
+  !B.worker?'<div class="req" style="grid-column:1/-1">Najpre pošalji baštovana</div>':
+  `<div class="clist" style="grid-column:1/-1">${CARE.map(c=>`<div class="seed"><div class="si" style="font-size:26px">${c.ic}</div><div><b>${c.n}</b><small>${c.d}<br>Trošak: ${Object.entries(c.cost).map(([k,v])=>v+' '+RES_GEN[k]).join(', ')}</small></div><button class="btn sm ${canPay(c.cost)?'primary':''}" ${canPay(c.cost)?'':'disabled'} data-cost='${JSON.stringify(c.cost)}' data-care="${c.k}">Odredi</button></div>`).join('')}</div>`}</div>`;
+ B.beds.forEach((b,i)=>{const c=cropOf(b.c);
+  if(!c){h+=`<div class="bcard"><h3>Leja ${i+1} <small>PRAZNA</small></h3><div></div><p class="bhelp">Leja je jedan red u bašti. U nju sadiš jednu biljku, a kad sazri, obereš je. Izaberi šta ćeš posaditi:</p><div class="bseeds">${CROPS.map(x=>{const lk=x.lvl>B.lvl,ok=!lk&&canPay(x.seed);return `<div class="seed${lk?' lock':''}"><div class="si">${CROP_SVG[x.id]||''}</div><div><b>${x.n}</b><small>Daje <i>${x.y} ${x.p==='melem'?'melema':'hrane'}</i> · raste ${fmtT(x.g*60)}<br>Seme: ${Object.entries(x.seed).map(([k,v])=>v+' '+RES_GEN[k]).join(', ')}</small></div>${lk?`<span class="req" style="width:auto;padding:6px 8px">Bašta ${x.lvl}. nivo</span>`:`<button class="btn sm ${ok?'primary':''}" ${ok?'':'disabled'} data-cost='${JSON.stringify(x.seed)}' data-plant="${i}:${x.id}">Posadi</button>`}</div>`}).join('')}</div></div>`;return}
+  const p=bedPct(b),ripe=p>=1;const left=Math.max(0,c.g*60-(b.p||0));const spoil=ripe&&b.ripeAt?Math.max(0,Math.max(3*3600*1000,c.g*60*1000)-(Date.now()-b.ripeAt))/1000:0;
+  h+=`<div class="bcard" data-bed="${i}"><div class="bed" style="grid-column:1/-1"><div class="ic">${CROP_SVG[c.id]||''}</div><div><h3 style="margin:0">Leja ${i+1}: ${c.n} <small>${ripe?'ZRELO':'RASTE'}</small></h3><div class="bbar"><b style="width:${p*100}%"></b></div>
+   <div class="bt">${ripe?(CN&&CN.keep?'zrelo, ne vene danas':`oberi u roku od ${fmtT(spoil)}, inače vene`):!B.worker?'stoji, nema baštovana':!CN?'stoji, danas niko nije radio':`zri još ${fmtT(left/CN.mul)}`}</div></div></div>
+   ${ripe?`<div class="act"><button class="btn green sm" data-harv="${i}" style="width:100%">Oberi: +${c.y} ${c.p==='melem'?'melema':'hrane'} u ambar</button></div>`:''}</div>`});
+ const nS=Math.max(1,soldiers().filter(s=>!isBusy(s.name)).length);
+ h+=`<div class="bcard"><h3>Nahrani vojsku</h3><div></div><p>Svaki vojnik pojede jedan obrok (${nS} hrane). Nahranjena vojska ima <b>+${Math.round((FED.mul-1)*100)}% zdravlja</b> u sledeće ${FED.battles} bitke. Ne može dok traje prethodni obrok.</p>
+  <div class="act">${B.fed?`<span class="req">Vojska je sita još ${B.fed} ${B.fed===1?'bitku':'bitke'}</span>`:`<button class="btn primary sm" id="bFeed" ${B.hrana>=nS?'':'disabled'} style="width:100%">${B.hrana>=nS?`Nahrani (${nS} hrane)`:`Nedostaje ${nS-B.hrana} hrane`}</button>`}</div></div>`;
+ const W=soldiers().filter(s=>isWounded(s.name));
+ if(W.length)h+=`<div class="bcard"><h3>Leči melemom</h3><div></div><p>Ranjenog vojnika odmah vraćaš u boj. Jedan melem za svaka 4 minuta oporavka.</p>${W.map(s=>{const c=melemCost(s.name);return`<div class="act"><span style="flex:1"><b>${esc(s.name)}</b> <small>još ${fmtT(woundLeft(s.name)/1000)}</small></span><button class="btn sm ${B.melem>=c?'green':''}" ${B.melem>=c?'':'disabled'} data-melem="${esc(s.name)}">${B.melem>=c?`Melem ×${c}`:`Nedostaje ${c-B.melem} melema`}</button></div>`}).join('')}</div>`;
+ if(B.lvl<BASTA.maxLvl){const uc=BASTA.up(B.lvl),nx=CROPS.filter(x=>x.lvl===B.lvl+1).map(x=>x.n);
+  h+=`<div class="bcard"><h3>Dogradi baštu <small>NIVO ${B.lvl}</small></h3><div></div><div class="eff">Sledeći nivo: <b>${BASTA.beds(B.lvl+1)}</b> leje, ambar <b>${BASTA.cap(B.lvl+1)}</b>${nx.length?`, novo seme: <b>${nx.join(', ')}</b>`:''}</div>
+   <div class="act">${costHtml(uc)}<button class="btn primary sm" ${canPay(uc)?'':'disabled'} data-cost='${JSON.stringify(uc)}' id="bUp">Dogradi</button></div></div>`}
+ body.innerHTML=h;
+ const wk=$('#bWk');if(wk)wk.onchange=()=>{bTick();B.worker=wk.value||null;B.last=Date.now();persist();notify(B.worker?`<b>${esc(B.worker)}</b> je otišao u baštu.`:'Baštovan se vratio u vojsku.');renderSheet();renderHub()};
+ body.querySelectorAll('[data-plant]').forEach(b=>b.onclick=()=>{const[i,id]=b.dataset.plant.split(':');bPlant(+i,id)});
+ body.querySelectorAll('[data-care]').forEach(b=>b.onclick=()=>bSetCare(b.dataset.care));
+ body.querySelectorAll('[data-harv]').forEach(b=>b.onclick=()=>bHarvest(+b.dataset.harv));
+ body.querySelectorAll('[data-melem]').forEach(b=>b.onclick=()=>bHealM(b.dataset.melem));
+ const fd=$('#bFeed');if(fd)fd.onclick=bFeed;
+ const up=$('#bUp');if(up)up.onclick=()=>{const uc=BASTA.up(B.lvl);if(!canPay(uc))return;pay(uc);B.lvl++;bInit();persist();sfx.build&&sfx.build();fortFx=1.2;notify(`Bašta je sada ${B.lvl}. nivo.`);renderSheet();renderHub()}}
+{const _rs=renderSheet;renderSheet=function(){if(sheetOpen==='basta'){const body=$('#shBody'),sc=body.scrollTop;sheetBasta(body);body.scrollTop=sc;try{btnDecor(body)}catch(e){}return}return _rs.apply(this,arguments)}}
+/* ---- plac u selu ---- */
+/* zajednički izgled placa: zaobljeno tlo, staza do puta, plot */
+function plotPts(x0,y0,W,H,r,step){const P=[];const add=(x,y)=>P.push([x,y]);const L=[[x0+r,y0,x0+W-r,y0],[x0+W,y0+r,x0+W,y0+H-r],[x0+W-r,y0+H,x0+r,y0+H],[x0,y0+H-r,x0,y0+r]];
+ const C=[[x0+W-r,y0+r,-Math.PI/2],[x0+W-r,y0+H-r,0],[x0+r,y0+H-r,Math.PI/2],[x0+r,y0+r,Math.PI]];
+ for(let k=0;k<4;k++){const[a,b,c,d]=L[k];const n=Math.max(1,Math.round(Math.hypot(c-a,d-b)/step));for(let i=0;i<n;i++)add(a+(c-a)*i/n,b+(d-b)*i/n);const[ox,oy,a0]=C[k];for(let i=0;i<3;i++){const a=a0+i/3*Math.PI/2;add(ox+Math.cos(a)*r,oy+Math.sin(a)*r)}}return P}
+function plotGround(ctx,x0,y0,W,H,t,o){const cx=VIL.cx,road=cx+6;ctx.save();
+ /* staza do glavnog puta */const gx=o.gate==='left'?x0:x0+W,gy2=y0+H*.62;ctx.strokeStyle='rgba(140,116,84,.95)';ctx.lineWidth=16;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(road,gy2+6);ctx.quadraticCurveTo((road+gx)/2,gy2+14,gx+(o.gate==='left'?6:-6),gy2);ctx.stroke();
+ ctx.fillStyle='rgba(0,0,0,.16)';ctx.beginPath();ctx.ellipse(x0+W/2,y0+H/2+8,W/2+22,H/2+18,0,0,7);ctx.fill();
+ const r=26;const g=ctx.createRadialGradient(x0+W/2,y0+H/2,10,x0+W/2,y0+H/2,W*.62);g.addColorStop(0,o.c0);g.addColorStop(.75,o.c1);g.addColorStop(1,'#5f7a3c');ctx.fillStyle=g;
+ ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x0-8,y0-6,W+16,H+12,r+6);else ctx.rect(x0-8,y0-6,W+16,H+12);ctx.fill();
+ ctx.strokeStyle='rgba(70,100,40,.7)';ctx.lineWidth=1;for(let i=0;i<46;i++){const a=i/46*6.283,px=x0+W/2+Math.cos(a)*(W/2+6),py=y0+H/2+Math.sin(a)*(H/2+5);ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px-1.5,py-5-(i%3)*2);ctx.moveTo(px+2,py);ctx.lineTo(px+3,py-4);ctx.stroke()}
+ ctx.restore()}
+function plotFence(ctx,x0,y0,W,H,o,front){const P=plotPts(x0,y0,W,H,26,24),mid=y0+H/2;ctx.save();
+ const gate=o.gate==='left'?[x0,y0+H*.62]:[x0+W,y0+H*.62];
+ for(let i=0;i<P.length;i++){const a=P[i],b=P[(i+1)%P.length];const isF=(a[1]+b[1])/2>mid;if(isF!==!!front)continue;
+  const gm=[(a[0]+b[0])/2,(a[1]+b[1])/2];if(Math.hypot(gm[0]-gate[0],gm[1]-gate[1])<20)continue;
+  if(o.pick){ctx.fillStyle=o.pick;for(let k=0;k<3;k++){const px=a[0]+(b[0]-a[0])*k/3,py=a[1]+(b[1]-a[1])*k/3;ctx.fillRect(px-2,py-13,4,13);ctx.beginPath();ctx.moveTo(px-2,py-13);ctx.lineTo(px,py-16);ctx.lineTo(px+2,py-13);ctx.fill()}ctx.fillRect(Math.min(a[0],b[0]),Math.min(a[1],b[1])-9,Math.abs(b[0]-a[0])||2,2)}
+  else{ctx.strokeStyle='#7a5632';ctx.lineWidth=2.2;for(let k=0;k<3;k++){const off=4+k*4;ctx.beginPath();ctx.moveTo(a[0],a[1]-off);ctx.lineTo(b[0],b[1]-off);ctx.stroke()}
+   ctx.fillStyle='#4a321c';ctx.fillRect(a[0]-2,a[1]-17,4,17);ctx.fillStyle='#6a4a2c';ctx.fillRect(a[0]-2,a[1]-17,2,17)}}
+ if(front){ctx.fillStyle='#4a321c';const gx=gate[0];for(const d of[-14,14]){ctx.fillRect(gx-2.5,gate[1]+d-22,5,22)}}
+ ctx.restore()}
+function drawBasta(ctx,t,cx,gy){const B=save.basta,x0=cx+86,y0=gy+188,W=270,H=96,own=!!B;ctx.save();
+ if(own){plotGround(ctx,x0,y0,W,H,t,{gate:'left',c0:'#7a6040',c1:'#6f5a3a'});plotFence(ctx,x0,y0,W,H,{gate:'left'},false);
+  const n=B.beds.length,gap=9,bw=(W-44-gap*(n-1))/n,bh=H-34;
+  for(let i=0;i<n;i++){const bx=x0+26+i*(bw+gap),by=y0+14,b=B.beds[i],c=b&&cropOf(b.c);
+   ctx.fillStyle='#3e2818';ctx.beginPath();ctx.roundRect?ctx.roundRect(bx-3,by-3,bw+6,bh+6,5):ctx.rect(bx-3,by-3,bw+6,bh+6);ctx.fill();ctx.fillStyle='#5a3a22';ctx.fillRect(bx,by,bw,bh);
+   ctx.fillStyle='rgba(0,0,0,.22)';for(let r=0;r<4;r++)ctx.fillRect(bx+2,by+6+r*(bh-8)/4,bw-4,3);
+   if(c){const p=bedPct(b);const cols=Math.max(2,Math.floor(bw/15));for(let r=0;r<4;r++)for(let k=0;k<cols;k++){const px=bx+bw*((k+.5)/cols),py=by+10+r*(bh-8)/4,hh=3+p*12,sw=Math.sin(t*2+k*.7+r)*1.2;
+     ctx.strokeStyle=c.id==='zito'||c.id==='proso'?'#8a9a3a':'#4f8a34';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+sw,py-hh);ctx.stroke();
+     if(p>.5){ctx.fillStyle=c.col;if(c.id==='zito'||c.id==='proso'){ctx.beginPath();ctx.ellipse(px+sw,py-hh-2,1.6,3.2+p*1.5,0,0,7);ctx.fill()}else{ctx.beginPath();ctx.arc(px+sw,py-hh,1.4+p*1.8,0,7);ctx.fill();if(c.id==='kamilica'){ctx.fillStyle='#e8b830';ctx.beginPath();ctx.arc(px+sw,py-hh,.9,0,7);ctx.fill()}}}}
+    if(p>=1){const pu=.5+.5*Math.sin(t*5);ctx.strokeStyle=`rgba(170,255,120,${.45+.5*pu})`;ctx.lineWidth=2.5;ctx.strokeRect(bx-5,by-5,bw+10,bh+10)}}
+   const sx=bx+bw/2,sy=by+bh+11;ctx.fillStyle='#e8d6a8';ctx.fillRect(sx-9,sy-6,18,11);ctx.strokeStyle='#5a3e22';ctx.lineWidth=1;ctx.strokeRect(sx-9,sy-6,18,11);ctx.fillStyle='#3a2010';ctx.font='700 9px Cinzel,serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(i+1,sx,sy)}
+  const sx=x0+W-14,sy=y0+30;ctx.strokeStyle='#5a3e24';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(sx,sy+26);ctx.lineTo(sx,sy-16);ctx.moveTo(sx-12,sy-6);ctx.lineTo(sx+12,sy-6);ctx.stroke();ctx.fillStyle='#d8b060';ctx.beginPath();ctx.arc(sx,sy-20,5,0,7);ctx.fill();ctx.fillStyle='#8a2a1a';ctx.fillRect(sx-7,sy-27,14,4);
+  const rp=B.beds.some(bedRipe);ctx.font='700 13px Cinzel,serif';ctx.textAlign='center';ctx.textBaseline='middle';const lb='BAŠTA'+(rp?' · ZRELO!':''),tw=ctx.measureText(lb).width+18;ctx.fillStyle=rp?'rgba(40,110,30,.92)':'rgba(30,18,10,.78)';ctx.beginPath();ctx.roundRect?ctx.roundRect(x0+W/2-tw/2,y0-34,tw,20,10):ctx.rect(x0+W/2-tw/2,y0-34,tw,20);ctx.fill();ctx.fillStyle='#fff3d8';ctx.fillText(lb,x0+W/2,y0-24);
+ }else plotEmpty(ctx,x0,y0,W,H,save.b.ognjiste>=BASTA.unlockOg?'PLAC ZA BAŠTU':'BAŠTA · ognjište '+BASTA.unlockOg,'left');
+ ctx.restore();vhit.push({id:'basta',x:x0-14,y:y0-38,w:W+28,h:H+54,bx:x0+W/2,by:y0-44})}
+function drawBastaFront(ctx,t,cx,gy){if(!save.basta)return;plotFence(ctx,cx+86,gy+188,270,96,{gate:'left'},true)}
+function plotEmpty(ctx,x0,y0,W,H,lb,gate){ctx.save();ctx.fillStyle='rgba(255,240,200,.07)';ctx.strokeStyle='rgba(255,240,200,.7)';ctx.lineWidth=2;ctx.setLineDash([8,6]);ctx.beginPath();ctx.roundRect?ctx.roundRect(x0,y0,W,H,26):ctx.rect(x0,y0,W,H);ctx.fill();ctx.stroke();ctx.setLineDash([]);
+ ctx.font='700 15px Cinzel,serif';ctx.textAlign='center';ctx.textBaseline='middle';const tw=ctx.measureText(lb).width+26;ctx.fillStyle='rgba(30,18,10,.8)';ctx.beginPath();ctx.roundRect?ctx.roundRect(x0+W/2-tw/2,y0+H/2-15,tw,30,15):ctx.rect(x0+W/2-tw/2,y0+H/2-15,tw,30);ctx.fill();ctx.fillStyle='#ffe7b0';ctx.fillText(lb,x0+W/2,y0+H/2+1);ctx.restore()}
+{const _df=drawFortress;drawFortress=function(t){const r=_df.apply(this,arguments);return r}}
+{const _rs=renderSheet;renderSheet=function(){const r=_rs.apply(this,arguments);try{if(sheetOpen==='utvrdjenje'){const body=$('#shBody');if(!body.querySelector('.bastaL')){const d=document.createElement('div');d.className='bcard bastaL';const B=save.basta;
+ d.innerHTML=`<h3>Bašta <small>${B?B.lvl+'. NIVO':'NOVO'}</small></h3><div></div><p>${B?`Melem ${B.melem}, hrana ${B.hrana}. ${B.worker?'Baštovan radi.':'Nema baštovana, leje stoje.'}${B.beds.some(bedRipe)?' <b>Ima zrelih leja!</b>':''}`:'Plac uz selo za lekovito bilje i hranu za vojsku.'}</p><div class="act"><button class="btn sm ${B&&B.beds.some(bedRipe)?'green':'primary'}" style="width:100%">Otvori baštu</button></div>`;
+ d.querySelector('button').onclick=()=>openSheet('basta');const sum=body.querySelector('.dmgsum');let at=body.firstChild;while(at&&(at.classList&&(at.classList.contains('dmgsum')||at.classList.contains('dmgc'))))at=at.nextSibling;body.insertBefore(d,at)}}}catch(e){}return r}}
+/* ---------- AMBULANTA (probna verzija): ležajevi, sestre, lekarka ---------- */
+const AMBU={unlockOg:6,buy:{zar:1500,kamen:1200,gvozdje:150},maxLvl:5,
+ up:l=>({zar:nice(1200*1.8**(l-1)),kamen:nice(900*1.75**(l-1)),gvozdje:nice(120*1.8**(l-1))}),
+ beds:l=>1+l,speed:l=>1.25+l*.25,admit:l=>({zar:40+l*10}),
+ sestra:{cost:{zar:900,gvozdje:60},plata:.5,add:.5,max:2,lvl:2},
+ lekarka:{cost:{zar:3000,kamen:800,gvozdje:300},plata:1.2,add:1,max:1,lvl:4},
+ wound:{win:8,lose:20}};
+const AMB_ERA=[{n:'Vidarnica',d:'Vidar i monasi leče travama i molitvom, kao u bolnici manastira Studenice.'},
+ {n:'Lazaret',d:'Kamena kuća sa ležajima, gde bolničari previjaju rane posle bitaka.'},
+ {n:'Vojna bolnica',d:'Ustanička bolnica sa lekarima i bolničarkama, kakve su nicale posle 1804.'}];
+function ambEra(){const r=Math.floor(topLevel()/10);return r>=4?2:r>=2?1:0}
+function ambInit(){if(!save.amb)save.amb={lvl:1,pat:[],sestre:0,lekarka:0,last:Date.now()};return save.amb}
+function ambSpeed(){const A=save.amb;if(!A)return 1;let s=AMBU.speed(A.lvl);if(!A._noPay)s+=A.sestre*AMBU.sestra.add+A.lekarka*AMBU.lekarka.add;return s}
+function ambIn(n){return !!(save.amb&&save.amb.pat.includes(n))}
+/* duži oporavak bez ambulante (probna pravila) */
+setTimeout(()=>{const _er=endRun;endRun=function(win){const w0=Object.assign({},save.wounded||{});const r=_er.apply(this,arguments);
+ try{const now=Date.now();for(const k in save.wounded||{}){if(!w0[k]||save.wounded[k]>w0[k]+1000){save.wounded[k]=now+(win?AMBU.wound.win:AMBU.wound.lose)*60000}}persist()}catch(e){}return r}},150);
+function ambTick(){const A=save.amb;if(!A)return;const now=Date.now(),dt=Math.min(24*3600,(now-(A.last||now))/1000);A.last=now;if(dt<=0)return;
+ A.pat=A.pat.filter(n=>save.wounded&&save.wounded[n]&&save.wounded[n]>now);
+ if(A.pat.length&&(A.sestre||A.lekarka)){const need=dt/60*(A.sestre*AMBU.sestra.plata+A.lekarka*AMBU.lekarka.plata);if((save.res.zar||0)>=need){save.res.zar-=need;if(A._noPay){A._noPay=0}}else if(!A._noPay){A._noPay=1;logAdd('<b>Ambulanta</b>: nema žara za plate, sestre i lekarka ne rade.','bad')}}
+ const extra=(ambSpeed()-1)*dt*1000;
+ for(const n of A.pat.slice()){save.wounded[n]-=extra;if(save.wounded[n]<=now){delete save.wounded[n];A.pat=A.pat.filter(x=>x!==n);logAdd(`<b>${esc(n)}</b> je izlečen u ambulanti i vratio se u vojsku.`,'good')}}}
+setInterval(()=>{if(save.amb){ambTick();if(sheetOpen==='amb'&&state==='hub'){const k=save.amb.pat.join()+Object.keys(save.wounded||{}).join()+save.amb.sestre+save.amb.lekarka+save.amb.lvl+(save.amb._noPay?1:0);if(k!==ambTick._k){ambTick._k=k;renderSheet()}else ambLive()}}},2000);
+function ambLive(){document.querySelectorAll('#shBody [data-pt]').forEach(el=>{const n=el.dataset.pt,t=el.querySelector('.bt');if(t)t.textContent=`još ${fmtT(woundLeft(n)/ambSpeed()/1000)}`})}
+function ambAdmit(n){const A=save.amb,c=AMBU.admit(A.lvl);if(!A||A.pat.length>=AMBU.beds(A.lvl)||!isWounded(n)||ambIn(n)||!canPay(c))return;ambTick();pay(c);A.pat.push(n);A.last=Date.now();persist();sfx.build&&sfx.build();notify(`<b>${esc(n)}</b> je smešten u ambulantu.`);renderSheet();renderHub()}
+function ambHire(k){const A=save.amb,H=AMBU[k];if(A.lvl<H.lvl||(k==='sestra'?A.sestre:A.lekarka)>=H.max||!canPay(H.cost))return;pay(H.cost);if(k==='sestra')A.sestre++;else A.lekarka++;persist();sfx.build&&sfx.build();notify(k==='sestra'?'Primljena je <b>medicinska sestra</b>.':'U ambulantu je stigla <b>lekarka</b>.');renderSheet()}
+const AMB_CSS=`.apat{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:8px 0;border-top:1px dashed rgba(90,50,20,.25)}.apat:first-of-type{border-top:0}
+.apat b{font:700 14px 'EB Garamond',serif;color:#2e1c0e}.apat small{display:block;font:600 12px 'Alegreya Sans',sans-serif;color:#7a5232}
+.abeds{display:flex;gap:5px;margin:6px 0 2px;flex-wrap:wrap}.abeds i{width:26px;height:14px;border-radius:3px;background:#e8dcc0;border:1.5px solid #8a6a48}.abeds i.on{background:#b8323a;border-color:#6e1a10}
+.staff{display:grid;grid-template-columns:44px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-top:1px dashed rgba(90,50,20,.25)}.staff .si{width:44px;height:44px;border-radius:50%;background:#efe4c8;display:grid;place-items:center;font-size:24px;border:2px solid #b08850}
+.staff b{display:block;font:700 14px Cinzel,serif;color:#2e1c0e}.staff small{display:block;font:600 12px/1.35 'Alegreya Sans',sans-serif;color:#6a4a2c}.staff .btn{max-width:120px}`;
+{const st=document.createElement('style');st.textContent=AMB_CSS;document.head.appendChild(st)}
+const NURSE_SVG='<svg viewBox="0 0 40 40" width="34" height="34"><circle cx="20" cy="13" r="6" fill="#f0c8a0"/><path d="M12 11c0-6 16-6 16 0v2H12z" fill="#fff"/><path d="M18 8h4v1.5h-4z" fill="#c22"/><path d="M11 36l3-15h12l3 15z" fill="#3a6aa8"/><path d="M15 22h10v14H15z" fill="#fff"/></svg>';
+const DOC_SVG='<svg viewBox="0 0 40 40" width="34" height="34"><circle cx="20" cy="12" r="6" fill="#f0c8a0"/><path d="M13 12c0-8 14-8 14 0-2-3-12-3-14 0z" fill="#5a3a22"/><path d="M10 37l3-17h14l3 17z" fill="#f4f4f0" stroke="#bbb" stroke-width=".6"/><path d="M17 20l3 6 3-6" stroke="#555" fill="none" stroke-width="1.2"/><circle cx="23" cy="29" r="2" fill="none" stroke="#555"/></svg>';
+function sheetAmb(body){const A=save.amb,E=AMB_ERA[ambEra()];$('#shTitle').textContent=A?E.n:'Ambulanta';
+ if(!A){const ok=save.b.ognjiste>=AMBU.unlockOg;$('#shSub').textContent='Plac za lečenje ranjenih vojnika';
+  body.innerHTML=`<div class="bcard"><h3>Plac za ambulantu <small>NIJE KUPLJEN</small></h3><div></div><p>Bez ambulante ranjeni se oporavljaju dugo (${AMBU.wound.win} min posle pobede, ${AMBU.wound.lose} posle poraza). U ambulanti leže na ležajima i ozdrave mnogo brže. Kasnije možeš primiti <b>medicinske sestre</b> i <b>lekarku</b>. Kako napreduješ kroz istoriju, ambulanta postaje savremenija: vidarnica, lazaret, vojna bolnica.</p>
+  <div class="act">${ok?costHtml(AMBU.buy)+`<button class="btn primary sm" data-cost='${JSON.stringify(AMBU.buy)}' id="aBuy">Kupi plac</button>`:`<span class="req">Najpre dogradi ognjište do ${AMBU.unlockOg}. nivoa</span>`}</div></div>`;
+  const b=$('#aBuy');if(b)b.onclick=()=>{if(!canPay(AMBU.buy))return;pay(AMBU.buy);ambInit();persist();sfx.build&&sfx.build();fortFx=1.2;notify(`Podignuta je <b>${AMB_ERA[ambEra()].n.toLowerCase()}</b>. Pošalji ranjene na lečenje.`);renderSheet();renderHub()};return}
+ ambTick();const nb=AMBU.beds(A.lvl),sp=ambSpeed();$('#shSub').textContent=`${A.lvl}. nivo · ${nb} ${nb<5?'ležaja':'ležajeva'} · leči ${String(sp.toFixed(2)).replace(/\.?0+$/,'').replace('.',',')}× brže`;
+ let h=`<p class="bhelp" style="margin:0 0 12px">${E.d} Pošalji ranjenog vojnika na ležaj i oporaviće se brže. Svako primanje košta žar.</p>`;
+ h+=`<div class="bcard"><h3>Ležajevi <small>${A.pat.length} / ${nb}</small></h3><div></div><div class="abeds" style="grid-column:1/-1">${Array.from({length:nb},(_,i)=>`<i class="${i<A.pat.length?'on':''}"></i>`).join('')}</div>
+  ${A.pat.length?A.pat.map(n=>`<div class="apat" data-pt="${esc(n)}" style="grid-column:1/-1"><span><b>${esc(n)}</b><small class="bt">još ${fmtT(woundLeft(n)/sp/1000)}</small></span><span class="req" style="width:auto;padding:5px 8px;border-style:solid">na lečenju</span></div>`).join(''):'<p style="grid-column:1/-1">Nema nikog na lečenju.</p>'}</div>`;
+ const W=soldiers().filter(s=>isWounded(s.name)&&!ambIn(s.name)),ac=AMBU.admit(A.lvl),full=A.pat.length>=nb;
+ h+=`<div class="bcard"><h3>Ranjeni u selu <small>${W.length}</small></h3><div></div>${W.length?W.map(s=>`<div class="apat" style="grid-column:1/-1"><span><b>${esc(s.name)}</b><small>${s.uname} · sam bi se oporavljao još ${fmtT(woundLeft(s.name)/1000)}, u ambulanti ${fmtT(woundLeft(s.name)/sp/1000)}</small></span>${full?'<span class="req" style="width:auto;padding:5px 8px">nema mesta</span>':`<button class="btn sm ${canPay(ac)?'primary':''}" ${canPay(ac)?'':'disabled'} data-cost='${JSON.stringify(ac)}' data-adm="${esc(s.name)}">Na lečenje</button>`}</div>`).join(''):'<p style="grid-column:1/-1">Nema ranjenih. Ranjeni se pojave posle bitaka u kojima padnu vojnici.</p>'}
+  ${W.length&&!full?`<div class="eff" style="grid-column:1/-1">Primanje: ${Object.entries(ac).map(([k,v])=>v+' '+RES_GEN[k]).join(', ')} po vojniku</div>`:''}</div>`;
+ const S=AMBU.sestra,L=AMBU.lekarka;
+ h+=`<div class="bcard"><h3>Osoblje</h3><div></div><div style="grid-column:1/-1">
+  <div class="staff"><div class="si">${NURSE_SVG}</div><div><b>Medicinska sestra ${A.sestre}/${S.max}</b><small>Leči +${String(S.add).replace('.',',')}× brže. Plata ${String(S.plata).replace('.',',')} žara/min dok ima bolesnih.</small></div>${A.lvl<S.lvl?`<span class="req" style="width:auto;padding:6px 8px">${S.lvl}. nivo</span>`:A.sestre>=S.max?'<span class="req" style="width:auto;padding:6px 8px;border-style:solid">puno</span>':`<button class="btn sm ${canPay(S.cost)?'primary':''}" ${canPay(S.cost)?'':'disabled'} data-cost='${JSON.stringify(S.cost)}' data-hire="sestra">Primi</button>`}</div>
+  <div class="staff"><div class="si">${DOC_SVG}</div><div><b>Lekarka ${A.lekarka}/${L.max}</b><small>Leči +${L.add}× brže. Plata ${String(L.plata).replace('.',',')} žara/min dok ima bolesnih.</small></div>${A.lvl<L.lvl?`<span class="req" style="width:auto;padding:6px 8px">${L.lvl}. nivo</span>`:A.lekarka>=L.max?'<span class="req" style="width:auto;padding:6px 8px;border-style:solid">tu je</span>':`<button class="btn sm ${canPay(L.cost)?'primary':''}" ${canPay(L.cost)?'':'disabled'} data-cost='${JSON.stringify(L.cost)}' data-hire="lekarka">Primi</button>`}</div>
+  ${A._noPay?'<p style="color:#a3291a;font-weight:700">Nema žara za plate, osoblje ne radi.</p>':''}</div></div>`;
+ if(A.lvl<AMBU.maxLvl){const uc=AMBU.up(A.lvl);h+=`<div class="bcard"><h3>Dogradi <small>NIVO ${A.lvl}</small></h3><div></div><div class="eff">Sledeći nivo: <b>${AMBU.beds(A.lvl+1)}</b> ležaja, leči <b>${String(AMBU.speed(A.lvl+1)).replace('.',',')}×</b> brže${A.lvl+1===S.lvl?', može se primiti medicinska sestra':''}${A.lvl+1===L.lvl?', može se primiti lekarka':''}</div><div class="act">${costHtml(uc)}<button class="btn primary sm" ${canPay(uc)?'':'disabled'} data-cost='${JSON.stringify(uc)}' id="aUp">Dogradi</button></div></div>`}
+ body.innerHTML=h;
+ body.querySelectorAll('[data-adm]').forEach(b=>b.onclick=()=>ambAdmit(b.dataset.adm));
+ body.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>ambHire(b.dataset.hire));
+ const up=$('#aUp');if(up)up.onclick=()=>{const uc=AMBU.up(A.lvl);if(!canPay(uc))return;pay(uc);A.lvl++;persist();sfx.build&&sfx.build();fortFx=1.2;notify(`Ambulanta je sada ${A.lvl}. nivo.`);renderSheet();renderHub()}}
+{const _rs=renderSheet;renderSheet=function(){if(sheetOpen==='amb'){const body=$('#shBody'),sc=body.scrollTop;sheetAmb(body);body.scrollTop=sc;try{btnDecor(body)}catch(e){}return}return _rs.apply(this,arguments)}}
+/* kartica u Utvrđenju */
+{const _rs=renderSheet;renderSheet=function(){const r=_rs.apply(this,arguments);try{if(sheetOpen==='utvrdjenje'){const body=$('#shBody');if(!body.querySelector('.ambL')){const A=save.amb,d=document.createElement('div');d.className='bcard ambL';const W=soldiers().filter(s=>isWounded(s.name)&&!ambIn(s.name)).length;
+ d.innerHTML=`<h3>${A?AMB_ERA[ambEra()].n:'Ambulanta'} <small>${A?A.lvl+'. NIVO':'NOVO'}</small></h3><div></div><p>${A?`Na lečenju: ${A.pat.length}/${AMBU.beds(A.lvl)}.${W?` <b>${W} ${W===1?'ranjeni čeka':'ranjenih čeka'}.</b>`:''}`:'Plac za lečenje ranjenih vojnika.'}</p><div class="act"><button class="btn sm ${W&&A?'green':'primary'}" style="width:100%">Otvori</button></div>`;
+ d.querySelector('button').onclick=()=>openSheet('amb');const bl=body.querySelector('.bastaL');bl?bl.after(d):body.insertBefore(d,body.firstChild)}}}catch(e){}return r}}
+/* ---- crtež u selu ---- */
+function drawAmb(items,ctx,t,cx,gy){const A=save.amb,x0=cx-356,y0=gy+188,W=270,H=96,era=ambEra();
+ const fo={gate:'right',pick:A&&era===2?'#e8e2d0':null};
+ items.push({y:y0,f:()=>{if(!A){plotEmpty(ctx,x0,y0,W,H,save.b.ognjiste>=AMBU.unlockOg?'PLAC ZA AMBULANTU':'AMBULANTA · ognjište '+AMBU.unlockOg,'right');return}
+  plotGround(ctx,x0,y0,W,H,t,{gate:'right',c0:era===2?'#a8a290':'#8a7a5a',c1:era===2?'#8f8a78':'#7a6a4a'});plotFence(ctx,x0,y0,W,H,fo,false)}});
+ items.push({y:y0+H-2,f:()=>{if(A)plotFence(ctx,x0,y0,W,H,fo,true)}});
+ /* zgrada pozadi */
+ items.push({y:y0+52,f:()=>{if(!A)return;const s=era===0?.95:era===1?1.05:1.15;house(ctx,x0+78,y0+50,s,{w:era===2?110:84,h:era===2?34:28,d:30,stone:era>=1,shingle:era===2,lit:true},t);
+  const fx=x0+40,fy=y0+52-62*s;ctx.save();
+  if(era===2){ctx.strokeStyle='#4a3a2a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(fx,fy+40);ctx.lineTo(fx,fy-20);ctx.stroke();const wv=Math.sin(t*3)*2;ctx.fillStyle='#fff';ctx.fillRect(fx,fy-20+wv*.3,22,14);ctx.fillStyle='#c22';ctx.fillRect(fx+9,fy-18+wv*.3,4,10);ctx.fillRect(fx+6,fy-15+wv*.3,10,4)}
+  else{ctx.fillStyle='#e8d6a8';ctx.fillRect(x0+130,y0+52-46*s,30,18);ctx.strokeStyle='#5a3e22';ctx.strokeRect(x0+130,y0+52-46*s,30,18);ctx.fillStyle='#6a1a10';ctx.fillRect(x0+144,y0+52-44*s,3,14);ctx.fillRect(x0+139,y0+52-40*s,13,3);ctx.fillRect(x0+141,y0+52-35*s,9,2)}
+  if(era===0){ctx.strokeStyle='#5a3e22';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x0+175,y0+20);ctx.lineTo(x0+245,y0+20);ctx.stroke();for(let i=0;i<7;i++){ctx.fillStyle=['#7a9a4a','#b8a050','#6a8a3a'][i%3];ctx.beginPath();ctx.moveTo(x0+180+i*10,y0+20);ctx.lineTo(x0+176+i*10,y0+34);ctx.lineTo(x0+184+i*10,y0+34);ctx.fill()}}
+  ctx.font='700 13px Cinzel,serif';ctx.textAlign='center';ctx.textBaseline='middle';const E=AMB_ERA[era].n.toUpperCase(),lb=E+' · '+A.pat.length+'/'+AMBU.beds(A.lvl),tw=ctx.measureText(lb).width+18;ctx.fillStyle='rgba(30,18,10,.78)';ctx.beginPath();ctx.roundRect?ctx.roundRect(x0+W/2-tw/2,y0-34,tw,20,10):ctx.rect(x0+W/2-tw/2,y0-34,tw,20);ctx.fill();ctx.fillStyle='#fff3d8';ctx.fillText(lb,x0+W/2,y0-24);ctx.restore()}});
+ vhit.push({id:'amb',x:x0-10,y:y0-36,w:W+20,h:H+48,bx:x0+W/2,by:y0-40});
+ if(!A)return;
+ /* ležajevi sa bolesnicima */
+ const nb=AMBU.beds(A.lvl);for(let i=0;i<nb;i++){const bx=x0+158+(i%3)*40,by=y0+52+Math.floor(i/3)*26;items.push({y:by,f:()=>{ctx.save();ctx.fillStyle='#5a3e22';ctx.fillRect(bx-17,by-2,34,4);ctx.fillRect(bx-17,by,3,6);ctx.fillRect(bx+14,by,3,6);ctx.fillStyle=era===2?'#f4f2ea':'#d8c8a0';ctx.fillRect(bx-17,by-8,34,7);
+  if(i<A.pat.length){ctx.fillStyle=save.tribe?save.tribe.color:'#b8323a';ctx.fillRect(bx-6,by-11,20,7);ctx.fillStyle='#f0c8a0';ctx.beginPath();ctx.arc(bx-11,by-10,4,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.fillRect(bx-14,by-14,7,2)}
+  ctx.restore()}})}
+ /* osoblje */
+ const staff=[];for(let i=0;i<A.sestre;i++)staff.push('s');if(A.lekarka)staff.push('l');
+ staff.forEach((k,i)=>{const sx=x0+150+((t*.15+i*.33)%1)*100,sy=y0+80+i*3;items.push({y:sy,f:()=>{ctx.save();ctx.translate(sx,sy);const bob=Math.sin(t*6+i)*1;
+  ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(0,0,7,2.5,0,0,7);ctx.fill();
+  ctx.fillStyle=k==='l'?'#f4f4f0':'#3a6aa8';ctx.beginPath();ctx.moveTo(-6,0);ctx.lineTo(6,0);ctx.lineTo(3.5,-16+bob);ctx.lineTo(-3.5,-16+bob);ctx.fill();
+  if(k==='s'){ctx.fillStyle='#fff';ctx.fillRect(-3,-15+bob,6,12)}
+  ctx.fillStyle='#f0c8a0';ctx.beginPath();ctx.arc(0,-20+bob,4,0,7);ctx.fill();
+  if(k==='s'){ctx.fillStyle='#fff';ctx.fillRect(-4.5,-25+bob,9,3);ctx.fillStyle='#c22';ctx.fillRect(-1,-25+bob,2,3)}else{ctx.fillStyle='#5a3a22';ctx.beginPath();ctx.arc(0,-22+bob,4.2,Math.PI,0);ctx.fill()}
+  ctx.restore()}})})}
+/* prečice: slanje na lečenje iz rezultata bitke i iz spiska vojske */
+function ambFree(){const A=save.amb;return A?AMBU.beds(A.lvl)-A.pat.length:0}
+function ambSendAll(){const A=save.amb;if(!A)return 0;let k=0;for(const s of soldiers()){if(ambFree()<=0)break;if(isWounded(s.name)&&!ambIn(s.name)&&canPay(AMBU.admit(A.lvl))){pay(AMBU.admit(A.lvl));A.pat.push(s.name);k++}}if(k){A.last=Date.now();persist();sfx.build&&sfx.build();notify(`${k} ${k===1?'ranjeni je smešten':'ranjenih je smešteno'} u ambulantu.`)}return k}
+setTimeout(()=>{const _er=endRun;endRun=function(win){const r=_er.apply(this,arguments);try{const cs=[...document.querySelectorAll('#sResult .conseq')];const box=cs[cs.length-1];if(box&&/\d+ min/.test(box.innerHTML)){const w=Object.values(save.wounded||{});if(w.length){const m=Math.round((Math.max(...w)-Date.now())/60000);box.innerHTML=box.innerHTML.replace(/\d+ min/,m+' min')}}const W=soldiers().filter(s=>isWounded(s.name)&&!ambIn(s.name)).length;
+ if(box&&W&&!box.querySelector('.ambgo')){const A=save.amb;const b=document.createElement('button');b.className='btn sm '+(A&&ambFree()>0?'green':'')+' ambgo';b.style.cssText='display:block;width:100%;margin-top:8px;white-space:normal;line-height:1.25';
+  if(!A){b.disabled=true;b.textContent=`Ambulanta se otključava na ${AMBU.unlockOg}. nivou ognjišta`}else if(ambFree()<=0){b.disabled=true;b.textContent='Ambulanta je puna'}else{const n=Math.min(W,ambFree());b.textContent=`U ambulantu: ${n} · ${n*AMBU.admit(A.lvl).zar} žara`;b.onclick=()=>{const k=ambSendAll();b.disabled=true;b.textContent=k?`U ambulanti: ${k}`:'Nema dovoljno žara'}}
+  box.appendChild(b)}}catch(e){}return r}
+ if(typeof armySheet==='function'){const _as=armySheet;armySheet=function(el){const r=_as.apply(this,arguments);try{const A=save.amb;el.querySelectorAll('[data-heal]').forEach(h=>{const n=h.dataset.heal,row=h.closest('.wrow');if(!row||row.querySelector('.ambb'))return;const b=document.createElement('button');b.className='btn sm ambb';
+  if(ambIn(n)){b.disabled=true;b.textContent='u ambulanti'}else if(!A){b.disabled=true;b.textContent='nema ambulante'}else if(ambFree()<=0){b.disabled=true;b.textContent='ambulanta puna'}else{const c=AMBU.admit(A.lvl);b.classList.add('green');b.disabled=!canPay(c);b.textContent='U ambulantu';b.onclick=()=>ambAdmit(n)}
+  b.style.cssText='grid-column:1/-1;width:100%';row.appendChild(b)})}catch(e){}return r}}},300);
 /* ---------- vrste bitaka po istoriji: opsada, dvoboj, juriš, zaseda; talasi; blagoslovi ---------- */
 const MODEX={13:'glasnik',35:'glasnik',32:'zbeg',36:'zbeg',40:'oslobodi',45:'oslobodi',20:'drzi',47:'drzi',1:'dvoboj',16:'juris',18:'dvoboj',22:'opsada',27:'opsada',28:'opsada',30:'zaseda',33:'dvoboj',34:'zaseda',37:'zaseda',46:'juris'};
 const CHAMP={1:'Tihomir, Nemanjin brat',18:'Sultanov telohranitelj',33:'Turski delija'};
-const MODE_TXT={opsada:'Opsada. Braniš grad: dušmani nadiru u talasima i jurišaju na kapiju. Stani pred kapiju, a kad zagusti, priđi kazanu sa smolom.',
+const MODE_TXT={opsada:'Opsada. Braniš grad: neprijatelji nadiru u talasima i jurišaju na kapiju. Stani pred kapiju, a kad zagusti, priđi kazanu sa smolom.',
  dvoboj:'Dvoboj. Jedan na jedan, kao u pesmi. Kad protivnik zamahne, pojavi se crveni luk: skloni se, pa udri dok je iscrpljen.',
  juris:'Juriš konjice. Junak je brz kao vihor i gazi sve pred sobom. Obori njihove barjaktare pre nego što se vojska pribere.',
  zaseda:'Zaseda. Karavan sa plenom prolazi drumom pod stražom. Razbij kola pre nego što umaknu sa druge strane mape.',
- glasnik:'Glasnik. Nosiš vest koja ne sme da zakasni. Probij se kroz dušmane do odredišta pre isteka vremena. Ne moraš sve da pobiješ.',
- zbeg:'Zbeg. Narod beži pred poterom i ide za tobom. Izvedi ih do izlaza na drugom kraju mape. Dušmani će napadati njih, ne samo tebe.',
+ glasnik:'Glasnik. Nosiš vest koja ne sme da zakasni. Probij se kroz neprijatelje do odredišta pre isteka vremena. Ne moraš sve da pobiješ.',
+ zbeg:'Zbeg. Narod beži pred poterom i ide za tobom. Izvedi ih do izlaza na drugom kraju mape. Neprijatelji će napadati njih, ne samo tebe.',
  oslobodi:'Oslobodi zarobljene. Ljudi su vezani u kavezima pod stražom. Razbij kaveze; svaki oslobođeni uzima oružje i bori se uz tebe.',
- drzi:'Zauzmi i drži. Stani u obeleženi krug i drži ga dok se ne napuni. Dok si u krugu, dušmani navaljuju; ako izađeš, napredak staje.',
- talasi:'Talasi. Dušmani dolaze sve jači, talas za talasom. Izdrži što duže.',
- nalet:'Nalet: 90 sekundi, dušmani navaljuju sa svih strana. Obaraj ih brzo jedne za drugim da raste niz i množilac poena. Zlatni barjaktar nosi veliki bonus. Isti uslovi za sve igrače.'};
+ drzi:'Zauzmi i drži. Stani u obeleženi krug i drži ga dok se ne napuni. Dok si u krugu, neprijatelji navaljuju; ako izađeš, napredak staje.',
+ talasi:'Talasi. Neprijatelji dolaze sve jači, talas za talasom. Izdrži što duže.',
+ nalet:'Nalet: 90 sekundi, neprijatelji navaljuju sa svih strana. Obaraj ih brzo jedne za drugim da raste niz i množilac poena. Zlatni barjaktar nosi veliki bonus. Isti uslovi za sve igrače.'};
 {const _cc=campCfg;campCfg=function(i){const c=_cc(i);const m=MODEX[i];if(!m)return c;c.type=m;c.mode=m;c.need=0;const L=c.L;
  if(m==='glasnik'){c.goal=1;c.tl=Math.round(75+L*.3);c.par=c.tl*.7;c.shape='long';[c.W,c.H]=[3400,1300];c.spawnEvery=Math.max(2.5,c.spawnEvery*.6)}
  if(m==='zbeg'){c.goal=Math.min(12,6+Math.floor(L/8));c.zN=c.goal+3;c.par=140;c.shape='long';[c.W,c.H]=[3200,1400];c.spawnEvery=Math.max(3,c.spawnEvery*.8)}
@@ -3714,15 +3966,15 @@ const MODE_TXT={opsada:'Opsada. Braniš grad: dušmani nadiru u talasima i juri�
  c.story=MODE_TXT[m]+' '+c.story;return c}}
 {const _dc=dailyCfg;dailyCfg=function(){const c=_dc();c.type='nalet';c.mode='nalet';c.goal=90;c.need=0;c.par=0;c.bonus=0;
  const mods=DMODS,h=hashStr(dayKey()+'mod');c.dmod=mods[h%mods.length];c.story=`Pravilo dana: ${c.dmod.n}. ${c.dmod.d} `+MODE_TXT.nalet;return c}}
-const DMODS=[{k:'magla',n:'Magla',d:'Fenjer vidi kraće, dušmani iskaču iz mraka.'},{k:'zar2',n:'Dvostruki žar',d:'Iz svakog palog dušmana ispada duplo više žara.'},
- {k:'strel',n:'Kiša strela',d:'Mnogo više strelaca u njihovim redovima.'},{k:'brzi',n:'Brzi dušmani',d:'Neprijatelj je brži za petinu.'},
+const DMODS=[{k:'magla',n:'Magla',d:'Fenjer vidi kraće, neprijatelji iskaču iz mraka.'},{k:'zar2',n:'Dvostruki žar',d:'Iz svakog palog neprijatelja ispada duplo više žara.'},
+ {k:'strel',n:'Kiša strela',d:'Mnogo više strelaca u njihovim redovima.'},{k:'brzi',n:'Brzi neprijatelji',d:'Neprijatelj je brži za petinu.'},
  {k:'krv',n:'Krvav dan',d:'Svi udaraju duplo jače, i ti i oni.'},{k:'odred',n:'Ceo odred',d:'Sa tobom ide dvostruko više vojnika.'}];
 {const _g=goalTxt;goalTxt=function(c){if(c.type==='opsada')return `Odbrani grad: ${c.goal} talasa`;if(c.type==='dvoboj')return `Pobedi u dvoboju: ${c.boss.name}`;
  if(c.type==='juris')return `Obori ${c.goal} barjaktara`;if(c.type==='zaseda')return `Razbij ${c.goal} kola karavana`;if(c.type==='talasi')return `Izdrži ${c.goal} talasa`;if(c.type==='nalet')return 'Nalet: što više poena za 90 sekundi';if(c.type==='glasnik')return `Stigni do odredišta za ${c.tl} sekundi`;if(c.type==='zbeg')return `Izvedi bar ${c.goal} od ${c.zN} ljudi`;if(c.type==='oslobodi')return `Oslobodi ${c.goal} kaveza sa zarobljenima`;if(c.type==='drzi')return 'Zauzmi krug i drži ga do kraja';return _g.apply(this,arguments)}}
 {const _cl=critList;critList=function(c){const l=_cl.apply(this,arguments);if(c.type==='opsada')l[2]='Kapija ostane bar napola cela';if(c.type==='zaseda')l[2]='Nijedna kola ne umaknu';if(c.type==='talasi')l[2]='Izdrži sve talase';if(c.type==='nalet'){l[0]='Izdrži 90 sekundi';l[2]='Napravi niz od bar ×3'}return l}}
 
 /* --- pokretanje --- */
-{const _s=start;start=function(c){const r=_s.apply(this,arguments);if(!G||!c)return r;const m=c.type;G.mode=m;G.slava=0;G.slNext=9;G.bl={};G.quietT=0;
+{const _s=start;start=function(c){const r=_s.apply(this,arguments);if(!G||!c)return r;const m=c.type;G.mode=m;G.slava=0;G.slNext=16;G.blN=0;G.bl={};G.quietT=0;
  if(c.dmod)dmodApply(c.dmod.k);
  if(m==='opsada'||m==='talasi'){G.waves={n:0,total:c.goal,state:'break',t:3.5};c.spawnEvery=1e9;G.nextSpawn=1e9;for(const e of G.enemies)e.hp=0;G.enemies.length=0}
  if(m==='opsada'){const cx=G.W/2,cy=G.H*.62;G.castle={x:cx,y:cy,r:70,hp:900+c.L*60,max:900+c.L*60,kind:'castle',hitT:0};G.bossRef=G.castle;G.bossLabel='Kapija grada';
@@ -3738,10 +3990,10 @@ function dmodApply(k){const c=G.cfg;if(k==='magla')G.st.light*=.72;if(k==='strel
 
 /* --- šteta: dvoboj, juriš, slava --- */
 {const _dm=dmgEnemy;dmgEnemy=function(e,d,kx=0,ky=0){if(G&&e&&e.duel&&e.hp>0){if(e.duel.st==='tired')d*=2.4;else{d*=.3;if(lim('blok',400))floatTxt(e.x,e.y-70,'blok','#c9d6ff')}}
- const was=e&&e.hp>0;const r=_dm.call(this,e,d,kx,ky);if(G&&was&&e.hp<=0&&!e.ally){G.slava++;if(G.bl.vamp)G.hp=Math.min(G.maxhp,G.hp+G.maxhp*.025);
+ const was=e&&e.hp>0;const r=_dm.call(this,e,d,kx,ky);if(G&&was&&e.hp<=0&&!e.ally){G.slava++;if(G.bl.vamp)G.hp=Math.min(G.maxhp,G.hp+G.maxhp*.03);
   if(G.dmZar&&R()<.5)G.sparks.push({x:e.x+10,y:e.y,ph:0,drop:true});
   if(G.mode==='juris'&&e.jb){G.prog++;toast(`Barjaktar je pao (${G.prog}/${G.cfg.goal})`);G.toastT=2}
-  if(G.mode!=='dvoboj'&&G.slava>=G.slNext&&state==='play'){G.slava=0;G.slNext=Math.round(G.slNext*1.45+3);blessOffer()}}return r}}
+  if(G.mode!=='dvoboj'&&(G.blN||0)<2&&G.slava>=G.slNext&&state==='play'){G.slava=0;G.blN=(G.blN||0)+1;G.slNext=Math.round(G.slNext*2.2+10);blessOffer()}}return r}}
 {const _hp=hurtPlayer;hurtPlayer=function(amt,src){if(G&&G.dmKrv)amt*=G.dmKrv;return _hp.call(this,amt,src)}}
 {const _ds=dmgStruct;dmgStruct=function(s,d){if(s.kind!=='kola')return _ds.apply(this,arguments);if(s.hp<=0)return;s.hp-=d;s.hitT=.12;floatTxt(s.x,s.y-50,Math.round(d),'#ffd9a0');sfx.ehit();
  if(s.hp<=0){burst(s.x,s.y-20,'#8a5a2a',40,260,3.4,1);burst(s.x,s.y-20,'#ffb648',20,200,2.6,.8);G.shake=10;sfx.hit();G.lootZ+=25;G.prog++;toast(`Kola razbijena (${G.prog}/${G.cfg.goal})`);G.toastT=2;
@@ -3808,23 +4060,53 @@ function modeDraw(g,t){if(!G)return;
  if(G.mode==='dvoboj'&&b&&b.duel&&b.duel.st==='tired'){g.save();g.strokeStyle=`rgba(255,215,120,${.5+.4*Math.sin(t*12)})`;g.lineWidth=3;ell(g,b.x,b.y+6,30,10);g.stroke();g.restore()}}
 
 /* --- blagoslovi (biraš 1 od 3) --- */
+const BL_ICON={
+ mac:'<path d="M20 4l4 4-12 12-3 1 1-3z" fill="#e8e8f0" stroke="#5a5a6a"/><path d="M8 18l2 2-4 4-2-2z" fill="#8a5a2a"/><path d="M7 15l6 6" stroke="#c9a24a" stroke-width="2.5"/>',
+ dva:'<path d="M18 3l3 3-9 9-2.5.5.5-2.5z M6 3l-3 3 9 9 2.5.5-.5-2.5z" fill="#e8e8f0" stroke="#5a5a6a"/><path d="M5 17l2 2-3 3-2-2zM19 17l-2 2 3 3 2-2z" fill="#8a5a2a"/>',
+ cizma:'<path d="M8 3h7v10l5 3v4H6l1-7z" fill="#8a5a2a" stroke="#4a2a10"/><path d="M3 8h4M2 12h4M3 16h3" stroke="#f3c870" stroke-width="1.6"/>',
+ stit:'<path d="M12 2l8 3v6c0 6-4 9-8 11-4-2-8-5-8-11V5z" fill="#b8323a" stroke="#f3c870" stroke-width="1.5"/><path d="M12 6v12M7 11h10" stroke="#fff" stroke-width="2"/>',
+ kap:'<path d="M12 2c4 6 7 9 7 13a7 7 0 0 1-14 0c0-4 3-7 7-13z" fill="#c22a1a" stroke="#6a0e04"/><path d="M9 14a3 3 0 0 0 3 3" stroke="#ff9a8a" fill="none"/>',
+ suma:'<path d="M7 3l5 8H9l4 6H1l4-6H2zM17 6l4 7h-3l3 5h-8l3-5h-3z" fill="#3f7a2a" stroke="#1f4a12"/><path d="M7 17v4M17 18v3" stroke="#5a3a1a" stroke-width="2"/>',
+ plamen:'<path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-6 0 2 1 3 2 3-1-3 0-6 1-9z" fill="#ff8a2a" stroke="#a03a08"/><path d="M12 12c1 2 3 3 3 5a3 3 0 0 1-6 0c0-2 2-3 3-5z" fill="#ffe08a"/>',
+ rog:'<path d="M3 16c6 0 12-4 16-12l2 1c-2 8-8 15-17 15z" fill="#e8d6a8" stroke="#6a4a2a"/><path d="M19 4l3-1-1 3" fill="#c9a24a"/>',
+ krst:'<path d="M10 2h4v5h5v4h-5v11h-4V11H5V7h5z" fill="#f3c870" stroke="#8a5a10"/><circle cx="12" cy="9" r="9" fill="none" stroke="#fff3c8" stroke-width=".8" opacity=".6"/>',
+ koplje:'<path d="M12 1l3 6-2 1v15h-2V8L9 7z" fill="#d8d8e0" stroke="#5a5a6a"/><path d="M11 8h2v15h-2z" fill="#8a5a2a"/>',
+ kruna:'<path d="M3 18l-1-11 5 4 5-7 5 7 5-4-1 11z" fill="#f3c870" stroke="#8a5a10"/><circle cx="12" cy="13" r="1.8" fill="#c22a1a"/><circle cx="7" cy="14" r="1.3" fill="#2a6ac2"/><circle cx="17" cy="14" r="1.3" fill="#2a6ac2"/>',
+ dukat:'<circle cx="12" cy="12" r="9" fill="#f3c870" stroke="#8a5a10" stroke-width="1.5"/><circle cx="12" cy="12" r="6" fill="none" stroke="#b8862a"/><path d="M12 8v8M9 11h6" stroke="#8a5a10" stroke-width="1.6"/>'};
 const BLESS=[
- {k:'dmg',n:'Oštar mač',d:'+25% štete',f:()=>{G.st.dmg*=1.25}},{k:'rate',n:'Brza ruka',d:'+20% brzine napada',f:()=>{G.st.rate*=1.2}},
- {k:'spd',n:'Laki korak',d:'+15% brzine kretanja',f:()=>{G.st.speed*=1.15}},{k:'hp',n:'Gvozdena koža',d:'+25% zdravlja i puno izlečenje',f:()=>{G.maxhp=Math.round(G.maxhp*1.25);G.hp=G.maxhp}},
- {k:'oil',n:'Puna uljanica',d:'Fenjer gori 30% sporije, odmah pun',f:()=>{G.st.drain*=.7;G.oil=100}},{k:'rng',n:'Duga ruka',d:'+18% dometa napada',f:()=>{G.st.range*=1.18}},
- {k:'vamp',n:'Krvna osveta',d:'Svaki pali dušman vraća malo zdravlja',f:()=>{G.bl.vamp=1}},{k:'help',n:'Pomoć iz šume',d:'Dva vojnika iz okolnih sela ti se pridružuju',f:()=>{const names=['Ivko','Stanko','Marko','Mitar'];for(let i=0;i<2;i++){const a=R()*6.28;G.allies.push(mkAlly(names[(G.allies.length+i)%4],G.p.x+Math.cos(a)*60,G.p.y+Math.sin(a)*60,undefined,0))}}},
- {k:'cd',n:'Sveti plamen',d:'Moć junaka se puni 35% brže',f:()=>{G.cdMul=(G.cdMul||1)*.65}},{k:'ally',n:'Bojni poklič',d:'Vojnici udaraju 30% jače',f:()=>{for(const a of G.allies)a.dmg*=1.3}}];
-{const st=document.createElement('style');st.textContent=`#bless{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:radial-gradient(ellipse at center,rgba(40,10,4,.55),rgba(10,4,2,.85))}
-#bless.on{display:flex;animation:blIn .3s ease-out}#bless h3{font:800 22px Cinzel,serif;color:#ffe7b0;letter-spacing:.08em;margin:0;text-shadow:0 2px 0 #5e140c}#bless .sub{font:italic 15px 'EB Garamond',serif;color:#f3d79a;margin-top:-8px}
-#bless .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:0 12px}
-#bless .bc{width:min(29vw,170px);min-height:150px;padding:14px 10px;background:linear-gradient(180deg,#fbf1d8,#ead6ac);border:2px solid #d6a955;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,.5),inset 0 0 0 1px #fff8;cursor:pointer;text-align:center;color:#3a2010;transition:transform .12s}
-#bless .bc:hover{transform:translateY(-4px)}#bless .bc b{display:block;font:800 14px Cinzel,serif;color:#6e1a10;margin:6px 0}#bless .bc span{font:600 14px/1.25 'EB Garamond',serif}
-#bless .bc i{display:block;width:42px;height:42px;margin:0 auto;border-radius:50%;background:radial-gradient(circle at 40% 35%,#d24a2a,#661208);border:2px solid #d6a955;font:800 20px/38px Cinzel,serif;color:#fff3dc;font-style:normal}
+ {k:'dmg',n:'Oštar mač',d:'+25% štete',ic:'mac',r:0,f:()=>{G.st.dmg*=1.25}},
+ {k:'rate',n:'Brza ruka',d:'+20% brzine udaraca',ic:'dva',r:0,f:()=>{G.st.rate*=1.2}},
+ {k:'spd',n:'Laki korak',d:'+15% brzine kretanja',ic:'cizma',r:0,f:()=>{G.st.speed*=1.15}},
+ {k:'hp',n:'Gvozdena koža',d:'+25% zdravlja i odmah izlečen',ic:'stit',r:0,f:()=>{G.maxhp=Math.round(G.maxhp*1.25);G.hp=G.maxhp}},
+ {k:'vamp',n:'Krvna osveta',d:'Svaki oboreni neprijatelj vraća 3% zdravlja',ic:'kap',r:1,f:()=>{G.bl.vamp=1}},
+ {k:'help',n:'Pomoć iz šume',d:'Dva vojnika iz okolnih sela staju uz tebe',ic:'suma',r:0,f:()=>{const names=['Ivko','Stanko','Marko','Mitar'];for(let i=0;i<2;i++){const a=R()*6.28;G.allies.push(mkAlly(names[(G.allies.length+i)%4],G.p.x+Math.cos(a)*60,G.p.y+Math.sin(a)*60,undefined,0))}}},
+ {k:'cd',n:'Sveti plamen',d:'Moć junaka se puni 35% brže',ic:'plamen',r:1,f:()=>{G.cdMul=(G.cdMul||1)*.65}},
+ {k:'ally',n:'Bojni rog',d:'Tvoji vojnici udaraju 30% jače',ic:'rog',r:0,f:()=>{for(const a of G.allies)a.dmg*=1.3}},
+ {k:'rng',n:'Dugo koplje',d:'+20% dometa i +10% štete',ic:'koplje',r:1,f:()=>{G.st.range*=1.2;G.st.dmg*=1.1}},
+ {k:'save',n:'Molitva majke',d:'Jednom te spasava od pogibije: ustaješ sa 40% zdravlja',ic:'krst',r:2,f:()=>{G.bl.save=1}},
+ {k:'gnev',n:'Carski gnev',d:'Moć je odmah spremna, a šteta raste za 35%',ic:'kruna',r:2,f:()=>{G.st.dmg*=1.35;if(G.p)G.p.cd=0}},
+ {k:'zlato',n:'Dukati',d:'Iz palih neprijatelja ispada duplo više žara',ic:'dukat',r:1,f:()=>{G.bl.zlato=1}}];
+const BL_RAR=[{n:'',c:'#d6a955',w:6},{n:'RETKO',c:'#7aa6d8',w:3},{n:'ZLATNO',c:'#f3c040',w:1}];
+{const st=document.createElement('style');st.textContent=`#bless{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;background:radial-gradient(ellipse at center,#2a160c 0%,#140a06 70%,#0c0604 100%)}
+#bless.on{display:flex;animation:blIn .25s ease-out}#bless h3{font:800 21px Cinzel,serif;color:#ffe7b0;letter-spacing:.1em;margin:0;text-shadow:0 2px 0 #5e140c;text-align:center}#bless .sub{font:italic 15px 'EB Garamond',serif;color:#f3d79a;margin-top:-6px;text-align:center;padding:0 16px}
+#bless .row{display:flex;gap:10px;justify-content:center;padding:0 10px;width:100%;max-width:560px;box-sizing:border-box}
+#bless .bc{flex:1 1 0;min-width:0;max-width:175px;padding:12px 8px 12px;background:linear-gradient(180deg,#fbf1d8,#ead6ac);border:2.5px solid var(--rc,#d6a955);border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,.55),inset 0 0 0 1px #fff8;cursor:pointer;text-align:center;color:#3a2010;transition:transform .12s;position:relative;display:flex;flex-direction:column;align-items:center}
+#bless .bc.r2{box-shadow:0 0 18px rgba(243,192,64,.55),0 8px 20px rgba(0,0,0,.55),inset 0 0 0 1px #fff8}
+#bless .bc:active{transform:scale(.97)}#bless .bc b{display:block;font:800 13.5px/1.2 Cinzel,serif;color:#6e1a10;margin:8px 0 5px}#bless .bc span{font:600 13.5px/1.28 'EB Garamond',serif}
+#bless .bc svg{width:46px;height:46px;padding:7px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#4a2a18,#1e100a);box-shadow:0 0 0 2px var(--rc,#d6a955)}
+#bless .bc em{position:absolute;top:-9px;left:50%;transform:translateX(-50%);font:700 9.5px Cinzel,serif;letter-spacing:.08em;font-style:normal;color:#1e100a;background:var(--rc);padding:2px 8px;border-radius:8px;white-space:nowrap}
+#bless.arm .bc{opacity:.55;filter:saturate(.6);pointer-events:none}#bless .bc{transition:opacity .3s,filter .3s,transform .12s}#bless .hint{font:600 12px 'Alegreya Sans',sans-serif;color:#c9b08a;letter-spacing:.04em}#bless.arm .hint:after{content:' …'}
 @keyframes blIn{from{opacity:0}to{opacity:1}}`;document.head.appendChild(st);const d=document.createElement('div');d.id='bless';document.body.appendChild(d)}
-function blessOffer(){const pool=BLESS.slice().sort(()=>R()-.5).slice(0,3);G.choice=pool;const d=$('#bless');
- d.innerHTML=`<h3>SLAVA JUNAKU</h3><div class="sub">Izaberi blagoslov za ovu bitku</div><div class="row">${pool.map((b,i)=>`<div class="bc" data-i="${i}"><i>${b.n[0]}</i><b>${b.n}</b><span>${b.d}</span></div>`).join('')}</div>`;
- d.querySelectorAll('.bc').forEach(el=>el.onclick=()=>{const b=pool[+el.dataset.i];b.f();G.choice=null;d.classList.remove('on');floatTxt(G.p.x,G.p.y-70,b.n,'#ffd27a',true);if(typeof play==='function')play('nivo',.35,1.1);last=performance.now()});
+function blessPick(){const ok=b=>!(G.blTaken||[]).includes(b.k);const pk=a=>a.length?a.splice(Math.floor(R()*a.length),1)[0]:null;
+ const c0=BLESS.filter(b=>b.r===0&&ok(b)),c1=BLESS.filter(b=>b.r===1&&ok(b)),c2=BLESS.filter(b=>b.r===2&&ok(b));
+ const out=[pk(c0),pk(c1),(R()<.45&&c2.length)?pk(c2):(pk(c1)||pk(c2))].filter(Boolean);while(out.length<3){const x=pk(c0)||pk(c1)||pk(c2);if(!x)break;out.push(x)}return out.sort((a,b)=>a.r-b.r)}
+function blessOffer(){const pool=blessPick();G.choice=pool;const d=$('#bless');const kills=G.kills||0;
+ d.innerHTML=`<h3>DAR ZA HRABROST</h3><div class="sub">Oborio si ${kills} neprijatelja. Odred ti nudi jedan dar do kraja ove bitke.</div><div class="row">${pool.map((b,i)=>`<div class="bc r${b.r}" style="--rc:${BL_RAR[b.r].c}" data-i="${i}">${b.r?`<em>${BL_RAR[b.r].n}</em>`:''}<svg viewBox="0 0 24 24">${BL_ICON[b.ic]||''}</svg><b>${b.n}</b><span>${b.d}</span></div>`).join('')}</div><div class="hint">Biraj pažljivo, drugu priliku nećeš skoro dobiti</div>`;
+ d.classList.add('arm');setTimeout(()=>d.classList.remove('arm'),1000);
+ d.querySelectorAll('.bc').forEach(el=>el.onclick=()=>{if(d.classList.contains('arm'))return;const b=pool[+el.dataset.i];b.f();(G.blTaken=G.blTaken||[]).push(b.k);G.choice=null;d.classList.remove('on');floatTxt(G.p.x,G.p.y-70,b.n,'#ffd27a',true);if(typeof play==='function')play('nivo',.35,1.1);last=performance.now()});
  d.classList.add('on');if(typeof play==='function')play('nivo',.4)}
+/* Molitva majke: spas od pogibije; Dukati: više žara */
+{const _h=hurtPlayer;hurtPlayer=function(){const r=_h.apply(this,arguments);if(G&&G.hp<=0&&G.bl&&G.bl.save){G.bl.save=0;G.hp=Math.round(G.maxhp*.4);G.p.inv=2;floatTxt(G.p.x,G.p.y-70,'Molitva majke!','#ffe7a0',true);burst(G.p.x,G.p.y-20,'#ffe7a0',40,260,3);toast('Molitva majke te podigla!')}return r}}
 {const _ua=useAbility;useAbility=function(){const cd0=G?G.p.cd:0;const r=_ua.apply(this,arguments);if(G&&G.cdMul&&G.p.cd>cd0)G.p.cd*=G.cdMul;return r}}
 {const _er=endRun;endRun=function(win){const d=$('#bless');if(d)d.classList.remove('on');if(G)G.choice=null;return _er.apply(this,arguments)}}
 
@@ -3906,7 +4188,7 @@ const ZNAMES=['Stana','Mara','Jelica','starac Ilija','Milica','Sava','kaluđer P
  if(G.dest){const D=G.dest;g.strokeStyle=`rgba(255,215,120,${.6+.3*Math.sin(t*4)})`;g.lineWidth=4;ell(g,D.x,D.y,D.r,D.r*.55);g.stroke();g.fillStyle='rgba(255,215,120,.12)';ell(g,D.x,D.y,D.r,D.r*.55);g.fill();
   g.fillStyle='#8a1c0e';g.fillRect(D.x-2,D.y-90,4,90);g.fillStyle='#c0301a';g.beginPath();g.moveTo(D.x+2,D.y-90);g.lineTo(D.x+44,D.y-78);g.lineTo(D.x+2,D.y-64);g.fill()}
  if(G.exit){const E=G.exit;g.strokeStyle=`rgba(160,230,140,${.5+.3*Math.sin(t*3)})`;g.setLineDash([12,8]);g.lineWidth=4;ell(g,E.x,E.y,E.r,E.r*.6);g.stroke();g.setLineDash([]);g.fillStyle='rgba(160,230,140,.1)';ell(g,E.x,E.y,E.r,E.r*.6);g.fill()}
- if(G.zone){const Z=G.zone;g.fillStyle='rgba(255,200,90,.1)';ell(g,Z.x,Z.y,Z.r,Z.r*.62);g.fill();g.strokeStyle='rgba(255,215,120,.5)';g.lineWidth=3;ell(g,Z.x,Z.y,Z.r,Z.r*.62);g.stroke();
+ if(G.zone&&!G.zone.camp){const Z=G.zone;g.fillStyle='rgba(255,200,90,.1)';ell(g,Z.x,Z.y,Z.r,Z.r*.62);g.fill();g.strokeStyle='rgba(255,215,120,.5)';g.lineWidth=3;ell(g,Z.x,Z.y,Z.r,Z.r*.62);g.stroke();
   g.strokeStyle='#ffd27a';g.lineWidth=7;g.beginPath();g.ellipse(Z.x,Z.y,Z.r,Z.r*.62,0,-Math.PI/2,-Math.PI/2+Z.p/100*Math.PI*2);g.stroke();
   g.fillStyle='#fff3dc';g.font="800 22px Cinzel,serif";g.textAlign='center';g.fillText(Math.floor(Z.p)+'%',Z.x,Z.y-Z.r*.62-14)}
  g.restore()}}
@@ -3917,7 +4199,7 @@ const ZNAMES=['Stana','Mara','Jelica','starac Ilija','Milica','Sava','kaluđer P
 function isWounded(n){const w=save.wounded&&save.wounded[n];return !!(w&&w>Date.now())}
 function woundLeft(n){const w=save.wounded&&save.wounded[n];return w?Math.max(0,w-Date.now()):0}
 const fmtMin=ms=>{const m=Math.ceil(ms/60000);return m>=60?Math.floor(m/60)+' h '+(m%60)+' min':m+' min'};
-{const _ap=armyPick;armyPick=function(c){const A=ensureArmy(),saveN={};for(const u of UNITS){saveN[u.id]=A[u.id].n;A[u.id].n=Math.max(0,A[u.id].n-(A[u.id].names||[]).filter(isWounded).length)}
+{const _ap=armyPick;armyPick=function(c){const A=ensureArmy(),saveN={};for(const u of UNITS){saveN[u.id]=A[u.id].n;A[u.id].n=Math.max(0,A[u.id].n-(A[u.id].names||[]).slice(0,A[u.id].n).filter((typeof isBusy==='function'?isBusy:isWounded)).length)}
  try{return _ap.apply(this,arguments)}finally{for(const u of UNITS)A[u.id].n=saveN[u.id]}}}
 {const _er=endRun;endRun=function(win){const c=G&&G.cfg;let lostRes=null,wounded=[];
  if(G&&c&&!c.spect){save.wounded=save.wounded||{};for(const k in save.wounded)if(save.wounded[k]<Date.now())delete save.wounded[k];
@@ -3925,7 +4207,7 @@ const fmtMin=ms=>{const m=Math.ceil(ms/60000);return m>=60?Math.floor(m/60)+' h 
   if(!win&&(c.kind==='camp'||c.kind==='raid'||c.kind==='war')){lostRes={};for(const k of RES){const l=Math.floor((save.res[k]||0)*.1);if(l>0){save.res[k]-=l;lostRes[k]=l}}}
   persist()}
  const r=_er.apply(this,arguments);
- try{const el=$('#rNote');let h='';if(lostRes&&Object.keys(lostRes).length)h+=`<div class="conseq bad"><b>Poraz ima cenu.</b> Dušmani su odneli: ${RES.map(k=>lostRes[k]?icon(k)+num(lostRes[k]):'').join(' ')}</div>`;
+ try{const el=$('#rNote');let h='';if(lostRes&&Object.keys(lostRes).length)h+=`<div class="conseq bad"><b>Poraz ima cenu.</b> Neprijatelji su odneli: ${RES.map(k=>lostRes[k]?icon(k)+num(lostRes[k]):'').join(' ')}</div>`;
   if(wounded.length)h+=`<div class="conseq"><b>Ranjeni:</b> ${wounded.map(esc).join(', ')}. ${wounded.length>1?"Oporavljaju":"Oporavlja"} se ${win?'4':'12'} min i do tada ne idu u boj.</div>`;
   if(h&&el)el.insertAdjacentHTML('beforeend',h)}catch(e){}
  return r}}
@@ -3973,6 +4255,55 @@ function cirToggle(){save.cir=save.cir?0:1;persist();location.reload()}
 setTimeout(()=>{const lab=()=>save.cir?'Pismo: ćirilica':'Pismo: latinica';
  const sb=document.getElementById('sndBtn');if(sb&&!document.getElementById('cirBtn')){const b=document.createElement('button');b.id='cirBtn';b.className=sb.className;b.textContent=lab();b.onclick=cirToggle;(document.getElementById('vibBtn')||document.getElementById('musBtn')||sb).after(b)}
  const tw=document.querySelector('#sTitle .title-wrap');if(tw&&!document.getElementById('cirT')){const b=document.createElement('button');b.id='cirT';b.className='btn sm ghost';b.style.marginTop='14px';b.textContent=save.cir?'Латиница':'Ћирилица';b.onclick=cirToggle;tw.appendChild(b)}},60);
+/* dok se bira dar, slika bitke stoji (nema treperenja) */
+{const _rg=renderGame;renderGame=function(t){if(G&&G.choice&&state==='play'){if(G._frz)return;G._frz=1}else if(G)G._frz=0;return _rg.apply(this,arguments)}}
+const N2ON=()=>Date.now()>=new Date(2026,10,28).getTime();
+/* ---------- NALET 2 (probna verzija): torba plena, logor za čuvanje, događaji, pojačanja ---------- */
+if(N2ON())MODE_TXT.nalet='Nalet: 90 sekundi borbe. Oboreni neprijatelji ostavljaju plen (dukate) koji nosiš sa sobom, ali plen je siguran tek kad ga odneseš u logor (zlatni krug). Ako te udare, deo plena ispadne. Na kraju se neodneseni plen računa upola. Skupljaj pojačanja i pazi na juriše i kišu strela.';
+const NPICK={bes:{c:'#ff6a3a',l:'⚔',n:'Bes: dupla snaga 6 s'},vreme:{c:'#7ad0ff',l:'+5',n:'+5 sekundi'},stit:{c:'#9fe08a',l:'◈',n:'Štit plena 8 s'}};
+function nCampPos(){const p=G.p;for(let i=0;i<40;i++){const a=R()*6.283,d=420+R()*320,x=clamp(p.x+Math.cos(a)*d,120,G.W-120),y=clamp(p.y+Math.sin(a)*d,120,G.H-120);if(!G.walls||!G.walls.some(w=>x>w.x-60&&x<w.x+w.w+60&&y>w.y-60&&y<w.y+w.h+60))return {x,y}}return {x:G.W/2,y:G.H/2}}
+function nNewCamp(){const q=nCampPos();G.zone={x:q.x,y:q.y,r:78,p:0,camp:1};G.campT=26}
+{const _s=start;start=function(c){const r=_s.apply(this,arguments);if(G&&c&&c.type==='nalet'&&N2ON()){G.n2=1;G.bag=0;G.bank=0;G.drops=[];G.picks=[];G.pickT=8;G.evT=15;G.evK=0;G.volleys=[];G.besT=0;G.stitT=0;G.extraT=0;nNewCamp();
+ const el=$('#nalet');if(el&&!el.querySelector('.bg')){el.querySelector('.sc').insertAdjacentHTML('afterend','<span class="bg" title="Plen"></span>')}
+ setTimeout(()=>{if(G&&state==='play'){toast('Plen nosi u logor (zlatni krug) da ga sačuvaš!');G.toastT=3}},1200)}return r}}
+{const st=document.createElement('style');st.textContent=`#nalet .bg{font-size:13px;color:#ffe7a0;background:#3a2414;border:1px solid #8a6430;border-radius:3px;padding:1px 7px;white-space:nowrap}#nalet .bg.full{background:#2f6a22;animation:bgP .8s ease-in-out infinite}@keyframes bgP{50%{transform:scale(1.12)}}#nalet .sc:before{content:'✓ ';font-size:12px;opacity:.8}`;document.head.appendChild(st)}
+/* poeni od obaranja idu u torbu */
+{const _dm=dmgEnemy;dmgEnemy=function(e,d,kx,ky){if(!G||!G.n2)return _dm.apply(this,arguments);const s0=G.score||0;const dd=G.besT>0?d*2:d;const r=_dm.call(this,e,dd,kx,ky);const gain=(G.score||0)-s0;if(gain>0){G.score=s0;G.bag+=gain}return r}}
+{const _h=hurtPlayer;hurtPlayer=function(amt,src){const before=G?G.hp:0;const r=_h.apply(this,arguments);try{if(G&&G.n2&&G.hp<before&&G.bag>0&&G.stitT<=0){const lost=Math.round(G.bag*.25);G.bag-=lost;const a=R()*6.283;G.drops.push({x:clamp(G.p.x+Math.cos(a)*70,40,G.W-40),y:clamp(G.p.y+Math.sin(a)*70,40,G.H-40),v:Math.round(lost*.6),t:6});floatTxt(G.p.x,G.p.y-62,'-'+lost+' plena','#ff9a6a',true)}}catch(e){}return r}}
+{const _u=update;update=function(dt){if(!G||state!=='play'||!G.n2||G.choice)return _u.call(this,dt);const c=G.cfg,p=G.p;
+ const r=_u.call(this,dt);if(!G||state!=='play')return r;
+ /* logor */const Z=G.zone;G.campT-=dt;if(Z&&Math.hypot(p.x-Z.x,p.y-Z.y)<Z.r){if(G.bag>0){const bonus=Math.min(.3,G.bag/4000),v=Math.round(G.bag*(1+bonus));G.bank+=v;floatTxt(Z.x,Z.y-60,`Sačuvano +${num(v)}${bonus>=.05?` (+${Math.round(bonus*100)}%)`:''}`,'#a8f08c',true);burst(Z.x,Z.y,'#ffd27a',30,220,3);sfx.coin&&sfx.coin();G.bag=0;nNewCamp();toast('Novi logor je dalje, prati strelicu');G.toastT=1.6}}
+ else if(G.campT<=0){nNewCamp();toast('Logor se pomerio!');G.toastT=1.6}
+ /* ispali plen */for(const d of G.drops){d.t-=dt;if(Math.hypot(p.x-d.x,p.y-d.y)<34){G.bag+=d.v;floatTxt(d.x,d.y-30,'+'+d.v,'#ffd27a');d.t=0}}G.drops=G.drops.filter(d=>d.t>0);
+ /* pojačanja */G.pickT-=dt;if(G.pickT<=0&&G.picks.length<3){G.pickT=9+R()*4;const k=['bes','vreme','stit'][Math.floor(R()*3)],a=R()*6.283,d=220+R()*220;G.picks.push({k,x:clamp(p.x+Math.cos(a)*d,60,G.W-60),y:clamp(p.y+Math.sin(a)*d,60,G.H-60),t:12})}
+ for(const q of G.picks){q.t-=dt;if(Math.hypot(p.x-q.x,p.y-q.y)<34){q.t=0;const P=NPICK[q.k];if(q.k==='bes')G.besT=6;if(q.k==='vreme')c.goal+=5;if(q.k==='stit')G.stitT=8;floatTxt(q.x,q.y-40,P.n,P.c,true);burst(q.x,q.y,P.c,20,180,2.6);sfx.spark&&sfx.spark()}}G.picks=G.picks.filter(q=>q.t>0);
+ G.besT=Math.max(0,G.besT-dt);G.stitT=Math.max(0,G.stitT-dt);
+ /* događaji */G.evT-=dt;if(G.evT<=0){G.evT=17;G.evK++;if(G.evK%2){const a=R()*6.283;toast('JURIŠ! Konjica navaljuje');G.toastT=2;sfx.horn?sfx.horn():(typeof playS==='function'&&playS('rog'));for(let i=0;i<5+Math.floor(G.t/30);i++){const e=spawnEnemy('lovac',{x:clamp(p.x+Math.cos(a)*460+(R()-.5)*120,40,G.W-40),y:clamp(p.y+Math.sin(a)*460+(R()-.5)*120,40,G.H-40)});if(e){e.hunt=99;e.sp=[e.sp[0]*1.25,e.sp[1]*1.25]}}}
+  else{toast('Kiša strela! Skloni se iz crvenih krugova');G.toastT=2;for(let i=0;i<6+Math.floor(G.t/30);i++){const a=R()*6.283,d=R()*170;G.volleys.push({x:clamp(p.x+Math.cos(a)*d,40,G.W-40),y:clamp(p.y+Math.sin(a)*d,40,G.H-40),r:48,t:1.4+i*.12})}}}
+ for(const v of G.volleys){v.t-=dt;if(v.t<=0&&!v.hit){v.hit=1;burst(v.x,v.y,'#c9b08a',14,160,2);if(Math.hypot(p.x-v.x,p.y-v.y)<v.r)hurtPlayer(G.maxhp*.14,null);for(const e of G.enemies)if(e.hp>0&&Math.hypot(e.x-v.x,e.y-v.y)<v.r)dmgEnemy(e,e.max*.4,0,0)}}G.volleys=G.volleys.filter(v=>v.t>-.3);
+ /* HUD */const el=$('#nalet');if(el){el.querySelector('.sc').textContent=num(Math.round(G.bank));const b=el.querySelector('.bg');if(b){b.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" style="vertical-align:-2px;margin-right:4px"><circle cx="9" cy="14" r="6" fill="#f3c870" stroke="#8a5a10"/><circle cx="15" cy="10" r="6" fill="#ffd86a" stroke="#8a5a10"/><path d="M15 7v6M12.5 9.5h5" stroke="#8a5a10" stroke-width="1.4"/></svg>'+num(Math.round(G.bag));b.classList.toggle('full',G.bag>=600)}}
+ return r}}
+/* kraj: neodneseni plen upola */
+{const _er=endRun;endRun=function(win){if(G&&G.n2&&G.bank!==undefined){const half=Math.round((G.bag||0)*.5);G.score=G.bank+half;if(half>0)setTimeout(()=>toast(`Neodnesen plen: ${num(half)} (pola)`),50);G.bag=0}return _er.apply(this,arguments)}}
+/* crtež */
+{const _md=modeDraw;modeDraw=function(g,t){_md(g,t);if(!G||!G.n2)return;g.save();
+ const Z=G.zone;if(Z){const pu=.5+.5*Math.sin(t*4);g.fillStyle=`rgba(255,200,90,${.12+.1*pu})`;ell(g,Z.x,Z.y,Z.r,Z.r*.62);g.fill();
+  for(let i=0;i<3;i++){const fh=18+Math.sin(t*11+i*2)*5,w=10-i*3;g.fillStyle=['rgba(255,100,35,.9)','rgba(255,185,75,.9)','rgba(255,245,200,.95)'][i];g.beginPath();g.moveTo(Z.x-w,Z.y);g.quadraticCurveTo(Z.x-w*.6,Z.y-fh*.6,Z.x,Z.y-fh+i*3);g.quadraticCurveTo(Z.x+w*.6,Z.y-fh*.6,Z.x+w,Z.y);g.fill()}
+  g.font="700 13px Cinzel,serif";g.textAlign='center';g.fillStyle='rgba(0,0,0,.6)';g.fillText('LOGOR · '+Math.ceil(Math.max(0,G.campT))+' s',Z.x+1,Z.y-Z.r*.62-9);g.fillStyle='#ffe7a0';g.fillText('LOGOR · '+Math.ceil(Math.max(0,G.campT))+' s',Z.x,Z.y-Z.r*.62-10)}
+ for(const d of G.drops){g.globalAlpha=Math.min(1,d.t);g.fillStyle='#8a5a2a';g.beginPath();g.arc(d.x,d.y-6,9,0,7);g.fill();g.fillStyle='#ffd27a';g.font="700 10px 'Alegreya Sans',sans-serif";g.textAlign='center';g.fillText(d.v,d.x,d.y-20)}g.globalAlpha=1;
+ for(const q of G.picks){const P=NPICK[q.k],bob=Math.sin(t*4+q.x)*3;g.globalAlpha=q.t<2?(Math.sin(t*20)>0?1:.3):1;g.fillStyle='rgba(0,0,0,.3)';ell(g,q.x,q.y+4,12,4);g.fill();g.fillStyle=P.c;g.beginPath();g.arc(q.x,q.y-14+bob,12,0,7);g.fill();g.strokeStyle='#fff';g.lineWidth=2;g.stroke();g.fillStyle='#fff';g.font="800 12px 'Alegreya Sans',sans-serif";g.textAlign='center';g.textBaseline='middle';g.fillText(P.l,q.x,q.y-13+bob);g.textBaseline='alphabetic'}g.globalAlpha=1;
+ for(const v of G.volleys){if(v.t>0){const k=1-Math.min(1,v.t/1.4);g.strokeStyle='rgba(220,40,20,.8)';g.lineWidth=2;ell(g,v.x,v.y,v.r,v.r*.62);g.stroke();g.fillStyle=`rgba(220,40,20,${.12+.3*k})`;ell(g,v.x,v.y,v.r*k,v.r*.62*k);g.fill()}}
+ if(G.besT>0||G.stitT>0){const p=G.p;g.strokeStyle=G.besT>0?'rgba(255,110,60,.8)':'rgba(140,230,120,.8)';g.lineWidth=3;ell(g,p.x,p.y+6,22+Math.sin(t*10)*2,8);g.stroke()}
+ g.restore()}}
+/* objašnjenje bitke dana na ekranu pred boj */
+{const st=document.createElement('style');st.textContent=`.nhelp{margin:4px 0 0;padding:0;list-style:none;text-align:left}.nhelp li{display:grid;grid-template-columns:26px 1fr;gap:8px;align-items:start;padding:5px 0;font:500 14.5px/1.35 'EB Garamond',serif;border-top:1px dashed rgba(90,50,20,.2)}.nhelp li:first-child{border-top:0}.nhelp i{font-style:normal;width:24px;height:24px;border-radius:50%;background:#6e1a10;color:#ffe7b0;display:grid;place-items:center;font:800 12px Cinzel,serif}.npoint{display:block;margin-bottom:6px}.nrule{display:block;margin-top:8px;font-size:13.5px;color:#7a4a20}`;document.head.appendChild(st)}
+{const _in=intro;intro=function(c){const r=_in.apply(this,arguments);if(c&&c.type==='nalet'&&N2ON()){const el=$('#iStory');
+ el.innerHTML=`<b class="npoint">Bitka dana je ista za sve igrače. Imaš 90 sekundi da skupiš što više poena i popneš se na tabeli dana. Imaš 3 pokušaja, računa se najbolji.</b>
+ <ul class="nhelp"><li><i>1</i><span><b>Obaraj neprijatelje.</b> Svaki ostavlja dukate koje nosiš. Obaraj ih brzo jedne za drugima i množilac raste do ×5.</span></li>
+ <li><i>2</i><span><b>Odnesi dukate u logor</b> (zlatni krug sa vatrom, prati strelicu). Tek tada su tvoji. Što više doneseš odjednom, veći bonus.</span></li>
+ <li><i>3</i><span><b>Ne daj se udariti.</b> Svaki udarac ti izbije deo dukata, pa ih brzo pokupi sa zemlje.</span></li>
+ <li><i>4</i><span><b>Pazi na juriš konjice i kišu strela,</b> a hvataj pojačanja: bes, +5 sekundi i štit.</span></li></ul>
+ <span class="nrule">${c.dmod?`Pravilo dana: <b>${c.dmod.n}</b>. ${c.dmod.d} `:''}Na kraju dukati koje nisi odneo vrede upola.</span>`}return r}}
 
 /* ---------- kraj misije ---------- */
 function endRun(win){const c=G.cfg,hid=G.hero.id;state='result';
@@ -4009,7 +4340,7 @@ function endRun(win){const c=G.cfg,hid=G.hero.id;state='result';
  else if(hs.lvl>=maxHeroLvl()&&xp>0)note.push(`${G.hero.name} ne može više dok se ognjište ne dogradi.`);
  persist();
  $('#rKick').textContent=c.kind==='camp'?`${REGIONS[c.reg].name}, ${c.idx+1}. bitka`:c.kind==='raid'?'Napad na odred':c.kind==='war'?'Rat odreda':c.kind==='def'?`${REGIONS[c.reg].name}, odbrana`:'Bitka dana';
- $('#rTitle').textContent=win?(stars===3?'Slavna pobeda':c.kind==='raid'?'Dušmanska vatra je ugašena':'Pobeda'):G.spect?'Vojska je pala':'Fenjer se ugasio';
+ $('#rTitle').textContent=win?(stars===3?'Slavna pobeda':c.kind==='raid'?'Neprijateljska vatra je ugašena':'Pobeda'):G.spect?'Vojska je pala':'Fenjer se ugasio';
  $('#rStars').innerHTML=win?[0,1,2].map(k=>`<b class="${k<stars?'on':''}" style="animation-delay:${.15+k*.22}s">${SVG.star}</b>`).join(''):'';
  $('#rCrit').innerHTML=win?critList(c).map((t,k)=>`<li class="${crit[k]?'ok':''}"><em>${ST(crit[k])}</em>${t}</li>`).join(''):'';
  $('#rTip').textContent=tip;
@@ -4040,8 +4371,8 @@ function intro(c){pendingCfg=c;closeSheet();const hs=save.heroes[curHero().id];
  $('#iRew').innerHTML=`Plen: ${RES.filter(k=>c.reward[k]).map(k=>`<span>${icon(k)}${num(c.reward[k]*m)}</span>`).join('')}${c.kind==='raid'?`<span>${icon('tr')}${c.tr}</span>`:''}<br>${(()=>{const al=armyLabel(c);return `<span style="font-weight:500;width:100%;justify-content:center">${al?(c.spect?'U boj idu: ':'U boj sa tobom idu: ')+al:'Nemaš vojsku. Kupi je u Junacima, pod Vojska.'}</span><br>`})()}${c.spect?'':`<span class="${hs.lvl<c.rec?'warn':''}" style="font-weight:500">Junaku priliči ${c.rec}. nivo${hs.lvl<c.rec?', tvoj je '+hs.lvl:''}</span>`}`;
  {const seen=save.seen||{},fo=[...new Set([...Object.keys(c.roster||{}),...(c.pool||[]).map(q=>q[0])])].filter(t=>t!=='ratnik'&&!seen[t]).map(t=>BEST.find(x=>x.sp===t&&!x.boss)).filter(Boolean).slice(0,2);
   const fe=$('#iFoes');fe.innerHTML='';fe.style.display='none';fo.length=0;
-  fo.forEach(b=>{const d=document.createElement('div');d.className='foe';d.appendChild(enemyIcon(b.sp,false,44));d.insertAdjacentHTML('beforeend',`<div><small>Novi dušmanin</small><b>${b.name}</b><span>${b.d}</span></div>`);fe.appendChild(d)})}
- {if(c.wx===undefined)c.wx=pickWx(c.reg);const ds=dayState(),dn=ds.d>.7?'Noć':ds.d<.3?'Dan':ds.h<12?'Zora':'Sumrak';const ew=$('#iWx');ew.innerHTML=`<b>${dn}${c.wx?' · '+WXN[c.wx]:''}</b>${c.wx?WXD[c.wx]:ds.d>.7?'U mraku vidiš samo dokle doseže fenjer.':ds.d<.3?'Danju se vidi daleko, ali ni dušmani ne spavaju.':'Polumrak, straže se menjaju.'}`}
+  fo.forEach(b=>{const d=document.createElement('div');d.className='foe';d.appendChild(enemyIcon(b.sp,false,44));d.insertAdjacentHTML('beforeend',`<div><small>Novi neprijatelj</small><b>${b.name}</b><span>${b.d}</span></div>`);fe.appendChild(d)})}
+ {if(c.wx===undefined)c.wx=pickWx(c.reg);const ds=dayState(),dn=ds.d>.7?'Noć':ds.d<.3?'Dan':ds.h<12?'Zora':'Sumrak';const ew=$('#iWx');ew.innerHTML=`<b>${dn}${c.wx?' · '+WXN[c.wx]:''}</b>${c.wx?WXD[c.wx]:ds.d>.7?'U mraku vidiš samo dokle doseže fenjer.':ds.d<.3?'Danju se vidi daleko, ali ni neprijatelji ne spavaju.':'Polumrak, straže se menjaju.'}`}
  renderHeroRow();$('#iHeroes').style.display=c.spect?'none':'';show('sIntro');if(state!=='play')state=state==='title'?'title':'hub'}
 function recBlock(){const rc=save.rec||{best:0,days:0,streak:0};const st=Object.values(save.stars).reduce((a,b)=>a+(b||0),0);const bosses=[9,19,29,39,49].filter(i=>save.best[i]).map(i=>`${LNAMES[i]} ${fmt(save.best[i])}`);
  return `<div class="recs"><div><b>${st}</b><small>zvezda od ${NL*3}</small></div><div><b>${rc.best?num(rc.best):'-'}</b><small>najbolja Bitka dana</small></div><div><b>${rc.streak||0}</b><small>dana zaredom</small></div><div><b>${rc.days||0}</b><small>dana odigrano</small></div></div>${bosses.length?`<div class="tip" style="margin:-4px 0 12px">Najbrže pobede nad gospodarima: ${bosses.join(', ')}</div>`:''}`}
@@ -4189,7 +4520,7 @@ function sheetPohod(body){$('#shTitle').textContent='Pohod kroz istoriju';const 
  body.querySelectorAll('[data-tn]').forEach(g=>g.addEventListener('click',()=>{const i=+g.dataset.tn;if(isLost(i)){ac();intro(defCfg(i))}else if(i<=topLevel()){ac();intro(campCfg(i))}}))}
 function sheetJunaci(body){$('#shTitle').textContent='Junaci';$('#shSub').textContent=`Najviši nivo ${maxHeroLvl()}, veštine do ${maxUp()}`;
  if(heroTab!=='zli'&&heroTab!=='vojska'&&(!heroTab||!HEROES.find(h=>h.id===heroTab)))heroTab=curHero().id;
- const md=(heroTab==='vojska'?'vojska':heroTab==='zli'?'zli':'junaci');body.innerHTML=`<div class="seg"><button data-md="junaci" class="${md==='junaci'?'on':''}">Junaci</button><button data-md="vojska" class="${md==='vojska'?'on':''}">Vojska</button><button data-md="zli" class="${md==='zli'?'on':''}">Dušmani</button></div><div class="hstrip" id="htabs"></div><div id="hbody"></div>`;
+ const md=(heroTab==='vojska'?'vojska':heroTab==='zli'?'zli':'junaci');body.innerHTML=`<div class="seg"><button data-md="junaci" class="${md==='junaci'?'on':''}">Junaci</button><button data-md="vojska" class="${md==='vojska'?'on':''}">Vojska</button><button data-md="zli" class="${md==='zli'?'on':''}">Neprijatelji</button></div><div class="hstrip" id="htabs"></div><div id="hbody"></div>`;
  body.querySelectorAll('[data-md]').forEach(b=>b.onclick=()=>{const m=b.dataset.md;heroTab=m==='junaci'?curHero().id:m;renderSheet()});
  const tabs=body.querySelector('#htabs');if(md!=='junaci')tabs.remove();else HEROES.forEach(h=>{const ok=heroOk(h);const b=document.createElement('button');b.className='hs'+(h.id===heroTab?' on':'')+(ok?'':' lock');b.appendChild(heroIcon(h,46,1.1));b.insertAdjacentHTML('beforeend',`<span>${(h.short||h.name.split(' ')[0])}</span>`);b.onclick=()=>{heroTab=h.id;renderSheet()};tabs.appendChild(b)});
  if(heroTab==='zli'){bestiary(body.querySelector('#hbody'));return}
@@ -4253,7 +4584,7 @@ function sheetUtv(body){$('#shTitle').textContent='Utvrđenje';$('#shSub').textC
  body.innerHTML='';BUILD.forEach(B=>{const l=save.b[B.id];const c=B.cost(l);const capOk=B.id==='ognjiste'||l<save.b.ognjiste;const maxed=l>=B.max;
   const d=document.createElement('div');d.className='bcard';
   const dm=dmgd(B.id);if(dm){const rc=repairCost(B.id);d.style.borderColor='#6a2a26';
-   d.innerHTML=`<h3>${B.name} <small style="color:#a01a0a">NIVO ${l}, OŠTEĆENO</small></h3><div></div><p>Dušmani su je zapalili. Ne radi dok je zanatlije ne poprave.</p><div class="act">${costHtml(rc)}<button class="btn green sm" ${canPay(rc)?'':'disabled'} data-cost='${JSON.stringify(rc)}'>Popravi</button></div>`;
+   d.innerHTML=`<h3>${B.name} <small style="color:#a01a0a">NIVO ${l}, OŠTEĆENO</small></h3><div></div><p>Neprijatelji su je zapalili. Ne radi dok je zanatlije ne poprave.</p><div class="act">${costHtml(rc)}<button class="btn green sm" ${canPay(rc)?'':'disabled'} data-cost='${JSON.stringify(rc)}'>Popravi</button></div>`;
    d.querySelector('button').onclick=()=>{if(!canPay(rc))return;pay(rc);delete save.dmg[B.id];persist();sfx.build();fortFx=1.2;notify(`Popravljeno: <b>${B.name}</b>.`);renderSheet();renderHub()};body.appendChild(d);return}
   d.innerHTML=`<h3>${B.name} <small>${l?'NIVO '+l:'NIJE IZGRAĐENO'}</small></h3><div></div><p>${B.desc}</p>
    <div class="eff">${l?`Sada: ${B.eff(l)}`:''}${!maxed?`${l?'<br>':''}Sledeći nivo: ${B.eff(l+1)}`:''}</div>
@@ -4472,6 +4803,7 @@ cv.addEventListener('wheel',e=>{if(state!=='hub'||sheetOpen)return;e.preventDefa
 function vTap(px,py){const w=s2w(px,py);let hit=null;const hits=vhit.filter(h=>w.x>=h.x&&w.x<=h.x+h.w&&w.y>=h.y&&w.y<=h.y+h.h).reverse();
  const bld=hits.find(h=>!h.id.startsWith('hero:')),hr=hits.find(h=>h.id.startsWith('hero:'));hit=hr&&(!bld||Math.abs(w.x-hr.hx)<9)?hr:(bld||hr||null);
  if(!hit){vsel=null;updateBpop();return}
+ if(hit.id==='basta'||hit.id==='amb'){vsel=null;updateBpop();openSheet(hit.id);return}
  if(hit.id.startsWith('hero:')){const id=hit.id.slice(5);heroTab=id;vsel=null;updateBpop();openSheet('junaci');return}
  vsel=hit.id;sfx.coin();updateBpop()}
 function upgradeBuilding(id){const B=BUILD.find(b=>b.id===id),l=save.b[id];const c=B.cost(l);if(l>=B.max||dmgd(id)||!(id==='ognjiste'||l<save.b.ognjiste)||!canPay(c))return;
@@ -4480,7 +4812,7 @@ function repairBuilding(id){const B=BUILD.find(b=>b.id===id),rc=repairCost(id);i
 function updateBpop(){const el=$('#bpop');if(!vsel||state!=='hub'||sheetOpen){el.classList.remove('on');return}
  const B=BUILD.find(b=>b.id===vsel),l=save.b[vsel],dm=dmgd(vsel),maxed=l>=B.max,capOk=vsel==='ognjiste'||l<save.b.ognjiste,c=B.cost(l);
  $('#bpName').textContent=B.name;$('#bpLvl').innerHTML=dm?'<span style="color:#a01a0a">OŠTEĆENO</span>':l?`NIVO ${l}${maxed?', DOGRAĐENO':''}`:'NIJE IZGRAĐENO';
- $('#bpDesc').innerHTML=dm?'Dušmani su je zapalili. Ne radi dok je zanatlije ne poprave.':`${B.desc}<br>${l?`Sada: ${B.eff(l)}<br>`:''}${maxed?'':`Sledeći nivo: ${B.eff(l+1)}`}`;
+ $('#bpDesc').innerHTML=dm?'Neprijatelji su je zapalili. Ne radi dok je zanatlije ne poprave.':`${B.desc}<br>${l?`Sada: ${B.eff(l)}<br>`:''}${maxed?'':`Sledeći nivo: ${B.eff(l+1)}`}`;
  const act=$('#bpAct');act.innerHTML='';
  const info=document.createElement('button');info.className='btn sm ghost';info.textContent='Sve zgrade';info.onclick=()=>{vsel=null;openSheet('utvrdjenje')};
  if(dm){const rc=repairCost(vsel);act.insertAdjacentHTML('beforeend',costHtml(rc));const b=document.createElement('button');b.className='btn sm green';b.disabled=!canPay(rc);b.textContent='Popravi';b.onclick=()=>repairBuilding(vsel);act.appendChild(b)}
@@ -4538,7 +4870,7 @@ function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
  ctx.strokeStyle='rgba(140,116,84,.95)';ctx.lineWidth=24;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cx,gy+40);ctx.quadraticCurveTo(cx+18,gy+260,cx-10,VIL.H+40);ctx.stroke();
  ctx.strokeStyle='rgba(96,78,56,.6)';ctx.lineWidth=1;for(let i=0;i<30;i++){const yy=gy+150+i*16;ctx.beginPath();ctx.moveTo(cx-8+Math.sin(i)*4,yy);ctx.lineTo(cx-4+Math.sin(i)*4,yy+3);ctx.stroke()}
  const rx=400,ry=134,gz=gy+16;const items=[];
- if(!forest)forestInit();for(const f of forest)items.push({y:f.y,f:()=>f.k==='pine'?pine(ctx,f.x,f.y,f.s,f.v):boulder(ctx,f.x,f.y,f.s)});
+ if(!forest)forestInit();for(const f of forest){if(typeof drawBasta==='function'&&f.x>cx+40&&f.x<cx+390&&f.y>gy+160&&f.y<gy+330)continue;if(typeof drawAmb==='function'&&f.x>cx-400&&f.x<cx-40&&f.y>gy+150&&f.y<gy+330)continue;items.push({y:f.y,f:()=>f.k==='pine'?pine(ctx,f.x,f.y,f.s,f.v):boulder(ctx,f.x,f.y,f.s)});}
  const sel=id=>vsel===id;
  // ognjište sa stegom
  items.push({y:gy,f:()=>{const L=b.ognjiste,sz=(1+L*.12);ctx.fillStyle='rgba(0,0,0,.4)';ell(ctx,cx,gy+4,46*sz,14*sz);ctx.fill();
@@ -4568,9 +4900,11 @@ function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
   heroAura(ctx,cx+x,gy+y,hs_,h.id,t,0,main);drawHero(ctx,cx+x,gy+y,hs_,h,x>0?-1:1,0,false,t+i,1);heroAura(ctx,cx+x,gy+y,hs_,h.id,t,1,main);
   if(main){const yy=gy+y-hh-30+Math.sin(t*3)*2;ctx.fillStyle='rgba(240,181,74,.95)';poly(ctx,[cx+x-5,yy,cx+x+5,yy,cx+x,yy+8]);ctx.fill()}}})});
  // vojska oko ognjišta
- {const S=soldiers().filter(s=>typeof isWounded!=='function'||!isWounded(s.name)).slice(0,10),n=S.length;const SPOTS=[[-150,-14],[150,-14],[-112,-44],[112,-44],[-176,22],[176,22],[-150,56],[150,56],[-60,64],[60,66]];S.forEach((sd,i)=>{const sp=SPOTS[i],x=cx+sp[0],y=gy+8+sp[1];
+ {const S=soldiers().filter(s=>typeof isWounded!=='function'||!(typeof isBusy==='function'?isBusy:isWounded)(s.name)).slice(0,10),n=S.length;const SPOTS=[[-150,-14],[150,-14],[-112,-44],[112,-44],[-176,22],[176,22],[-150,56],[150,56],[-60,64],[60,66]];S.forEach((sd,i)=>{const sp=SPOTS[i],x=cx+sp[0],y=gy+8+sp[1];
   items.push({y,f:()=>{const e={type:'ratnik',unit:sd.unit,color:save.tribe?save.tribe.color:'#b8323a',x,y,r:13.5*1.15,vx:0,vy:0,stun:0,seed:i*.37,born:0,hitT:0,face:x<cx?1:-1,boss:false,ally:true,vil:1,tg:{x:cx+(x<cx?30:-30),y:gy+60}};
    drawEnemy(ctx,e,t);if(vcam.z>1.15||n<=4){ctx.font="700 9.5px 'EB Garamond',serif";ctx.textAlign='center';ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillText(sd.name,x+.7,y-56.3);ctx.fillStyle='#f6e7c4';ctx.fillText(sd.name,x,y-57)}}})})}
+ if(typeof drawAmb==='function')drawAmb(items,ctx,t,cx,gy);
+ if(typeof drawBasta==='function'){items.push({y:gy+188,f:()=>drawBasta(ctx,t,cx,gy)});items.push({y:gy+286,f:()=>drawBastaFront(ctx,t,cx,gy)});const B=save.basta;if(B&&B.worker){const sd=soldiers().find(s=>s.name===B.worker);if(sd){const wx=cx+221+Math.sin(t*.3)*100,wy=gy+272;items.push({y:wy,f:()=>{const e={type:'ratnik',unit:sd.unit,color:save.tribe?save.tribe.color:'#b8323a',x:wx,y:wy,r:13.5*1.15,vx:Math.cos(t*.35),vy:0,stun:0,seed:.9,born:0,hitT:0,face:Math.cos(t*.3)>0?1:-1,boss:false,ally:true,vil:1,tg:{x:wx+10,y:wy}};drawEnemy(ctx,e,t)}})}}}
  // kule
  const ta=[-2.55,-.6,2.72,.4];
  for(let i=0;i<Math.min(4,b.kula);i++){const a=ta[i],x=cx+Math.cos(a)*rx,y=gz+Math.sin(a)*ry;items.push({y:y+1,f:()=>tower(ctx,x,y,.92,t,save.tribe.color,dmgd('kula')&&i===0)});vhit.push({id:'kula',x:x-20,y:y-112,w:44,h:116,bx:x,by:y-122})}

@@ -1170,7 +1170,7 @@ const HEROES_OLD=[
  {id:'marko',name:'Marko Kraljević',role:'Junak sa Šarcem',color:'#8a4a2a',hp:220,dmg:44,rate:.9,range:92,speed:195,light:145,weapon:'topuz',
   ab:'Šarac',abDesc:'Marko jurne kao na Šarcu: gazi sve pred sobom, obara i omamljuje.',cd:7,unlock:29},
  {id:'novak',name:'Starina Novak',role:'Hajdučki harambaša',color:'#7a6a4a',hp:170,dmg:30,rate:1.3,range:84,speed:210,light:150,weapon:'mac',
-  ab:'Zaseda',abDesc:'Iz šume iskaču tri hajduka i bore se uz njega dvanaest sekundi.',cd:14,unlock:39},
+  ab:'Zaseda',abDesc:'Iz šume iskaču tri vojnika i bore se uz njega dvanaest sekundi.',cd:14,unlock:39},
  {id:'ustanik',name:'Janko',role:'Ustanik',color:'#9a2a22',hp:110,dmg:48,rate:.7,range:340,speed:205,light:150,weapon:'puska',
   ab:'Plotun',abDesc:'Lepeza od devet zrna pred junakom. Odbacuje sve što pogodi.',cd:7,unlock:40},
  {id:'veljko',name:'Hajduk Veljko',role:'Vojvoda ustanika',color:'#2a2a2a',hp:160,dmg:34,rate:1.1,range:300,speed:210,light:150,weapon:'puska',
@@ -2426,10 +2426,10 @@ function start(c){
  if(c.boss){const pos={x:sx>G.W/2?140:G.W-160,y:G.H/2};const b=mkEnemy(c.boss.sprite==='rvitez'?'vitez':c.boss.sprite,pos);const m=1+.11*(c.L-1);
   Object.assign(b,{boss:true,sprite:c.boss.sprite,look:c.bossLook||'B'+c.reg,r:c.boss.r,hp:1300*m*(1+c.reg*.3),max:1300*m*(1+c.reg*.3),dmg:26*(1+.06*c.L),sp:[62,62],xp:300+c.L*10,loot:120+c.L*8,ringT:3,sumT:7});
   G.enemies.push(b);G.bossRef=b;G.bossLabel=c.boss.name}
- {const pick=armyPick(c),n=pick.length,A=ensureArmy(),usedI={};for(let i=0;i<n;i++){const id=pick[i],us=unitStats(id),a=i/n*6.283;const k=usedI[id]=(usedI[id]||0)+1;const name=A[id].names.filter(n=>!isWounded(n))[k-1]||UNITS.find(u=>u.id===id).name;
-  G.allies.push({name,unit:id,type:'ratnik',sprite:'ratnik',x:G.p.x-30+Math.cos(a)*40,y:G.p.y+Math.sin(a)*40,r:13,vx:0,vy:0,kx:0,ky:0,face:1,stun:0,seed:R()*10,born:0,hitT:0,boss:false,color:save.tribe?save.tribe.color:'#b8323a',
+ {const pick=armyPick(c),n=pick.length,A=ensureArmy(),usedI={};for(let i=0;i<n;i++){const id=pick[i],us=unitStats(id),a=i/n*6.283;const k=usedI[id]=(usedI[id]||0)+1;const name=A[id].names.slice(0,A[id].n).filter(n=>!isWounded(n))[k-1]||UNITS.find(u=>u.id===id).name;
+  G.allies.push({name,army:1,unit:id,type:'ratnik',sprite:'ratnik',x:G.p.x-30+Math.cos(a)*40,y:G.p.y+Math.sin(a)*40,r:13,vx:0,vy:0,kx:0,ky:0,face:1,stun:0,seed:R()*10,born:0,hitT:0,boss:false,color:save.tribe?save.tribe.color:'#b8323a',
    hp:us.hp,max:us.hp,dmg:us.dmg,range:us.range,rate:us.rate,taunt:id==='stit',atkT:R(),off:a,ally:true})}}
- $('#allyC').innerHTML=G.allies.length?`<i class="ic">${SVG.ally}</i>${G.allies.length} saborca`:'';
+ $('#allyC').innerHTML=G.allies.length?`<i class="ic">${SVG.ally}</i>${G.allies.length} ${G.allies.length===1?'vojnik':'vojnika'}`:'';
  G.spect=!!c.spect&&G.allies.length>0;G.spect0=G.allies.length;document.body.classList.toggle('spect',G.spect);if(G.spect)G.p.inv=1e9;
  for(const k in keys)keys[k]=0;joy.on=false;joy.x=joy.y=0;
  decorate();$('#abLbl').textContent=hero.ab;$('#abIc').innerHTML=SVG[ABIL_IC[hero.id]];
@@ -2694,7 +2694,7 @@ function update(dt){
   if(Math.abs(a.vx)>8&&a.swing<=0)a.face=a.vx>0?1:-1;
   if(dpl<a.r+p.r){const dd=dpl||1,o=a.r+p.r-dd;a.x+=(a.x-p.x)/dd*o;a.y+=(a.y-p.y)/dd*o}
   for(const e of G.enemies){const dx=a.x-e.x,dy=a.y-e.y,dd=Math.hypot(dx,dy)||1,m=a.r+e.r;if(dd<m){const o=(m-dd)/2;a.x+=dx/dd*o;a.y+=dy/dd*o;e.x-=dx/dd*o;e.y-=dy/dd*o}}});
- G.allies=G.allies.filter(a=>{if(a.ttl!==undefined){a.ttl-=dt;if(a.ttl<=0){burst(a.x,a.y-10,'#c9b08a',14,120,2);return false}}if(a.hp>0)return true;if(a.ttl!==undefined)return false;burst(a.x,a.y-10,a.color,24,180,2.6);G.fallen=(G.fallen||[]).concat(a.name);return false});
+ G.allies=G.allies.filter(a=>{if(a.ttl!==undefined){a.ttl-=dt;if(a.ttl<=0){burst(a.x,a.y-10,'#c9b08a',14,120,2);return false}}if(a.hp>0)return true;if(a.ttl!==undefined)return false;burst(a.x,a.y-10,a.color,24,180,2.6);G.fallen=(G.fallen||[]).concat(a.name);if(a.army)G.fallenA=(G.fallenA||[]).concat(a.name);return false});
  G.threatT=Math.max(0,(G.threatT||0)-dt);if(G.threatT<=0)G.threat=null;
  // kule
  for(const s of G.structs){s.hitT=Math.max(0,s.hitT-dt);if(s.kind!=='tower'||s.hp<=0)continue;s.cd-=dt;const d=Math.hypot(p.x-s.x,p.y-s.y);
@@ -2983,7 +2983,7 @@ const MAP_W=(23.1-P_LON0)*P_K*100,MAP_H=(P_LAT0-41.8)*100;
 const PTYPE={z:'Manastir',k:'Grad',g:'Rudnik',b:'Bojište'};
 const PINC={z:{zar:1.5},k:{kamen:1.5},g:{gvozdje:.6},b:{zar:.8,kamen:.4}};
 const ERA_COL=['#9a5a2a','#8a2a22','#5a5a78','#4a6a7a','#4a6a3a'];
-const ERA_BONUS=['Manastirska kandila: fenjer gori 10% sporije','Kosovski zavet: svi junaci udaraju 10% jače','Bedemi Smedereva: utvrđenje jače za 80','Hajdučke staze: junaci 6% brži','Ustanički duh: jedan saborac više u svakom boju'];
+const ERA_BONUS=['Manastirska kandila: fenjer gori 10% sporije','Kosovski zavet: svi junaci udaraju 10% jače','Bedemi Smedereva: utvrđenje jače za 80','Hajdučke staze: junaci 6% brži','Ustanički duh: jedan vojnik više u svakom boju'];
 const owned=i=>save.stars[i]>0;
 const isLost=i=>!!(save.lost&&save.lost[i]);
 const eraDone=r=>{for(let n=0;n<10;n++)if(!owned(r*10+n))return false;return true};
@@ -3066,7 +3066,7 @@ function unitStats(id){const u=UNITS.find(x=>x.id===id),l=ensureArmy()[id].lvl,f
 const unitUpCost=id=>{const l=ensureArmy()[id].lvl;return{zar:nice(70*Math.pow(1.17,l)),gvozdje:nice(3+l*1.6)}};
 function armyPick(c){const A=ensureArmy(),n=armySlots(c),left={};UNITS.forEach(u=>left[u.id]=A[u.id].n);const order=['stit','koplja','strel','koplja','strel','stit','koplja','strel'];const out=[];
  for(let k=0;out.length<n&&k<40;k++){const id=order[k%order.length];if(left[id]>0){left[id]--;out.push(id)}else if(!UNITS.some(u=>left[u.id]>0))break}return out}
-const UNAMES=['Milan Toplica','Ivan Kosančić','Relja Krilatica','Pavle Orlović','Jug Bogdan','Boško Jugović','Stefan Musić','Banović Sekula','Vojvoda Momčilo','Dmitar Jakšić','Miloš Pocerac','Jakov Nenadović','Luka Lazarević','Stanoje Glavaš','Hajduk Stanko','Vujica Vulićević','Mladen Milovanović','Petar Dobrnjac','Janko Katić','Stevan Sinđelić','Vasa Čarapić','Đorđe Ćurčija','Kara-Marko','Toma Vučić','Sima Marković','Milenko Stojković','Hajduk Ivko','Vojvoda Prijezda','Novak Debelić','Radič Postupović'];
+const UNAMES=['Milan Toplica','Ivan Kosančić','Relja Krilatica','Pavle Orlović','Jug Bogdan','Boško Jugović','Stefan Musić','Banović Sekula','Vojvoda Momčilo','Dmitar Jakšić','Miloš Pocerac','Jakov Nenadović','Luka Lazarević','Stanoje Glavaš','Stanko Arambašić','Vujica Vulićević','Mladen Milovanović','Petar Dobrnjac','Janko Katić','Stevan Sinđelić','Vasa Čarapić','Đorđe Ćurčija','Kara-Marko','Toma Vučić','Sima Marković','Milenko Stojković','Ivko Protić','Vojvoda Prijezda','Novak Debelić','Radič Postupović'];
 function armyLabel(c){const p=armyPick(c);if(!p.length)return'';const cnt={};p.forEach(i=>cnt[i]=(cnt[i]||0)+1);const nm={stit:['štitonoša','štitonoše','štitonoša'],koplja:['kopljanik','kopljanika','kopljanika'],strel:['strelac','strelca','strelaca']};
  return Object.entries(cnt).map(([i,n])=>`${n} ${n===1?nm[i][0]:n<5?nm[i][1]:nm[i][2]}`).join(', ').replace(/, ([^,]*)$/,' i $1')}
 function unitOpt(id,col){const b={tunic:'#8a8274',pants:'#3a3028',boots:'#1e1612',hat:'helm',sleeve:'#8a8274',must:'#4a3020',nolantern:1};
@@ -3078,6 +3078,9 @@ function unitOpt(id,col){const b={tunic:'#8a8274',pants:'#3a3028',boots:'#1e1612
  g.fillStyle='#5a3a1e';g.fillRect(-.7,-26,1.4,34);g.fillStyle='#c8ced4';g.beginPath();g.moveTo(0,-32);g.lineTo(1.6,-26);g.lineTo(-1.6,-26);g.closePath();g.fill();g.fillStyle='#8a1a1a';g.fillRect(-1.2,-25.6,2.4,1.4);g.restore()}}
 
 {const _ea=ensureArmy;ensureArmy=function(){const A=_ea.apply(this,arguments);if(!save.namesV2){const used=new Set();let k=0;for(const u of UNITS){const a=A[u.id];a.names=(a.names||[]).map(n=>{if(UNAMES.includes(n)&&!used.has(n)){used.add(n);return n}while(k<UNAMES.length&&used.has(UNAMES[k]))k++;const nn=UNAMES[k++]||n;used.add(nn);return nn})}save.namesV2=1;try{persist()}catch(e){}}return A}}
+{const _ea=ensureArmy;ensureArmy=function(){const A=_ea.apply(this,arguments);if(!save.namesV3){const M={'Hajduk Stanko':'Stanko Arambašić','Hajduk Ivko':'Ivko Protić'};
+ for(const u of UNITS){const a=A[u.id];if(a&&a.names)a.names=a.names.map(n=>M[n]||n)}if(save.wounded)for(const k in M)if(save.wounded[k]){save.wounded[M[k]]=save.wounded[k];delete save.wounded[k]}
+ save.namesV3=1;try{persist()}catch(e){}}return A}}
 
 /* ---------- okupatorske vojske po dobima ---------- */
 const ERA_FOES=[
@@ -3212,7 +3215,7 @@ const TACT={
  42:{k:'misar',t:'Šanac i konjica',d:'Karađorđe drži pešadiju u šancu, a konjicu krije sa strane. Kad pobediš dovoljno dušmana, konjica udara s boka.'},
  43:{k:'sanac',t:'Šanac',d:'Deligradski šanci zatvaraju put dolinom Morave. Drži se iza kolja i dočekaj dušmane na prolazima.'},
  44:{k:'cegar',t:'Šanac i barut',d:'Stevan Sinđelić brani šanac na Čegru. Pred kraj boja pali barut: eksplozija nosi dušmane oko šanca.'},
- 49:{k:'dub',t:'Zbijen red',d:'Drži red. Saborci staju u zid, primaju manje udaraca i navlače dušmane na sebe.'}};
+ 49:{k:'dub',t:'Zbijen red',d:'Drži red. Vojnici staju u zid, primaju manje udaraca i navlače dušmane na sebe.'}};
 
 function mkAlly(name,x,y,ttl,rage){const st=G.st;return{name,type:'ratnik',sprite:'ratnik',x,y,r:13,vx:0,vy:0,kx:0,ky:0,face:1,stun:0,seed:R()*10,born:0,hitT:0,boss:false,color:save.tribe?save.tribe.color:'#b8323a',
  hp:Math.round(st.hp*.6),max:Math.round(st.hp*.6),dmg:st.dmg*.7,atkT:R(),off:R()*6.283,ally:true,ttl,rage:rage||4}}
@@ -3549,6 +3552,7 @@ function hubTourSteps(){const tu=typeof touchUI!=='undefined'&&touchUI;return [
  {t:'Ognjište',x:`Srce sela. Dok ognjište gori, selo živi. ${tu?'Prevuci prstom':'Prevuci mišem'} po selu da ga razgledaš, a <b>dodirni zgradu</b> da vidiš šta radi i da je dograđuješ.`,el:hearthRect,pad:14,round:1},
  {t:'Zalihe',x:'<b>Žar</b>, <b>kamen</b> i <b>gvožđe</b>. Na početku imaš nula. Zarađuješ ih u bitkama i od zgrada, a trošiš na gradnju, junake i vojsku.',el:'#resBox'},
  {t:'Tvoj odred',x:'Ime i grb tvog odreda, <b>trofeji</b> i <b>liga</b>. Pobede u ratu odreda donose trofeje i penju te u jaču ligu.',el:'#tribeBox'},
+ {t:'Obaveštenja',x:'Zvonce čuva <b>sve poruke</b>: napade na selo, plen, ranjene vojnike, ishod bitaka. Crveni broj znači da imaš nepročitano.',el:'#logBtn',round:1,opt:true},
  {t:'Pohod',x:'<b>Ovde počinje igra.</b> 50 bitaka kroz srpsku istoriju, od Nemanjića do ustanaka. Svaka bitka je drugačija: braniš grad, nosiš vest, spasavaš zarobljene, ideš na megdan…',el:'.nav [data-sheet="pohod"]'},
  {t:'Junaci',x:'Strahinja, Dušan, Miloš i drugi. Svaki ima svoju <b>moć</b>. Ovde ih biraš i jačaš.',el:'.nav [data-sheet="junaci"]'},
  {t:'Utvrđenje',x:'Gradi i dograđuj: kamenolom, kovačnicu, kasarnu, zidine. Jače selo daje više zaliha i bolju vojsku. <b>Ranjeni vojnici</b> se ovde leče.',el:'.nav [data-sheet="utvrdjenje"]'},
@@ -3580,6 +3584,59 @@ function battleTour(){if(!G||(state!=='play'&&state!=='pause'))return;const was=
 {const _s=start;start=function(c){const first=c&&!c.spect&&(c.kind==='camp'||c.kind==='def')&&!save.tourBoj;const r=_s.apply(this,arguments);if(first&&G&&state==='play')battleTour();return r}}
 setTimeout(()=>{const sb=document.getElementById('sndBtn');if(sb&&!document.getElementById('helpBtn')){const b=document.createElement('button');b.id='helpBtn';b.className=sb.className;b.textContent='Uputstvo za bitku';
  b.onclick=()=>{if(typeof show==='function')show(null);battleTour()};const after=document.getElementById('cirBtn')||document.getElementById('vibBtn')||document.getElementById('musBtn')||sb;after.after(b)}},120);
+/* ---------- obaveštenja: sve poruke na jednom mestu ---------- */
+const LOG_CSS=`.snd.bell{position:relative;padding:7px}.snd.bell svg{width:100%;height:100%;fill:#f3dca4}
+.snd.bell i{position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#c22a14;color:#fff;font:700 11px/17px 'Alegreya Sans',sans-serif;font-style:normal;text-align:center;box-shadow:0 0 0 1.5px #1a0e06;display:none}
+.snd.bell.has i{display:block}
+#logP{position:fixed;inset:0;z-index:85;display:none;background:rgba(6,4,10,.6);align-items:flex-start;justify-content:center;padding:calc(64px + env(safe-area-inset-top)) 10px 10px}
+#logP.on{display:flex}
+#logP .lp{width:min(100%,440px);max-height:calc(100% - 20px);display:flex;flex-direction:column;background:linear-gradient(180deg,#fbf1d8,#ead6ac);border:2px solid #d6a955;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.55);color:#3a2010;overflow:hidden}
+#logP .lh{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 10px;border-bottom:1px solid rgba(110,60,20,.2)}
+#logP .lh b{font:700 15px Cinzel,serif;letter-spacing:.06em;color:#6e1a10}
+#logP .lh button{background:none;border:0;cursor:pointer;color:#8a5a30;font:600 13px 'EB Garamond',serif;padding:4px 6px}
+#logP .lh .lx{font-size:22px;line-height:1;color:#6e1a10}
+#logP .ll{overflow:auto;padding:4px 14px 12px;-webkit-overflow-scrolling:touch}
+#logP .le{display:grid;grid-template-columns:10px 1fr;gap:4px 10px;padding:10px 0;border-bottom:1px dashed rgba(110,60,20,.2);font:500 15px/1.35 'EB Garamond',serif}
+#logP .le:last-child{border-bottom:0}
+#logP .le:before{content:'';width:8px;height:8px;border-radius:50%;background:#c9a96a;margin-top:6px}
+#logP .le.bad:before{background:#b3301b}#logP .le.good:before{background:#4c8a3a}
+#logP .le.new{background:linear-gradient(90deg,rgba(214,169,85,.18),transparent)}
+#logP .le small{grid-column:2;color:#8a6a48;font-size:12.5px}
+#logP .le b{color:#6e1a10}
+#tribeBox>div{min-width:0;flex:1 1 auto}#tribeBox>div b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:400px){#tribeBox{gap:6px}#tribeBox .snd{flex:none;width:30px;height:30px;margin-left:4px;padding:6px}#tribeBox .snd.help{padding:0;font-size:14px}#tribeBox .snd.bell{padding:6px}}
+#logP .lempty{padding:24px 0;text-align:center;color:#8a6a48;font:italic 15px 'EB Garamond',serif}`;
+{const st=document.createElement('style');st.textContent=LOG_CSS;document.head.appendChild(st);
+ const p=document.createElement('div');p.id='logP';p.innerHTML='<div class="lp"><div class="lh"><b>Obaveštenja</b><span><button class="lc">Obriši sve</button><button class="lx" aria-label="Zatvori">×</button></span></div><div class="ll"></div></div>';
+ document.body.appendChild(p);p.onclick=e=>{if(e.target===p)logClose()};p.querySelector('.lx').onclick=logClose;
+ p.querySelector('.lc').onclick=()=>{save.log=[];persist();logRender()}}
+function logAdd(html,kind){if(!html)return;save.log=save.log||[];const txt=String(html);const L=save.log;
+ if(L.length&&L[0].h===txt&&Date.now()-L[0].t<5000)return;L.unshift({t:Date.now(),h:txt,k:kind||'',n:1});if(L.length>60)L.length=60;try{persist()}catch(e){}logBadge()}
+function logUnread(){return (save.log||[]).filter(e=>e.n).length}
+function logBadge(){const b=document.getElementById('logBtn');if(!b)return;const n=logUnread();b.classList.toggle('has',n>0);b.querySelector('i').textContent=n>9?'9+':n}
+function logAgo(t){const s=Math.round((Date.now()-t)/1000);if(s<60)return 'upravo';const m=Math.round(s/60);if(m<60)return `pre ${m} min`;const h=Math.round(m/60);if(h<24)return `pre ${h} h`;const d=Math.round(h/24);return d===1?'juče':`pre ${d} dana`}
+function logRender(){const l=$('#logP .ll'),L=save.log||[];
+ l.innerHTML=L.length?L.map(e=>`<div class="le ${e.k}${e.n?' new':''}"><div>${e.h}</div><small>${logAgo(e.t)}</small></div>`).join(''):'<div class="lempty">Još nema obaveštenja.</div>';
+ l.querySelectorAll('button,.nx').forEach(b=>b.remove())}
+function logOpen(){logRender();$('#logP').classList.add('on');for(const e of save.log||[])e.n=0;try{persist()}catch(e){}logBadge()}
+function logClose(){$('#logP').classList.remove('on')}
+{const _n=notify;notify=function(html,bad){logAdd(html,bad?'bad':'');return _n.apply(this,arguments)}}
+{const _rh=renderHub;renderHub=function(){const r=_rh.apply(this,arguments);const tb=$('#tribeBox');if(tb&&!tb.querySelector('#logBtn')){const b=document.createElement('button');b.id='logBtn';b.className='snd bell';b.title='Obaveštenja';
+ b.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 2a6 6 0 0 0-6 6v4.2L4.3 15a1 1 0 0 0 .9 1.5h13.6a1 1 0 0 0 .9-1.5L18 12.2V8a6 6 0 0 0-6-6zm0 21a3 3 0 0 0 3-3H9a3 3 0 0 0 3 3z"/></svg><i></i>';
+ b.onclick=e=>{e.stopPropagation();logOpen()};const help=tb.querySelector('.help');help?tb.insertBefore(b,help):tb.appendChild(b)}logBadge();return r}}
+/* zapis o svakoj bici */
+setTimeout(()=>{const _er=endRun;endRun=function(win){const c=G&&G.cfg,w0=Object.assign({},save.wounded||{}),r0=Object.assign({},save.res||{});const r=_er.apply(this,arguments);
+ try{if(c&&!c.spect){const nm=esc(c.name||(c.kind==='daily'?'Bitka dana':'Bitka'));let h=win?`Pobeda: <b>${nm}</b>.`:`Poraz: <b>${nm}</b>.`;
+  if(c.kind==='daily')h=`<b>Bitka dana</b>: ${G.score!=null?G.score+' poena':'završena'}.`;
+  const lost=Object.keys(r0).map(k=>[k,(r0[k]||0)-((save.res||{})[k]||0)]).filter(x=>x[1]>0);
+  if(!win&&lost.length)h+=` Izgubljeno: ${lost.map(([k,v])=>`${v} ${({zar:'žara',kamen:'kamena',gvozdje:'gvožđa'})[k]||k}`).join(', ')}.`;
+  const nw=Object.keys(save.wounded||{}).filter(k=>!w0[k]||save.wounded[k]>w0[k]+1000);
+  if(nw.length){const m=Math.round((save.wounded[nw[0]]-Date.now())/60000);h+=` Ranjeni vojnici (${nw.map(esc).join(', ')}) se oporavljaju ${m} min. U Utvrđenju ih možeš izlečiti odmah.`}
+  logAdd(h,win?'good':'bad')}}catch(e){}return r}},200);
+/* obaveštenje kad vojnik ozdravi */
+setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=save._healSeen||{};let ch=0;
+ for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
+ if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- vrste bitaka po istoriji: opsada, dvoboj, juriš, zaseda; talasi; blagoslovi ---------- */
 const MODEX={13:'glasnik',35:'glasnik',32:'zbeg',36:'zbeg',40:'oslobodi',45:'oslobodi',20:'drzi',47:'drzi',1:'dvoboj',16:'juris',18:'dvoboj',22:'opsada',27:'opsada',28:'opsada',30:'zaseda',33:'dvoboj',34:'zaseda',37:'zaseda',46:'juris'};
 const CHAMP={1:'Tihomir, Nemanjin brat',18:'Sultanov telohranitelj',33:'Turski delija'};
@@ -3703,7 +3760,7 @@ const BLESS=[
  {k:'dmg',n:'Oštar mač',d:'+25% štete',f:()=>{G.st.dmg*=1.25}},{k:'rate',n:'Brza ruka',d:'+20% brzine napada',f:()=>{G.st.rate*=1.2}},
  {k:'spd',n:'Laki korak',d:'+15% brzine kretanja',f:()=>{G.st.speed*=1.15}},{k:'hp',n:'Gvozdena koža',d:'+25% zdravlja i puno izlečenje',f:()=>{G.maxhp=Math.round(G.maxhp*1.25);G.hp=G.maxhp}},
  {k:'oil',n:'Puna uljanica',d:'Fenjer gori 30% sporije, odmah pun',f:()=>{G.st.drain*=.7;G.oil=100}},{k:'rng',n:'Duga ruka',d:'+18% dometa napada',f:()=>{G.st.range*=1.18}},
- {k:'vamp',n:'Krvna osveta',d:'Svaki pali dušman vraća malo zdravlja',f:()=>{G.bl.vamp=1}},{k:'help',n:'Pomoć iz šume',d:'Dva hajduka ti se pridružuju',f:()=>{const names=['Hajduk Ivko','Hajduk Stanko','Deli-Marko','Hajduk Mitar'];for(let i=0;i<2;i++){const a=R()*6.28;G.allies.push(mkAlly(names[(G.allies.length+i)%4],G.p.x+Math.cos(a)*60,G.p.y+Math.sin(a)*60,undefined,0))}}},
+ {k:'vamp',n:'Krvna osveta',d:'Svaki pali dušman vraća malo zdravlja',f:()=>{G.bl.vamp=1}},{k:'help',n:'Pomoć iz šume',d:'Dva vojnika iz okolnih sela ti se pridružuju',f:()=>{const names=['Ivko','Stanko','Marko','Mitar'];for(let i=0;i<2;i++){const a=R()*6.28;G.allies.push(mkAlly(names[(G.allies.length+i)%4],G.p.x+Math.cos(a)*60,G.p.y+Math.sin(a)*60,undefined,0))}}},
  {k:'cd',n:'Sveti plamen',d:'Moć junaka se puni 35% brže',f:()=>{G.cdMul=(G.cdMul||1)*.65}},{k:'ally',n:'Bojni poklič',d:'Vojnici udaraju 30% jače',f:()=>{for(const a of G.allies)a.dmg*=1.3}}];
 {const st=document.createElement('style');st.textContent=`#bless{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:radial-gradient(ellipse at center,rgba(40,10,4,.55),rgba(10,4,2,.85))}
 #bless.on{display:flex;animation:blIn .3s ease-out}#bless h3{font:800 22px Cinzel,serif;color:#ffe7b0;letter-spacing:.08em;margin:0;text-shadow:0 2px 0 #5e140c}#bless .sub{font:italic 15px 'EB Garamond',serif;color:#f3d79a;margin-top:-8px}
@@ -3771,7 +3828,7 @@ const ZNAMES=['Stana','Mara','Jelica','starac Ilija','Milica','Sava','kaluđer P
  if(m==='drzi'){const q={x:G.W/2,y:G.H/2};G.obst=G.obst.filter(o=>Math.hypot(o.x-q.x,o.y-q.y)>220);G.walls=G.walls.filter(w=>Math.hypot(w.x+w.w/2-q.x,w.y+w.h/2-q.y)>240);makeFloor();G.zone={x:q.x,y:q.y,r:130,p:0};G.p.x=q.x-450;G.p.y=q.y}
  return r}}
 {const _ds=dmgStruct;dmgStruct=function(s,d){if(s.kind!=='kavez')return _ds.apply(this,arguments);if(s.hp<=0)return;s.hp-=d;s.hitT=.12;floatTxt(s.x,s.y-50,Math.round(d),'#ffd9a0');sfx.ehit();
- if(s.hp<=0){burst(s.x,s.y-20,'#8a6a40',30,220,3,1);G.shake=8;sfx.hit();G.prog++;const nm=UNAMES[(G.prog*7+3)%UNAMES.length];const a=mkAlly(nm,s.x,s.y,undefined,3);a.unit='koplja';G.allies.push(a);
+ if(s.hp<=0){burst(s.x,s.y-20,'#8a6a40',30,220,3,1);G.shake=8;sfx.hit();G.prog++;const nm=['Radoje','Milutin','Stojan','Bogdan','Rade','Jovan','Nikola','Vuk','Dragutin','Petko','Simeun','Lazar'][(G.prog*5+1)%12];const a=mkAlly(nm,s.x,s.y,undefined,3);a.unit='koplja';G.allies.push(a);
   floatTxt(s.x,s.y-70,nm+' je slobodan!','#bff0a0',true);toast(`Oslobođeno ${G.prog} od ${G.cfg.goal}`);G.toastT=2}}}
 {const _dt=drawTotem;drawTotem=function(g,o,t){if(o.kind!=='kavez')return _dt.apply(this,arguments);g.save();g.translate(o.x,o.y);if(o.hitT>0)g.filter='brightness(1.7)';
  g.fillStyle='rgba(0,0,0,.4)';ell(g,0,4,30,9);g.fill();g.fillStyle='#3a2a1a';g.fillRect(-26,-6,52,8);g.fillRect(-26,-60,52,6);
@@ -3812,7 +3869,7 @@ const fmtMin=ms=>{const m=Math.ceil(ms/60000);return m>=60?Math.floor(m/60)+' h 
  try{return _ap.apply(this,arguments)}finally{for(const u of UNITS)A[u.id].n=saveN[u.id]}}}
 {const _er=endRun;endRun=function(win){const c=G&&G.cfg;let lostRes=null,wounded=[];
  if(G&&c&&!c.spect){save.wounded=save.wounded||{};for(const k in save.wounded)if(save.wounded[k]<Date.now())delete save.wounded[k];
-  const mins=win?4:12;for(const n of (G.fallen||[]))if(soldiers().some(s=>s.name===n)){save.wounded[n]=Date.now()+mins*60000;wounded.push(n)}
+  const mins=win?4:12;for(const n of (G.fallenA||[]))if(soldiers().some(s=>s.name===n)){save.wounded[n]=Date.now()+mins*60000;wounded.push(n)}
   if(!win&&(c.kind==='camp'||c.kind==='raid'||c.kind==='war')){lostRes={};for(const k of RES){const l=Math.floor((save.res[k]||0)*.1);if(l>0){save.res[k]-=l;lostRes[k]=l}}}
   persist()}
  const r=_er.apply(this,arguments);
@@ -4127,7 +4184,7 @@ function enemyIcon(sp,boss,size,look){const c=document.createElement('canvas');c
  const rig=boss?true:!!RIGE[sp];const [x0,y0,x1,y1]=rig?[-15,-52,22,3]:EB[sp];const s=Math.min(size*.84/(y1-y0),size*.84/(x1-x0));const e={type:sp==='rvitez'?'vitez':sp,sprite:sp,r:(rig?RB[sp==='rvitez'?'vitez':sp]:BASE_R[sp])*s,face:1,vx:0,vy:0,stun:0,seed:.5,born:0,hitT:0,boss,look,color:'#b8323a',x:size/2-(x0+x1)/2*s,y:0};
  e.y=size*.92-y1*s-(rig?0:GROUND[sp])*s;drawEnemy(g,e,1);drawEyes(g,e,1);return c}
 function armySheet(el){const A=ensureArmy(),cap=unitCap(),mx=unitMaxN();const col=save.tribe?save.tribe.color:'#b8323a';
- el.innerHTML=`<p class="tip">U boj staje ${armySlots(null)} ratnika. Najviši nivo vojnika: ${cap}.</p>`;
+ el.innerHTML=`<p class="tip">U boj staje ${armySlots(null)} vojnika. Najviši nivo vojnika: ${cap}.</p>`;
  for(const u of UNITS){const a=A[u.id],st=unitStats(u.id),bc=u.cost,uc=unitUpCost(u.id);const d=document.createElement('div');d.className='bcard unit';
   const cv=document.createElement('canvas');cv.width=cv.height=152;cv.style.width=cv.style.height='76px';const g=cv.getContext('2d');g.scale(2,2);g.fillStyle='rgba(240,170,70,.18)';g.beginPath();g.arc(38,40,30,0,7);g.fill();
   drawEnemy(g,{type:'ratnik',unit:u.id,color:col,x:36,y:70,r:13*1.15,vx:0,vy:0,stun:0,seed:.3,born:0,hitT:0,face:1,boss:false},1);d.appendChild(cv);
@@ -4135,7 +4192,7 @@ function armySheet(el){const A=ensureArmy(),cap=unitCap(),mx=unitMaxN();const co
   const ub=d.querySelector('.ub');
   const mk=(lbl,cost,ok,fn,why)=>{const row=document.createElement('div');row.className='arow';row.innerHTML=ok?costHtml(cost):`<span class="req">${why}</span>`;const b=document.createElement('button');b.className='btn sm'+(lbl==='Kupi'?' primary':'');b.textContent=lbl;b.disabled=!ok||!canPay(cost);row.appendChild(b);ub.appendChild(row);if(!ok&&why)b.title=why;b.onclick=()=>{if(!ok||!canPay(cost))return;pay(cost);fn();persist();sfx.build();renderHub();renderSheet()}};
   mk('Kupi',bc,a.n<mx,()=>{a.n++;const nm=newSoldierName();a.names.push(nm);notify(`<b>${nm}</b> je stupio u vojsku kao ${u.name.toLowerCase()}.`)},'Za više treba veće ognjište');
-  mk('Unapredi',uc,a.n>0&&a.lvl<cap,()=>{a.lvl++;notify(`${u.name} je sada ${a.lvl}. nivo.`)},a.n?`Najviše ${cap}. nivo, dok junak ne poraste`:'Prvo kupi ovog ratnika');
+  mk('Unapredi',uc,a.n>0&&a.lvl<cap,()=>{a.lvl++;notify(`${u.name} je sada ${a.lvl}. nivo.`)},a.n?`Najviše ${cap}. nivo, dok junak ne poraste`:'Prvo unajmi ovog vojnika');
   el.appendChild(d)}}
 function bestiary(el){BEST.forEach(b=>{const d=document.createElement('div');d.className='bcard bestia';d.appendChild(enemyIcon(b.sp,!!b.boss,74,b.look));
   d.insertAdjacentHTML('beforeend',`<div><b style="color:${b.boss?'#7a1a10':'#2e1c0e'}">${b.name}</b><small>${b.d}</small><span class="tg">${b.boss?'Vođa, ':''}${b.w}</span></div>`);el.appendChild(d)})}
@@ -4208,7 +4265,7 @@ function warCfg(i){const w=save.war,m=w.enemy.members[i];const rv={name:`${m.nam
 
 function sheetRat(body){ensureRivals();ensureMembers();$('#shTitle').textContent='Rat odreda';
  $('#shSub').textContent=`Okupatori iz doba: ${REGIONS[Math.min(REGIONS.length-1,Math.floor(topLevel()/10))].era}`;
- let h=`<div class="defbox"><div><b>${icon('tr')}${save.trophies}</b>trofeji, liga ${league(save.trophies)}</div><div><b>${defense()}</b>odbrana tvog utvrđenja</div></div>`;
+ let h=`<p class="tip" style="margin:0 0 10px">Napadni okupatore u okolini: <b>predvodi</b> bitku sam ili <b>pošalji vojsku</b> da se bori bez tebe. Pobeda donosi <b>plen</b> za gradnju i <b>trofeje</b> koji te penju u jaču ligu na tabeli. Vojnici koji padnu se oporavljaju.</p><div class="defbox"><div><b>${icon('tr')}${save.trophies}</b>trofeji, liga ${league(save.trophies)}</div><div><b>${defense()}</b>odbrana tvog utvrđenja</div></div>`;
  const w=save.war;
  if(w){const sc=warScore(),left=Math.max(0,w.end-Date.now());
   h+=`<div class="sec">Rat traje još ${fmt(left/1000)}</div>
@@ -4360,7 +4417,8 @@ cv.addEventListener('pointermove',e=>{if(state!=='hub'||!vp.pts.has(e.pointerId)
 function vpEnd(e){if(!vp.pts.has(e.pointerId))return;const single=vp.pts.size===1;vp.pts.delete(e.pointerId);if(single&&!vp.moved&&state==='hub')vTap(e.clientX,e.clientY)}
 cv.addEventListener('pointerup',vpEnd);cv.addEventListener('pointercancel',e=>{vp.pts.delete(e.pointerId)});
 cv.addEventListener('wheel',e=>{if(state!=='hub'||sheetOpen)return;e.preventDefault();const w0=s2w(e.clientX,e.clientY);vcam.z=clamp(vcam.z*Math.exp(-e.deltaY*.0015),vcam.zmin,2.4);const w1=s2w(e.clientX,e.clientY);vcam.x+=w0.x-w1.x;vcam.y+=w0.y-w1.y;vclamp();hideHint()},{passive:false});
-function vTap(px,py){const w=s2w(px,py);let hit=null;for(let i=vhit.length-1;i>=0;i--){const h=vhit[i];if(w.x>=h.x&&w.x<=h.x+h.w&&w.y>=h.y&&w.y<=h.y+h.h){hit=h;break}}
+function vTap(px,py){const w=s2w(px,py);let hit=null;const hits=vhit.filter(h=>w.x>=h.x&&w.x<=h.x+h.w&&w.y>=h.y&&w.y<=h.y+h.h).reverse();
+ const bld=hits.find(h=>!h.id.startsWith('hero:')),hr=hits.find(h=>h.id.startsWith('hero:'));hit=hr&&(!bld||Math.abs(w.x-hr.hx)<9)?hr:(bld||hr||null);
  if(!hit){vsel=null;updateBpop();return}
  if(hit.id.startsWith('hero:')){const id=hit.id.slice(5);heroTab=id;vsel=null;updateBpop();openSheet('junaci');return}
  vsel=hit.id;sfx.coin();updateBpop()}
@@ -4450,11 +4508,11 @@ function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
  vhit.push({id:'kamenolom',x:P.kamenolom[0]-50,y:P.kamenolom[1]-62,w:110,h:70,bx:P.kamenolom[0]-6,by:P.kamenolom[1]-68});
  vhit.push({id:'rudnik',x:P.rudnik[0]-64,y:P.rudnik[1]-62,w:128,h:84,bx:P.rudnik[0],by:P.rudnik[1]-68});
  // junaci
- const hs=[curHero(),...HEROES.filter(h=>heroOk(h)&&h.id!==curHero().id)].slice(0,6);const hpos=[[4,46],[-48,30],[48,28],[-92,42],[92,40],[-20,62]];
- hs.forEach((h,i)=>{const[x,y]=hpos[i];vhit.push({id:'hero:'+h.id,x:cx+x-14,y:gy+y-56,w:28,h:58});items.push({y:gy+y,f:()=>{drawHero(ctx,cx+x,gy+y,1.5,h,x>0?-1:1,0,false,t+i,1);
+ const hs=[curHero(),...HEROES.filter(h=>heroOk(h)&&h.id!==curHero().id)].slice(0,6);const hpos=[[0,74],[-58,46],[58,44],[-104,56],[104,54],[-30,92]];
+ hs.forEach((h,i)=>{const[x,y]=hpos[i];vhit.push({id:'hero:'+h.id,x:cx+x-12,y:gy+y-50,w:24,h:52,hx:cx+x});items.push({y:gy+y,f:()=>{drawHero(ctx,cx+x,gy+y,1.5,h,x>0?-1:1,0,false,t+i,1);
   if(save.hero===h.id){ctx.fillStyle='rgba(240,181,74,.9)';poly(ctx,[cx+x-4,gy+y-70+Math.sin(t*4)*2,cx+x+4,gy+y-70+Math.sin(t*4)*2,cx+x,gy+y-63+Math.sin(t*4)*2]);ctx.fill()}}})});
  // vojska oko ognjišta
- {const S=soldiers().slice(0,10),n=S.length;const SPOTS=[[-150,-6],[150,-6],[-205,34],[205,34],[-95,-40],[95,-40],[-170,74],[170,74],[-245,-8],[245,-8]];S.forEach((sd,i)=>{const sp=SPOTS[i],x=cx+sp[0],y=gy+8+sp[1];
+ {const S=soldiers().filter(s=>typeof isWounded!=='function'||!isWounded(s.name)).slice(0,10),n=S.length;const SPOTS=[[-150,-6],[150,-6],[-205,34],[205,34],[-95,-40],[95,-40],[-170,74],[170,74],[-245,-8],[245,-8]];S.forEach((sd,i)=>{const sp=SPOTS[i],x=cx+sp[0],y=gy+8+sp[1];
   items.push({y,f:()=>{const e={type:'ratnik',unit:sd.unit,color:save.tribe?save.tribe.color:'#b8323a',x,y,r:13.5*1.15,vx:0,vy:0,stun:0,seed:i*.37,born:0,hitT:0,face:x<cx?1:-1,boss:false,ally:true,vil:1,tg:{x:cx+(x<cx?30:-30),y:gy+60}};
    drawEnemy(ctx,e,t);if(vcam.z>1.15||n<=4){ctx.font="700 9.5px 'EB Garamond',serif";ctx.textAlign='center';ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillText(sd.name,x+.7,y-56.3);ctx.fillStyle='#f6e7c4';ctx.fillText(sd.name,x,y-57)}}})})}
  // kule

@@ -1308,10 +1308,12 @@ setTimeout(gfxApply,0);
 {let acc=0,n=0,lastT=0,cool=0;const tick=now=>{if(lastT&&state==='play'&&!document.hidden){const dt=now-lastT;if(dt<250){acc+=dt;n++}
   if(n>=90){const avg=acc/n;acc=0;n=0;if(cool<=0&&avg>26&&(save.gfx===undefined||save.gfx==='auto'||save.gfx===null)&&gfxLevel()>0){save.gfxAuto=gfxLevel()-1;cool=3;gfxApply();try{persist()}catch(e){}if(typeof toast==='function'){toast('Grafika je prilagođena telefonu da igra teče glatko');if(G)G.toastT=2.2}}else cool--}}
  lastT=now;requestAnimationFrame(tick)};requestAnimationFrame(tick)}
-/* izbor u pauzi */
-setTimeout(()=>{const sb=document.getElementById('sndBtn');if(sb&&!document.getElementById('gfxBtn')){const b=document.createElement('button');b.id='gfxBtn';b.className=sb.className;
- const lab=()=>{b.textContent='Grafika: '+(save.gfx===undefined||save.gfx==='auto'||save.gfx===null?'automatski ('+GFX_NAMES[gfxLevel()].toLowerCase()+')':GFX_NAMES[gfxLevel()].toLowerCase())};lab();
- b.onclick=()=>{const cur=save.gfx===undefined||save.gfx===null?'auto':save.gfx;const order=['auto',2,1,0];save.gfx=order[(order.indexOf(cur)+1)%order.length];if(save.gfx==='auto')delete save.gfxAuto;persist();gfxApply();lab()};
+/* dugme za moć levo ili desno */
+{const st=document.createElement('style');st.textContent=`body.abl #abBtn{right:auto!important;left:16px!important}body.abl #atkBtn{right:auto!important;left:120px!important}@media (max-width:400px){body.abl #abBtn{left:12px!important}body.abl #atkBtn{left:104px!important}}`;document.head.appendChild(st)}
+function abSide(){document.body.classList.toggle('abl',!!save.abLeft)}
+setTimeout(()=>{abSide();const sb=document.getElementById('sndBtn');if(sb&&!document.getElementById('abSideBtn')){const b=document.createElement('button');b.id='abSideBtn';b.className=sb.className;
+ const lab=()=>{b.textContent='Dugme za moć: '+(save.abLeft?'levo':'desno')};lab();
+ b.onclick=()=>{save.abLeft=save.abLeft?0:1;persist();abSide();lab();if(typeof joyIdle==='function')joyIdle()};
  const after=document.getElementById('helpBtn')||document.getElementById('cirBtn')||sb;after.after(b)}},150);
 
 /* ---------- ikonice ---------- */
@@ -3658,7 +3660,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795819352';
+const BUILD_ID='1795819720';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
@@ -4428,11 +4430,11 @@ let atkHeld=false;
 function syncDoba(){const d=DOBA.find(x=>x[0]===(save.doba??'auto'))||DOBA[0];$('#dobaBtn').textContent='Doba: '+d[1]}
 function syncMan(){const b=$('#manBtn');if(b)b.textContent=save.manual?'Napad: na dugme':'Napad: sam';$('#atkBtn').style.display=save.manual?'':'none';document.body.classList.toggle('manual',!!save.manual)}
 const JR=58;let touchUI=matchMedia('(pointer:coarse)').matches;
-function joyHome(){return{x:Math.max(90,innerWidth*.17),y:innerHeight-Math.max(110,innerHeight*.17)}}
+function joyHome(){const x=Math.max(90,innerWidth*.17);return{x:save.abLeft?innerWidth-x:x,y:innerHeight-Math.max(110,innerHeight*.17)}}
 function joyIdle(){if(!touchUI||state!=='play'){joyEl.style.display='none';return}const h=joyHome();joyEl.style.display='block';joyEl.classList.add('idle');joyEl.style.left=h.x+'px';joyEl.style.top=h.y+'px';joyKnob.style.transform=''}
 cv.addEventListener('pointerdown',e=>{if(state!=='play')return;ac();if(e.pointerType!=='mouse')touchUI=true;
  if(joy.on&&joy.id!==e.pointerId)return;joy.on=true;joy.id=e.pointerId;
- let ox=e.clientX,oy=e.clientY;if(e.pointerType!=='mouse'){const inZone=ox<innerWidth*.6&&oy>innerHeight*.35;if(!inZone){const h=joyHome();ox=h.x;oy=h.y}}
+ let ox=e.clientX,oy=e.clientY;if(e.pointerType!=='mouse'){const inZone=(save.abLeft?ox>innerWidth*.4:ox<innerWidth*.6)&&oy>innerHeight*.35;if(!inZone){const h=joyHome();ox=h.x;oy=h.y}}
  joy.ox=ox;joy.oy=oy;joy.x=joy.y=0;try{cv.setPointerCapture(e.pointerId)}catch(_){}
  if(e.pointerType!=='mouse'){joyEl.style.display='block';joyEl.classList.remove('idle');joyEl.style.left=ox+'px';joyEl.style.top=oy+'px';joyKnob.style.transform=''}
  joyMove(e)});

@@ -3639,7 +3639,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795807132';
+const BUILD_ID='1795807495';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
@@ -3739,7 +3739,7 @@ function bHarvest(i){const B=save.basta,b=B.beds[i];if(!bedRipe(b))return;const 
  if(got<=0){notify(`Ambar je pun (${cap}). Potroši ${c.p==='melem'?'melem':'hranu'} ili dogradi baštu.`,true);return}
  B[c.p]=(B[c.p]||0)+got;b.c=null;b.p=0;b.ripeAt=0;persist();sfx.coin&&sfx.coin();notify(`Obrano: <b>${c.n}</b>, +${got} ${unit(c.p,got)}.`);renderSheet()}
 function bPlant(i,id){const B=save.basta,b=B.beds[i],c=cropOf(id);if(!c||b.c||!canPay(c.seed)||B.lvl<c.lvl)return;pay(c.seed);b.c=id;b.p=0;b.ripeAt=0;B.last=Date.now();persist();sfx.build&&sfx.build();renderSheet();renderHub()}
-function bFeed(){const B=save.basta,S=soldiers().filter(s=>!isBusy(s.name)),need=Math.max(1,S.length);if(B.fed>0||B.hrana<need)return;B.hrana-=need;B.fed=FED.battles;persist();sfx.build&&sfx.build();notify(`Vojska je nahranjena: <b>+${Math.round((FED.mul-1)*100)}% zdravlja</b> u sledeće ${FED.battles} bitke.`);renderSheet()}
+function bFeed(){const B=save.basta,need=Math.max(1,soldiers().length);if(B.fed>0||B.hrana<need)return;B.hrana-=need;B.fed=FED.battles;persist();sfx.build&&sfx.build();notify(`Vojska je nahranjena: <b>+${Math.round((FED.mul-1)*100)}% zdravlja</b> u sledeće ${FED.battles} bitke.`);renderSheet()}
 function melemCost(n){return Math.max(1,Math.ceil(woundLeft(n)/60000/4))}
 function bHealM(n){const B=save.basta,c=melemCost(n);if(!B||B.melem<c||!isWounded(n))return;B.melem-=c;delete save.wounded[n];persist();sfx.build&&sfx.build();notify(`<b>${esc(n)}</b> je izlečen melemom.`);renderSheet()}
 /* posle bitke: troši se obrok */
@@ -3784,8 +3784,8 @@ function sheetBasta(body){$('#shTitle').textContent='Bašta';const B=save.basta;
   h+=`<div class="bcard" data-bed="${i}"><div class="bed" style="grid-column:1/-1"><div class="ic">${CROP_SVG[c.id]||''}</div><div><h3 style="margin:0">Leja ${i+1}: ${c.n} <small>${ripe?'ZRELO':'RASTE'}</small></h3><div class="bbar"><b style="width:${p*100}%"></b></div>
    <div class="bt">${ripe?(CN&&CN.keep?'zrelo, ne vene danas':`oberi u roku od ${fmtT(spoil)}, inače vene`):!B.worker?'stoji, nema baštovana':!CN?'stoji, danas niko nije radio':`zri još ${fmtT(left/CN.mul)}`}</div></div></div>
    ${ripe?`<div class="act"><button class="btn green sm" data-harv="${i}" style="width:100%">Oberi: +${c.y} ${unit(c.p,c.y)} u ambar</button></div>`:''}</div>`});
- const nS=Math.max(1,soldiers().filter(s=>!isBusy(s.name)).length);
- h+=`<div class="bcard"><h3>Nahrani vojsku</h3><div></div><p>Svakom vojniku treba po jedan obrok. Sad imaš <b>${nS} ${pl(nS,'vojnika','vojnika','vojnika')} spremnih za boj</b>, pa treba <b>${nS} ${unit('hrana',nS)}</b>. Sita vojska ima <b>+${Math.round((FED.mul-1)*100)}% zdravlja</b> u sledeće ${FED.battles} bitke.</p>
+ const nS=Math.max(1,soldiers().length),nW=soldiers().filter(s=>isWounded(s.name)).length;
+ h+=`<div class="bcard"><h3>Nahrani vojsku</h3><div></div><p>Svakom vojniku treba po jedan obrok. U odredu imaš <b>${nS} ${pl(nS,'vojnika','vojnika','vojnika')}</b>${B.worker||nW?` (računajući ${[B.worker?'baštovana':'',nW?(nW===1?'ranjenog':nW+' ranjenih'):''].filter(Boolean).join(' i ')})`:''}, pa treba <b>${nS} ${unit('hrana',nS)}</b>. Sita vojska ima <b>+${Math.round((FED.mul-1)*100)}% zdravlja</b> u sledeće ${FED.battles} bitke.</p>
   <div class="act">${B.fed?`<span class="req">Vojska je sita još ${B.fed} ${B.fed===1?'bitku':'bitke'}</span>`:`<button class="btn primary sm" id="bFeed" ${B.hrana>=nS?'':'disabled'} style="width:100%">${B.hrana>=nS?`Nahrani (${nS} ${unit('hrana',nS)})`:`Nedostaje ${nS-B.hrana} ${unit('hrana',nS-B.hrana)}`}</button>`}</div></div>`;
  const W=soldiers().filter(s=>isWounded(s.name));
  if(W.length)h+=`<div class="bcard"><h3>Leči melemom</h3><div></div><p>Ranjenog vojnika odmah vraćaš u boj. Jedan melem za svaka 4 minuta oporavka.</p>${W.map(s=>{const c=melemCost(s.name);return`<div class="act"><span style="flex:1"><b>${esc(s.name)}</b> <small>još ${fmtT(woundLeft(s.name)/1000)}</small></span><button class="btn sm ${B.melem>=c?'green':''}" ${B.melem>=c?'':'disabled'} data-melem="${esc(s.name)}">${B.melem>=c?`Melem ×${c}`:`Nedostaje ${c-B.melem} melema`}</button></div>`}).join('')}</div>`;

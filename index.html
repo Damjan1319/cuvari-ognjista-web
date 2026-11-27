@@ -1184,7 +1184,7 @@ const UPS=[
 ];
 const BUILD=[
  {id:'ognjiste',name:'Ognjište',desc:'Srce odreda. Dokle ono doseže, dotle rastu i junaci i sve druge zgrade.',max:12,
-  cost:l=>({zar:nice(150*1.8**(l-1)),kamen:nice(120*1.75**(l-1)),gvozdje:l>=3?nice(15*1.8**(l-3)):0}),
+  cost:l=>({zar:nice(150*1.68**(l-1)),kamen:nice(120*1.68**(l-1)),gvozdje:l>=3?nice(15*1.8**(l-3)):0}),
   eff:l=>`junaci do <b>${l*5}.</b> nivoa, <b>${l*4}</b> žara u minuti, skladište za <b>${num(cap('zar',l))}</b>`},
  {id:'kamenolom',name:'Kamenolom',desc:'Klesari ovde vade kamen za zidine i kule.',max:12,
   cost:l=>({zar:nice(90*1.6**l),kamen:nice(30*1.6**l)}),eff:l=>`<b>${l*4}</b> kamena u minuti`},
@@ -1245,7 +1245,7 @@ const heroOk=h=>h.unlock<0||save.stars[h.unlock]>0;
 const curHero=()=>HEROES.find(h=>h.id===save.hero&&heroOk(h))||HEROES[0];
 const maxHeroLvl=()=>save.b.ognjiste*5;
 const maxUp=()=>Math.min(12,3+save.b.kovacnica*2);
-const xpNeed=l=>Math.round(80*Math.pow(l,1.45));
+const xpNeed=l=>Math.round(50*l+30);
 function heroStats(id){const b=HEROES.find(h=>h.id===id),s=save.heroes[id],l=s.lvl,u=s.up,f=save.b.kovacnica;
  return{hp:Math.round(b.hp*(1+.08*(l-1))*(1+.1*u.zdravlje)),dmg:b.dmg*(1+.065*(l-1))*(1+.08*u.snaga)*(1+.05*f)*(1+.1*eraB(1)),rate:b.rate*(1+.04*u.brzina),
   range:b.range,speed:b.speed*(1+.04*u.brzina)*(1+.06*eraB(3)),light:b.light*(1+.06*u.plamen),drain:(1-.05*u.plamen)*(1-.1*eraB(0))}}
@@ -3638,14 +3638,14 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795797054';
+const BUILD_ID='1795797360';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
 setTimeout(updCheck,2500);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updCheck()});setInterval(updCheck,10*60000);
 /* ---------- izgled junaka raste sa nivoom i ojačanjima ---------- */
 const RANK_COL=[null,'#d08a4a','#dfe6f2','#f6cd6c'],RANK_NAME=['','Bronzani','Srebrni','Zlatni'];
-function heroTier(id){const h=save.heroes&&save.heroes[id];if(!h)return 0;const l=h.lvl||1;return l>=15?3:l>=10?2:l>=5?1:0}
+function heroTier(id){const h=save.heroes&&save.heroes[id];if(!h)return 0;const l=h.lvl||1;return l>=30?3:l>=20?2:l>=10?1:0}
 function heroSig(id){const h=save.heroes&&save.heroes[id];if(!h)return 0;const u=h.up||{};return (h.lvl||1)*100+Object.values(u).reduce((a,b)=>a+(+b||0),0)}
 const HERO_FX={};
 function heroAura(g,x,y,s,id,t,front,main){const tr=heroTier(id),c=RANK_COL[tr],sig=heroSig(id);
@@ -3664,6 +3664,30 @@ function heroAura(g,x,y,s,id,t,front,main){const tr=heroTier(id),c=RANK_COL[tr],
    for(let i=0;i<10;i++){const a=i*.63,rr=(6+k*30)*s;g.fillStyle=i%2?'#ffd36a':'#fff3c8';g.beginPath();g.arc(x+Math.cos(a)*rr*.7,y-10*s-k*40*s-Math.sin(a*3)*6*s,1.6*s*(1-k*.5),0,7);g.fill()}
    if(main){g.globalAlpha=Math.min(1,(1-k)*2);g.font=`700 ${Math.round(11*s/1.5)}px Cinzel,serif`;g.textAlign='center';g.fillStyle='#ffe7a0';g.strokeStyle='rgba(0,0,0,.75)';g.lineWidth=3;const ty=y-52*s-k*14*s;g.strokeText('Ojačao!',x,ty);g.fillText('Ojačao!',x,ty)}}
  }g.restore()}
+/* ---------- jasna dugmad: može / ne može / popravka ---------- */
+const BTN_CSS=`#shBody .btn.need,#bpop .btn.need{background:repeating-linear-gradient(135deg,rgba(120,80,40,.06) 0 8px,rgba(120,80,40,.12) 8px 16px)!important;border:2px dashed #b08850!important;color:#7a5232!important;box-shadow:none!important;filter:none!important;opacity:1!important;text-shadow:none!important;font-size:12px!important;letter-spacing:.02em!important;text-transform:none!important;font-family:'Alegreya Sans',sans-serif!important;font-weight:700!important;line-height:1.2!important;white-space:normal!important}
+#shBody .btn.need svg,#bpop .btn.need svg{width:13px;height:13px;vertical-align:-2px;margin-right:5px;fill:#9a6a3a}
+#shBody .btn.primary:not(:disabled),#bpop .btn.primary:not(:disabled){box-shadow:0 0 0 2px #f3c870,0 0 14px rgba(243,170,60,.55),inset 0 1px 0 rgba(255,255,255,.3)!important;animation:btnRdy 1.8s ease-in-out infinite}
+@keyframes btnRdy{0%,100%{box-shadow:0 0 0 2px #f3c870,0 0 8px rgba(243,170,60,.35),inset 0 1px 0 rgba(255,255,255,.3)}50%{box-shadow:0 0 0 2px #ffe3a0,0 0 18px rgba(243,170,60,.7),inset 0 1px 0 rgba(255,255,255,.3)}}
+#shBody .btn.green:not(:disabled),#bpop .btn.green:not(:disabled){background:linear-gradient(180deg,#6fb64e,#3c7f2a 55%,#25561a)!important;color:#fff!important;text-shadow:0 1px 1px rgba(0,0,0,.5)!important;border-color:#cdeeb0!important;box-shadow:0 0 0 2px #9fd67a,0 0 14px rgba(110,200,80,.55)!important}
+.bcard.dmgc{border:2px solid #b3301b!important;background:linear-gradient(180deg,rgba(179,48,27,.14),rgba(179,48,27,.05))!important;position:relative;padding-top:30px!important}
+.bcard.dmgc .dmgr{position:absolute;left:-1px;right:-1px;top:-1px;padding:5px 10px;background:#a3291a;color:#fff3e6;font:700 11px/1.2 Cinzel,serif;letter-spacing:.08em;border-radius:2px 2px 0 0}
+.dmgsum{margin:0 0 12px;padding:10px 12px;border-radius:6px;background:#a3291a;color:#fff3e6;font:600 14px/1.35 'EB Garamond',serif;box-shadow:0 2px 8px rgba(120,20,10,.35)}.dmgsum b{color:#fff;font-family:Cinzel,serif;font-size:13px;letter-spacing:.05em}
+.bcard .req{display:block;width:100%;padding:9px 10px;border:2px dashed #b08850;border-radius:8px;color:#7a5232;font:700 12px 'Alegreya Sans',sans-serif;text-align:center}`;
+{const st=document.createElement('style');st.textContent=BTN_CSS;document.head.appendChild(st)}
+const RES_GEN={zar:'žara',kamen:'kamena',gvozdje:'gvožđa'};
+const LOCK_SVG='<svg viewBox="0 0 24 24"><path d="M17 9V7A5 5 0 0 0 7 7v2H5v13h14V9zM9 7a3 3 0 0 1 6 0v2H9z"/></svg>';
+function missTxt(c){const m=Object.keys(c).filter(k=>c[k]>0&&(save.res[k]||0)<c[k]).map(k=>`${num(Math.ceil(c[k]-(save.res[k]||0)))} ${RES_GEN[k]||k}`);return m.length?'Nedostaje '+m.join(', '):''}
+function btnDecor(root){if(!root)return;root.querySelectorAll('button[data-cost],button.need'+(root.id==='bpop'?',button':'')).forEach(b=>{let c=null;try{c=b.dataset.cost?JSON.parse(b.dataset.cost):null}catch(e){}
+ if(!b.dataset.lbl)b.dataset.lbl=b.textContent;if(!c&&b._cost)c=b._cost;
+ if(b.disabled&&c){const t=missTxt(c);if(t){b.classList.add('need');const tt=(typeof cirOn!=='undefined'&&cirOn)?toCir(t):t;if(b.dataset.need!==tt){b.dataset.need=tt;b.innerHTML=LOCK_SVG+tt}return}}
+ if(b.classList.contains('need')){b.classList.remove('need');delete b.dataset.need;b.textContent=b.dataset.lbl}})}
+function dmgSheet(){const body=$('#shBody');if(!body)return;const cards=[...body.querySelectorAll('.bcard')];const dm=cards.filter((d,i)=>BUILD[i]&&dmgd(BUILD[i].id));
+ if(!dm.length)return;dm.forEach(d=>{d.classList.add('dmgc');d.insertAdjacentHTML('afterbegin','<div class="dmgr">OŠTEĆENO · POPRAVI DA BI RADILO</div>');body.insertBefore(d,body.firstChild)});
+ const names=BUILD.filter(B=>dmgd(B.id)).map(B=>B.name);const s=document.createElement('div');s.className='dmgsum';s.innerHTML=`<b>Dušmani su oštetili selo.</b><br>Ne radi dok ne popraviš: ${names.join(', ')}.`;body.insertBefore(s,body.firstChild)}
+{const _rs=renderSheet;renderSheet=function(){const r=_rs.apply(this,arguments);try{if(sheetOpen==='utvrdjenje')dmgSheet();btnDecor($('#shBody'))}catch(e){}return r}}
+{const _ra=refreshAfford;refreshAfford=function(){const r=_ra.apply(this,arguments);btnDecor($('#shBody'));return r}}
+if(typeof updateBpop==='function'){const _ub=updateBpop;updateBpop=function(){const r=_ub.apply(this,arguments);try{const bp=$('#bpop');if(bp&&vsel){const B=BUILD.find(x=>x.id===vsel);if(B){const btn=[...bp.querySelectorAll('button')].find(b=>/Dogradi|Sagradi|Popravi/.test(b.dataset.lbl||b.textContent));if(btn){btn._cost=dmgd(vsel)?repairCost(vsel):B.cost(save.b[vsel]);btnDecor(bp)}}}}catch(e){}return r}}
 /* ---------- vrste bitaka po istoriji: opsada, dvoboj, juriš, zaseda; talasi; blagoslovi ---------- */
 const MODEX={13:'glasnik',35:'glasnik',32:'zbeg',36:'zbeg',40:'oslobodi',45:'oslobodi',20:'drzi',47:'drzi',1:'dvoboj',16:'juris',18:'dvoboj',22:'opsada',27:'opsada',28:'opsada',30:'zaseda',33:'dvoboj',34:'zaseda',37:'zaseda',46:'juris'};
 const CHAMP={1:'Tihomir, Nemanjin brat',18:'Sultanov telohranitelj',33:'Turski delija'};
@@ -4174,7 +4198,7 @@ function sheetJunaci(body){$('#shTitle').textContent='Junaci';$('#shSub').textCo
  const head=document.createElement('div');head.className='hhead';head.appendChild(heroIcon(H,96,2.3));
  const need=xpNeed(hs.lvl),atMax=hs.lvl>=maxHeroLvl();
  head.insertAdjacentHTML('beforeend',`<div style="flex:1"><div class="nm">${H.name}</div><div class="rl">${H.role}, ${hs.lvl}. nivo</div>
-  <div class="xp"><b style="width:${atMax?100:hs.xp/need*100}%"></b></div><div class="xpt">${atMax?'Najviši nivo dok se ne unapredi Ognjište':`${Math.floor(hs.xp)} / ${need} iskustva`}</div>${(()=>{const tr=typeof heroTier==='function'?heroTier(H.id):0,nx=[5,10,15][tr];return `<div class="xpt" style="margin-top:4px">${tr?`<b style="color:${[0,'#8a4a1a','#4f5a70','#9a6a10'][tr]}">${RANK_NAME[tr]} junak</b>`:'Bez ranga'}${nx?` · na ${nx}. nivou dobija ${RANK_NAME[tr+1].toLowerCase()} sjaj`:' · najviši rang'}</div>`})()}</div>`);
+  <div class="xp"><b style="width:${atMax?100:hs.xp/need*100}%"></b></div><div class="xpt">${atMax?'Najviši nivo dok se ne unapredi Ognjište':`${Math.floor(hs.xp)} / ${need} iskustva`}</div>${(()=>{const tr=typeof heroTier==='function'?heroTier(H.id):0,nx=[10,20,30][tr];return `<div class="xpt" style="margin-top:4px">${tr?`<b style="color:${[0,'#8a4a1a','#4f5a70','#9a6a10'][tr]}">${RANK_NAME[tr]} junak</b>`:'Bez ranga'}${nx?` · na ${nx}. nivou dobija ${RANK_NAME[tr+1].toLowerCase()} sjaj`:' · najviši rang'}</div>`})()}</div>`);
  card.appendChild(head);
  card.insertAdjacentHTML('beforeend',`<div class="stats"><div><b>${st.hp}</b>zdravlje</div><div><b>${Math.round(st.dmg)}</b>šteta</div><div><b>${st.rate.toFixed(1)}</b>napada/s</div>
   <div><b>${st.range}</b>domet</div><div><b>${Math.round(st.speed)}</b>brzina</div><div><b>${Math.round(st.light)}</b>svetlo</div></div>
@@ -4484,7 +4508,10 @@ function boulder(g,x,y,s){g.fillStyle='rgba(0,0,0,.4)';ell(g,x+3*s,y+2*s,15*s,5*
 function badge(g,x,y,lvl,dm,sel){g.save();g.translate(x,y);const s=1/Math.max(.7,Math.min(1.4,vcam.z))*1.1;g.scale(s,s);
  g.fillStyle='rgba(0,0,0,.5)';ell(g,0,15,9,3);g.fill();
  g.fillStyle=dm?'#8f1a10':'#1a1420';g.strokeStyle=sel?'#ffe08a':'#c9822a';g.lineWidth=2;g.beginPath();g.moveTo(-10,-11);g.lineTo(10,-11);g.lineTo(10,2);g.quadraticCurveTo(10,9,0,13);g.quadraticCurveTo(-10,9,-10,2);g.closePath();g.fill();g.stroke();
- g.fillStyle=dm?'#ffd0c0':'#ffe08a';g.font="800 12px Cinzel,serif";g.textAlign='center';g.textBaseline='middle';g.fillText(dm?'!':lvl,0,0);g.restore()}
+ g.fillStyle=dm?'#ffd0c0':'#ffe08a';g.font="800 12px Cinzel,serif";g.textAlign='center';g.textBaseline='middle';g.fillText(dm?'!':lvl,0,0);
+ if(dm){const p=.5+.5*Math.sin(performance.now()/180);g.strokeStyle=`rgba(255,80,50,${.35+.5*p})`;g.lineWidth=2.5;g.beginPath();g.arc(0,1,15+p*4,0,7);g.stroke();g.font="800 9px Cinzel,serif";const tw=g.measureText('POPRAVI').width+10;g.fillStyle='#8f1a10';g.fillRect(-tw/2,17,tw,13);g.strokeStyle='#ffb09a';g.lineWidth=1;g.strokeRect(-tw/2,17,tw,13);g.fillStyle='#fff0e8';g.fillText('POPRAVI',0,24)}
+ else if(arguments[6]){const bo=Math.sin(performance.now()/250)*2;g.fillStyle='#3f9a32';g.strokeStyle='#d8ffc0';g.lineWidth=1.5;g.beginPath();g.moveTo(12,-6+bo);g.lineTo(20,-15+bo);g.lineTo(28,-6+bo);g.lineTo(23,-6+bo);g.lineTo(23,1+bo);g.lineTo(17,1+bo);g.lineTo(17,-6+bo);g.closePath();g.fill();g.stroke()}
+ g.restore()}
 function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
  ctx.setTransform(k,0,0,k,0,0);
  const DN=dayState();const dk=DN.d,wm=DN.w;
@@ -4525,7 +4552,7 @@ function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
  // dom odreda
  const ds=1.05+b.ognjiste*.05;items.push({y:gy-84,f:()=>house(ctx,cx-20,gy-84,ds*1.12,{w:92,h:30,d:38,big:true,shingle:b.ognjiste>=4,damaged:dmgd('ognjiste')},t)});
  vhit.push({id:'ognjiste',x:cx-20-56*ds,y:gy-84-100*ds,w:134*ds,h:102*ds,bx:cx+2,by:gy-84-108*ds});
- const hp=[[-118,84],[100,86],[250,12],[-212,76],[188,84],[-332,36],[332,42]];
+ const hp=[[-118,84],[100,86],[272,34],[-212,76],[188,84],[-332,36]];
  for(let i=0;i<Math.min(hp.length,b.ognjiste);i++){const[x,y]=hp[i];items.push({y:gy+y,f:()=>house(ctx,cx+x,gy+y,.95,{w:46+(i%3)*6,h:24+(i%2)*4,lit:dk>.35&&(i+Math.floor(t*.15))%5!==0,shingle:i%4===3},t)})}
  const P={kovacnica:[cx-250,gy+12],kamenolom:[cx-205,gy-64],rudnik:[cx+222,gy-66]};
  items.push({y:gy+20,f:()=>b.kovacnica?forge(ctx,P.kovacnica[0],P.kovacnica[1],1.06,b.kovacnica,t,dmgd('kovacnica')):plot(P.kovacnica[0],P.kovacnica[1],1)});
@@ -4584,7 +4611,7 @@ function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
  // oznake nivoa
  if(!PXPASS)fortBadges();
  fortFx=Math.max(0,fortFx-.02)}
-function fortBadges(){const seen={};for(const h of vhit){if(h.id.startsWith('hero:')||seen[h.id])continue;seen[h.id]=1;const L=save.b[h.id];if(!L&&vsel!==h.id)continue;badge(ctx,h.bx,h.by,L,dmgd(h.id),vsel===h.id)}}
+function fortBadges(){const seen={};for(const h of vhit){if(h.id.startsWith('hero:')||seen[h.id])continue;seen[h.id]=1;const L=save.b[h.id];if(!L&&vsel!==h.id)continue;const B=BUILD.find(x=>x.id===h.id);const up=B&&L<B.max&&(h.id==='ognjiste'||L<save.b.ognjiste)&&canPay(B.cost(L));badge(ctx,h.bx,h.by,L,dmgd(h.id),vsel===h.id,up)}}
 function plot(x,y,fs){ctx.strokeStyle='rgba(140,120,90,.35)';ctx.setLineDash([4*fs,4*fs]);ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(x,y,34*fs,12*fs,0,0,7);ctx.stroke();ctx.setLineDash([]);
  for(const dx of[-30,30]){limb(ctx,x+dx*fs,y,x+dx*fs,y-14*fs,2*fs,'#5a4030')}}
 

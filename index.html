@@ -3638,7 +3638,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795796850';
+const BUILD_ID='1795797054';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
@@ -4525,9 +4525,9 @@ function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
  // dom odreda
  const ds=1.05+b.ognjiste*.05;items.push({y:gy-84,f:()=>house(ctx,cx-20,gy-84,ds*1.12,{w:92,h:30,d:38,big:true,shingle:b.ognjiste>=4,damaged:dmgd('ognjiste')},t)});
  vhit.push({id:'ognjiste',x:cx-20-56*ds,y:gy-84-100*ds,w:134*ds,h:102*ds,bx:cx+2,by:gy-84-108*ds});
- const hp=[[228,30],[-160,-66],[150,-70],[-270,-26],[275,-18],[150,74],[-160,78],[60,104],[-70,108]];
+ const hp=[[-118,84],[100,86],[250,12],[-212,76],[188,84],[-332,36],[332,42]];
  for(let i=0;i<Math.min(hp.length,b.ognjiste);i++){const[x,y]=hp[i];items.push({y:gy+y,f:()=>house(ctx,cx+x,gy+y,.95,{w:46+(i%3)*6,h:24+(i%2)*4,lit:dk>.35&&(i+Math.floor(t*.15))%5!==0,shingle:i%4===3},t)})}
- const P={kovacnica:[cx-222,gy+20],kamenolom:[cx-190,gy-72],rudnik:[cx+200,gy-76]};
+ const P={kovacnica:[cx-250,gy+12],kamenolom:[cx-205,gy-64],rudnik:[cx+222,gy-66]};
  items.push({y:gy+20,f:()=>b.kovacnica?forge(ctx,P.kovacnica[0],P.kovacnica[1],1.06,b.kovacnica,t,dmgd('kovacnica')):plot(P.kovacnica[0],P.kovacnica[1],1)});
  items.push({y:gy-72,f:()=>b.kamenolom?quarry(ctx,P.kamenolom[0],P.kamenolom[1],1.09,b.kamenolom,t,dmgd('kamenolom')):plot(P.kamenolom[0],P.kamenolom[1],1)});
  items.push({y:gy-76,f:()=>b.rudnik?mine(ctx,P.rudnik[0],P.rudnik[1],1.04,b.rudnik,t,dmgd('rudnik')):plot(P.rudnik[0],P.rudnik[1],1)});
@@ -4540,7 +4540,7 @@ function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
   heroAura(ctx,cx+x,gy+y,hs_,h.id,t,0,main);drawHero(ctx,cx+x,gy+y,hs_,h,x>0?-1:1,0,false,t+i,1);heroAura(ctx,cx+x,gy+y,hs_,h.id,t,1,main);
   if(main){const yy=gy+y-hh-30+Math.sin(t*3)*2;ctx.fillStyle='rgba(240,181,74,.95)';poly(ctx,[cx+x-5,yy,cx+x+5,yy,cx+x,yy+8]);ctx.fill()}}})});
  // vojska oko ognjišta
- {const S=soldiers().filter(s=>typeof isWounded!=='function'||!isWounded(s.name)).slice(0,10),n=S.length;const SPOTS=[[-150,-6],[150,-6],[-205,34],[205,34],[-95,-40],[95,-40],[-170,74],[170,74],[-245,-8],[245,-8]];S.forEach((sd,i)=>{const sp=SPOTS[i],x=cx+sp[0],y=gy+8+sp[1];
+ {const S=soldiers().filter(s=>typeof isWounded!=='function'||!isWounded(s.name)).slice(0,10),n=S.length;const SPOTS=[[-150,-14],[150,-14],[-112,-44],[112,-44],[-176,22],[176,22],[-150,56],[150,56],[-60,64],[60,66]];S.forEach((sd,i)=>{const sp=SPOTS[i],x=cx+sp[0],y=gy+8+sp[1];
   items.push({y,f:()=>{const e={type:'ratnik',unit:sd.unit,color:save.tribe?save.tribe.color:'#b8323a',x,y,r:13.5*1.15,vx:0,vy:0,stun:0,seed:i*.37,born:0,hitT:0,face:x<cx?1:-1,boss:false,ally:true,vil:1,tg:{x:cx+(x<cx?30:-30),y:gy+60}};
    drawEnemy(ctx,e,t);if(vcam.z>1.15||n<=4){ctx.font="700 9.5px 'EB Garamond',serif";ctx.textAlign='center';ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillText(sd.name,x+.7,y-56.3);ctx.fillStyle='#f6e7c4';ctx.fillText(sd.name,x,y-57)}}})})}
  // kule

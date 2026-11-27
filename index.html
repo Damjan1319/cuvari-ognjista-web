@@ -3609,16 +3609,17 @@ const LOG_CSS=`.snd.bell{position:relative;padding:7px}.snd.bell svg{width:100%;
 {const st=document.createElement('style');st.textContent=LOG_CSS;document.head.appendChild(st);
  const p=document.createElement('div');p.id='logP';p.innerHTML='<div class="lp"><div class="lh"><b>Obaveštenja</b><span><button class="lc">Obriši sve</button><button class="lx" aria-label="Zatvori">×</button></span></div><div class="ll"></div></div>';
  document.body.appendChild(p);p.onclick=e=>{if(e.target===p)logClose()};p.querySelector('.lx').onclick=logClose;
- p.querySelector('.lc').onclick=()=>{save.log=[];persist();logRender()}}
-function logAdd(html,kind){if(!html)return;save.log=save.log||[];const txt=String(html);const L=save.log;
+ p.querySelector('.lc').onclick=()=>{save.ntf=[];persist();logRender()}}
+function logAdd(html,kind){if(!html)return;logMig();save.ntf=save.ntf||[];const txt=String(html);const L=save.ntf;
  if(L.length&&L[0].h===txt&&Date.now()-L[0].t<5000)return;L.unshift({t:Date.now(),h:txt,k:kind||'',n:1});if(L.length>60)L.length=60;try{persist()}catch(e){}logBadge()}
-function logUnread(){return (save.log||[]).filter(e=>e.n).length}
+function logMig(){if(!save.ntf){save.ntf=(save.log||[]).filter(e=>e&&e.h);}}
+function logUnread(){logMig();return (save.ntf||[]).filter(e=>e.n).length}
 function logBadge(){const b=document.getElementById('logBtn');if(!b)return;const n=logUnread();b.classList.toggle('has',n>0);b.querySelector('i').textContent=n>9?'9+':n}
 function logAgo(t){const s=Math.round((Date.now()-t)/1000);if(s<60)return 'upravo';const m=Math.round(s/60);if(m<60)return `pre ${m} min`;const h=Math.round(m/60);if(h<24)return `pre ${h} h`;const d=Math.round(h/24);return d===1?'juče':`pre ${d} dana`}
-function logRender(){const l=$('#logP .ll'),L=save.log||[];
- l.innerHTML=L.length?L.map(e=>`<div class="le ${e.k}${e.n?' new':''}"><div>${e.h}</div><small>${logAgo(e.t)}</small></div>`).join(''):'<div class="lempty">Još nema obaveštenja.</div>';
+function logRender(){logMig();const l=$('#logP .ll'),L=save.ntf||[];
+ l.innerHTML=L.length?L.map(e=>`<div class="le ${e.k}${e.n?' new':''}"><div>${e.h||e.txt||''}</div><small>${logAgo(e.t)}</small></div>`).join(''):'<div class="lempty">Još nema obaveštenja.</div>';
  l.querySelectorAll('button,.nx').forEach(b=>b.remove())}
-function logOpen(){logRender();$('#logP').classList.add('on');for(const e of save.log||[])e.n=0;try{persist()}catch(e){}logBadge()}
+function logOpen(){logRender();$('#logP').classList.add('on');for(const e of save.ntf||[])e.n=0;try{persist()}catch(e){}logBadge()}
 function logClose(){$('#logP').classList.remove('on')}
 {const _n=notify;notify=function(html,bad){logAdd(html,bad?'bad':'');return _n.apply(this,arguments)}}
 {const _rh=renderHub;renderHub=function(){const r=_rh.apply(this,arguments);const tb=$('#tribeBox');if(tb&&!tb.querySelector('#logBtn')){const b=document.createElement('button');b.id='logBtn';b.className='snd bell';b.title='Obaveštenja';
@@ -3638,7 +3639,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795797360';
+const BUILD_ID='1795805580';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}

@@ -3560,8 +3560,7 @@ function hubTourSteps(){const tu=typeof touchUI!=='undefined'&&touchUI;return [
 function hubTour(auto){if(state!=='hub')return;if(typeof closeSheet==='function'&&sheetOpen)closeSheet();if(typeof vfit==='function'&&auto)vfit();
  setTimeout(()=>tourStart('hub',hubTourSteps(),sk=>{save.tourHub=1;persist();if(!sk&&state==='hub'&&typeof openSheet==='function')openSheet('pohod')}),auto?700:50)}
 {const _g=goHub;goHub=function(){const r=_g.apply(this,arguments);
- if(save.tribe&&!save.tourHub&&!(save.stars&&Object.keys(save.stars).length)){if(typeof TUT!=='undefined')TUT.hub=0;hubTour(true)}
- else if(save.tribe&&!save.tourHub){save.tourHub=1;save.tourBoj=1;persist()}return r}}
+ if(save.tribe&&!save.tourHub&&!TOUR.on){if(typeof TUT!=='undefined')TUT.hub=0;hubTour(true)}return r}}
 {const _rh=renderHub;renderHub=function(){const r=_rh.apply(this,arguments);const tb=$('#tribeBox');if(tb&&!tb.querySelector('.help')){const b=document.createElement('button');b.className='snd help';b.title='Uputstvo';b.textContent='?';b.onclick=e=>{e.stopPropagation();hubTour(false)};tb.appendChild(b)}return r}}
 
 /* ----- bitka ----- */
@@ -3578,7 +3577,7 @@ function battleTourSteps(){const tu=typeof touchUI!=='undefined'&&touchUI;return
  {t:'U boj!',x:'To je sve. Prati cilj, skupljaj žar i čuvaj zdravlje. Srećno, junače!',btn:'U boj!'}]}
 function battleTour(){if(!G||(state!=='play'&&state!=='pause'))return;const was=state;state='pause';if(typeof show==='function')show(null);
  setTimeout(()=>tourStart('boj',battleTourSteps(),()=>{save.tourBoj=1;persist();if(G&&state==='pause'){state='play';if(typeof last!=='undefined')last=performance.now()}}),was==='play'?450:50)}
-{const _s=start;start=function(c){const first=c&&c.kind==='camp'&&c.idx===0&&!save.tourBoj;const r=_s.apply(this,arguments);if(first&&G&&state==='play')battleTour();return r}}
+{const _s=start;start=function(c){const first=c&&!c.spect&&(c.kind==='camp'||c.kind==='def')&&!save.tourBoj;const r=_s.apply(this,arguments);if(first&&G&&state==='play')battleTour();return r}}
 setTimeout(()=>{const sb=document.getElementById('sndBtn');if(sb&&!document.getElementById('helpBtn')){const b=document.createElement('button');b.id='helpBtn';b.className=sb.className;b.textContent='Uputstvo za bitku';
  b.onclick=()=>{if(typeof show==='function')show(null);battleTour()};const after=document.getElementById('cirBtn')||document.getElementById('vibBtn')||document.getElementById('musBtn')||sb;after.after(b)}},120);
 /* ---------- vrste bitaka po istoriji: opsada, dvoboj, juriš, zaseda; talasi; blagoslovi ---------- */

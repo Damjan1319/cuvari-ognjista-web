@@ -1121,7 +1121,7 @@ const cv=$('#cv');let ctx=cv.getContext('2d');const ctxMain=ctx;
 const dark=document.createElement('canvas'),dctx=dark.getContext('2d');
 const floor=document.createElement('canvas');
 let CW=1000,CH=600,scale=1,dpr=1;
-function dims(){const vw=innerWidth,vh=innerHeight;CW=vw>=vh?1000:560;CH=Math.round(CW*vh/vw);scale=vw/CW;dpr=Math.min(devicePixelRatio||1,2);
+function dims(){const vw=innerWidth,vh=innerHeight;CW=vw>=vh?1000:560;CH=Math.round(CW*vh/vw);scale=vw/CW;dpr=Math.min(devicePixelRatio||1,typeof gfxCap==='function'?gfxCap():2);
  cv.width=Math.round(vw*dpr);cv.height=Math.round(vh*dpr);cv.style.width=vw+'px';cv.style.height=vh+'px';dark.width=cv.width;dark.height=cv.height;starsBg=null}
 addEventListener('resize',dims);
 
@@ -1294,6 +1294,25 @@ muteBtn.onclick=()=>{save.muted=!save.muted;persist();syncMute();ac()};
 
 function crestSvg(color,name){const ch=(name||'?').replace(/^(Pleme|Odred|Vojska|Dahija)\s+/i,'').trim().charAt(0).toUpperCase()||'?';
  return`<svg viewBox="0 0 40 46"><path d="M4 4h32v16c0 12-8 19-16 23C12 39 4 32 4 20z" fill="${color}" stroke="#efe3c8" stroke-opacity=".55" stroke-width="1.6"/><path d="M4 4h32v6H4z" fill="#000" opacity=".22"/><text x="20" y="29" text-anchor="middle" font-family="Cinzel,serif" font-weight="800" font-size="17" fill="#fff8e6">${esc(ch)}</text></svg>`}
+/* ---------- brzina na slabijim telefonima: automatska grafika ---------- */
+var LOWFX=false;
+const GFX_NAMES=['Brza','Srednja','Lepa'];
+function gfxIsPhone(){return Math.min(innerWidth,innerHeight)<760&&(('ontouchstart' in window)||navigator.maxTouchPoints>0)}
+function gfxLevel(){let q=save&&save.gfx!==undefined&&save.gfx!==null&&save.gfx!=='auto'?+save.gfx:(save&&save.gfxAuto!==undefined?+save.gfxAuto:null);
+ if(q===null){const mem=navigator.deviceMemory||4,cpu=navigator.hardwareConcurrency||4;q=gfxIsPhone()?((mem<=3||cpu<=4)?0:1):2}return Math.max(0,Math.min(2,q))}
+function gfxCap(){return [1,1.5,2][gfxLevel()]}
+function gfxLo(){return gfxLevel()<2&&gfxIsPhone()||gfxLevel()===0}
+function gfxApply(){LOWFX=gfxLevel()===0;try{dims();if(typeof vfit==='function'&&state==='hub')vfit()}catch(e){}}
+setTimeout(gfxApply,0);
+/* merenje: ako bitka ne stiže, spusti kvalitet jednom po stepen */
+{let acc=0,n=0,lastT=0,cool=0;const tick=now=>{if(lastT&&state==='play'&&!document.hidden){const dt=now-lastT;if(dt<250){acc+=dt;n++}
+  if(n>=90){const avg=acc/n;acc=0;n=0;if(cool<=0&&avg>26&&(save.gfx===undefined||save.gfx==='auto'||save.gfx===null)&&gfxLevel()>0){save.gfxAuto=gfxLevel()-1;cool=3;gfxApply();try{persist()}catch(e){}if(typeof toast==='function'){toast('Grafika je prilagođena telefonu da igra teče glatko');if(G)G.toastT=2.2}}else cool--}}
+ lastT=now;requestAnimationFrame(tick)};requestAnimationFrame(tick)}
+/* izbor u pauzi */
+setTimeout(()=>{const sb=document.getElementById('sndBtn');if(sb&&!document.getElementById('gfxBtn')){const b=document.createElement('button');b.id='gfxBtn';b.className=sb.className;
+ const lab=()=>{b.textContent='Grafika: '+(save.gfx===undefined||save.gfx==='auto'||save.gfx===null?'automatski ('+GFX_NAMES[gfxLevel()].toLowerCase()+')':GFX_NAMES[gfxLevel()].toLowerCase())};lab();
+ b.onclick=()=>{const cur=save.gfx===undefined||save.gfx===null?'auto':save.gfx;const order=['auto',2,1,0];save.gfx=order[(order.indexOf(cur)+1)%order.length];if(save.gfx==='auto')delete save.gfxAuto;persist();gfxApply();lab()};
+ const after=document.getElementById('helpBtn')||document.getElementById('cirBtn')||sb;after.after(b)}},150);
 
 /* ---------- ikonice ---------- */
 const GD=`<defs>
@@ -1534,20 +1553,20 @@ const H3D={"strahinja": {"f": "strahinja", "w": 301, "h": 315, "cx": 125, "fy": 
 const A3D={"stit": {"f": "stit", "w": 233, "h": 252, "cx": 89, "fy": 243, "ph": 182}, "koplja": {"f": "koplja", "w": 281, "h": 245, "cx": 137, "fy": 232, "ph": 182}, "strel": {"f": "strel", "w": 245, "h": 219, "cx": 107, "fy": 207, "ph": 190}};
 const F3D={"osm_pesak": {"f": "osm_pesak", "w": 182, "h": 198, "cx": 70, "fy": 190, "ph": 147}, "biz_pesak": {"f": "biz_pesak", "w": 182, "h": 198, "cx": 70, "fy": 190, "ph": 158}, "osm_koplje": {"f": "osm_koplje", "w": 220, "h": 193, "cx": 108, "fy": 182, "ph": 147}, "osm_strel": {"f": "osm_strel", "w": 192, "h": 176, "cx": 84, "fy": 166, "ph": 147}, "osm_teski": {"f": "osm_teski", "w": 172, "h": 182, "cx": 73, "fy": 160, "ph": 145}, "dah_pesak": {"f": "dah_pesak", "w": 182, "h": 198, "cx": 70, "fy": 190, "ph": 145}, "dah_koplje": {"f": "dah_koplje", "w": 220, "h": 193, "cx": 108, "fy": 182, "ph": 145}, "dah_strel": {"f": "dah_strel", "w": 192, "h": 170, "cx": 84, "fy": 160, "ph": 145}, "dah_teski": {"f": "dah_teski", "w": 172, "h": 173, "cx": 73, "fy": 151, "ph": 126}, "krd_pesak": {"f": "krd_pesak", "w": 182, "h": 198, "cx": 70, "fy": 190, "ph": 145}, "krd_koplje": {"f": "krd_koplje", "w": 220, "h": 193, "cx": 108, "fy": 182, "ph": 145}, "krd_strel": {"f": "krd_strel", "w": 192, "h": 170, "cx": 84, "fy": 160, "ph": 145}, "krd_teski": {"f": "krd_teski", "w": 172, "h": 173, "cx": 73, "fy": 151, "ph": 126}, "biz_koplje": {"f": "biz_koplje", "w": 220, "h": 193, "cx": 108, "fy": 182, "ph": 158}, "biz_strel": {"f": "biz_strel", "w": 192, "h": 185, "cx": 84, "fy": 174, "ph": 158}, "biz_teski": {"f": "biz_teski", "w": 172, "h": 174, "cx": 73, "fy": 153, "ph": 139}, "ugr_pesak": {"f": "ugr_pesak", "w": 182, "h": 198, "cx": 70, "fy": 190, "ph": 153}, "ugr_koplje": {"f": "ugr_koplje", "w": 220, "h": 193, "cx": 108, "fy": 182, "ph": 153}, "ugr_strel": {"f": "ugr_strel", "w": 192, "h": 180, "cx": 84, "fy": 169, "ph": 153}, "ugr_teski": {"f": "ugr_teski", "w": 172, "h": 173, "cx": 73, "fy": 152, "ph": 134}, "bug_pesak": {"f": "bug_pesak", "w": 182, "h": 198, "cx": 70, "fy": 190, "ph": 148}, "bug_koplje": {"f": "bug_koplje", "w": 220, "h": 193, "cx": 108, "fy": 182, "ph": 148}, "bug_strel": {"f": "bug_strel", "w": 192, "h": 172, "cx": 84, "fy": 162, "ph": 148}, "bug_teski": {"f": "bug_teski", "w": 172, "h": 173, "cx": 73, "fy": 151, "ph": 130}, "osm_vodja": {"f": "osm_vodja", "w": 256, "h": 255, "cx": 128, "fy": 231, "ph": 192}, "dah_vodja": {"f": "dah_vodja", "w": 256, "h": 255, "cx": 128, "fy": 231, "ph": 191}, "krd_vodja": {"f": "krd_vodja", "w": 256, "h": 243, "cx": 128, "fy": 219, "ph": 189}, "biz_vodja": {"f": "biz_vodja", "w": 256, "h": 254, "cx": 128, "fy": 231, "ph": 211}, "ugr_vodja": {"f": "ugr_vodja", "w": 256, "h": 249, "cx": 128, "fy": 226, "ph": 206}, "bug_vodja": {"f": "bug_vodja", "w": 256, "h": 251, "cx": 128, "fy": 227, "ph": 207}};
 const H3D_COL={i:[0,4],m:[4,8],a:[12,6]},H3D_ROW={f:0,s:1,b:2};
-function d3get(o){if(!o)return null;if(!o.img){o.img=new Image();o.img.onload=()=>{o.ok=1};o.img.src='a3d/'+o.f+'.webp?v='+A3V}return o.ok?o:null}
+function d3get(o){if(!o)return null;if(!o.img){o.img=new Image();o.img.onload=()=>{o.sx=o.img.naturalWidth/(o.w*18);o.sy=o.img.naturalHeight/(o.h*3);o.ok=1};o.img.src='a3d/'+(typeof gfxLo==='function'&&gfxLo()?'lo/':'')+o.f+'.webp?v='+A3V}return o.ok?o:null}
 function d3pre(){for(const T of[H3D,A3D])for(const k in T)d3get(T[k])}
 function d3preFac(f){if(!f)return;f={tat:'bug',srb:'ugr'}[f]||f;for(const r of['pesak','koplje','strel','teski','vodja'])d3get(F3D[f+'_'+r])}
 setTimeout(()=>{d3pre();const fs=[...new Set(Object.values(typeof LFOE!=='undefined'?LFOE:{}).map(x=>x&&x[0]))];
  {const _st=start;start=function(c){try{d3preFac(c&&c.fac);if(c&&c.rival)d3preFac(c.rival.fac||'osm')}catch(e){}return _st.apply(this,arguments)}}
  setTimeout(()=>fs.forEach(d3preFac),4000)},0);
 function d3blit(g,o,st,f,vw,face,k){const col=H3D_COL[st][0]+f,row=H3D_ROW[vw];g.scale(face,1);g.imageSmoothingQuality='high';
- g.drawImage(o.img,col*o.w,row*o.h,o.w,o.h,-o.cx*k,-o.fy*k,o.w*k,o.h*k)}
+ const sx=o.sx||1,sy=o.sy||1;g.drawImage(o.img,col*o.w*sx,row*o.h*sy,o.w*sx,o.h*sy,-o.cx*k,-o.fy*k,o.w*k,o.h*k)}
 {const _dh=drawHero;drawHero=function(g,x,y,s,h,face,walk,moving,t,alpha=1,act){const o=save.h3d===0?null:d3get(H3D[h.id]);if(!o)return _dh.apply(this,arguments);
  const wf=((Math.floor(walk/(Math.PI*2)*8)%8)+8)%8;let st='i',f=Math.floor(t*3)%4;
  if(act&&act.a>=0){st='a';f=Math.min(5,Math.floor(act.a*6))}else if(moving){st='m';f=wf}
  const vw=act&&act.dir?viewOf(act.dir[0],act.dir[1]):act?'s':'f';if(vw!=='s')face=1;else if(act&&act.a>=0&&act.dir&&Math.abs(act.dir[0])>.05)face=act.dir[0]>0?1:-1;
  g.save();g.translate(x,y);g.globalAlpha*=alpha;g.fillStyle='rgba(0,0,0,.45)';ell(g,0,0,(s<1.4?12:10)*s,(s<1.4?4:3.4)*s);g.fill();
- g.scale(s,s);if(act&&act.hurt>0)g.filter='brightness(1.8) saturate(.6)';
+ g.scale(s,s);if(act&&act.hurt>0&&!LOWFX)g.filter='brightness(1.8) saturate(.6)';
  d3blit(g,o,st,f,vw,face,(s<1.4?44:42)/o.ph);g.restore()}}
 const FROLE={senka:'pesak',vampir:'pesak',barjaktar:'pesak',ratnik:'pesak',lovac:'koplje',vrac:'strel',gutac:'teski',vitez:'teski'};
 function foe3d(e){if(e.ally||save.h3d===0||(!e.look&&!e.boss))return null;if(e._f3!==undefined)return e._f3?d3get(e._f3):null;
@@ -1572,7 +1591,7 @@ setTimeout(()=>{
   if(e.boss){g.strokeStyle=`rgba(217,69,95,${.35+.2*Math.sin(t*4)})`;g.lineWidth=2;ell(g,0,0,16*sh,5*sh);g.stroke()}
   if(e.type==='barjaktar'&&state==='play'){g.fillStyle=`rgba(170,30,30,${.12+.06*Math.sin(t*3)})`;ell(g,0,0,160,60);g.fill()}
   if(e.bf>0&&e.type!=='barjaktar'){g.strokeStyle='rgba(200,40,40,.45)';g.lineWidth=1.4;ell(g,0,0,12*sh,4*sh);g.stroke()}
-  if(e.hitT>0)g.filter='brightness(2.2) saturate(.4)';if(e.stun>0)g.filter='grayscale(.6) brightness(.9)';g.globalAlpha*=1-Math.min(1,e.born||0);
+  if(e.hitT>0&&!LOWFX)g.filter='brightness(2.2) saturate(.4)';if(e.stun>0&&!LOWFX)g.filter='grayscale(.6) brightness(.9)';g.globalAlpha*=1-Math.min(1,e.born||0);
   d3blit(g,o,st,f,vw,face,H/o.ph);g.restore();e._d3={o,f:st==='a'?f:0,st:st==='a'?'a':'i',vw,face,H,yo}};
  const _et=enemyTop;enemyTop=function(e){if(foe3d(e))return e.y+e.r*.75-e._fh*1.02;return _et(e)};
  const _ey=drawEyes;drawEyes=function(g,e,t){if(foe3d(e))return;return _ey(g,e,t)};
@@ -2518,7 +2537,7 @@ function collide(o){let hit=false;
  for(const s of G.structs){if(s.hp<=0)continue;const dx=o.x-s.x,dy=o.y-s.y,d=Math.hypot(dx,dy)||1,m=s.r+o.r;if(d<m){o.x=s.x+dx/d*m;o.y=s.y+dy/d*m;hit=true}}
  return hit}
 function blocked(x,y){if(G.obst.some(r=>Math.hypot(r.x-x,r.y-y)<r.r*.8))return true;return G.walls.some(w=>x>w.x&&x<w.x+w.w&&y>w.y&&y<w.y+w.h)}
-function burst(x,y,c,n,sp=160,s=2.5,life=.7){for(let i=0;i<n;i++){const a=R()*6.283,v=sp*(.3+R()*.7);G.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:life*(.6+R()*.6),max:life,c,s:s*(.6+R()*.8)})}}
+function burst(x,y,c,n,sp=160,s=2.5,life=.7){if(G&&G.parts.length>(LOWFX?110:380))return;if(LOWFX)n=Math.ceil(n*.5);for(let i=0;i<n;i++){const a=R()*6.283,v=sp*(.3+R()*.7);G.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:life*(.6+R()*.6),max:life,c,s:s*(.6+R()*.8)})}}
 function floatTxt(x,y,txt,col,big){G.floats.push({x:x+(R()-.5)*10,y,txt,col,life:.9,big})}
 function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');if(G)G.toastT=2.2}
 
@@ -3639,7 +3658,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795807495';
+const BUILD_ID='1795819352';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
@@ -4048,7 +4067,7 @@ function waveOne(){const W=G.waves,c=G.cfg,n=W.n;const side=R();let pos;
  const e=spawnEnemy(t,pos);if(e&&G.waves){const m=1+n*.07;e.hp*=m;e.max*=m}}
 function kazanPour(k){const K=G.castle,a=Math.atan2(k.y-K.y,k.x-K.x),fx=k.x+Math.cos(a)*90,fy=k.y-60;burst(fx,fy,'#2a1a10',40,260,4,1.1);burst(fx,fy,'#ff8a2a',30,220,3,.9);G.shake=8;
  if(typeof play==='function')play('shield',.5,.7);for(const e of G.enemies){if(e.hp>0&&Math.hypot(e.x-fx,e.y-fy)<210){dmgEnemy(e,G.st.dmg*3.2,0,-120);e.stun=Math.max(e.stun,1.2)}}floatTxt(fx,fy-40,'Smola!','#ffb648',true)}
-function modeDs(ds,t){const K=G&&G.castle;if(!K)return;ds.push({y:K.y,f:()=>{const g=ctx;g.save();if(K.hitT>0)g.filter='brightness(1.4)';g.fillStyle='rgba(0,0,0,.35)';ell(g,K.x,K.y+4,110,32);g.fill();
+function modeDs(ds,t){const K=G&&G.castle;if(!K)return;ds.push({y:K.y,f:()=>{const g=ctx;g.save();if(K.hitT>0&&!LOWFX)g.filter='brightness(1.4)';g.fillStyle='rgba(0,0,0,.35)';ell(g,K.x,K.y+4,110,32);g.fill();
   if(!(typeof pdraw==='function'&&pdraw(g,'hall',K.x,K.y+16,200))){g.fillStyle='#5a5048';g.fillRect(K.x-80,K.y-110,160,110)}g.restore()}})}
 function modeDraw(g,t){if(!G)return;
  if(G.castle){
@@ -4231,7 +4250,7 @@ setInterval(()=>{const n=$('#nalet'),mp=document.querySelector('.mplate');if(!n|
  if(G&&was&&e.hp<=0&&e.boss)buzz([60,40,90]);return r}}
 {const _u=update;update=function(dt){const r=_u.call(this,dt);if(G&&G.dead){for(const z of G.dead)z.t+=dt;G.dead=G.dead.filter(z=>z.t<1.5)}return r}}
 {const _ds=modeDs;modeDs=function(ds,t){_ds(ds,t);if(!G||!G.dead)return;for(const z of G.dead)ds.push({y:z.y-1,f:()=>{const D=z.d,o=D.o;if(!o||!o.ok)return;const g=ctx,k=Math.min(1,z.t/.32),ang=(1-Math.pow(1-k,2))*1.45*z.dir,al=z.t>1.05?Math.max(0,1-(z.t-1.05)/.45):1;
- g.save();g.translate(z.x,z.y+D.yo);g.globalAlpha*=al;g.rotate(ang);g.filter='brightness(.75) saturate(.7)';d3blit(g,o,D.st,D.f,D.vw,D.face,D.H/o.ph);g.restore()}})}}
+ g.save();g.translate(z.x,z.y+D.yo);g.globalAlpha*=al;g.rotate(ang);if(!LOWFX)g.filter='brightness(.75) saturate(.7)';d3blit(g,o,D.st,D.f,D.vw,D.face,D.H/o.ph);g.restore()}})}}
 function buzz(p){try{if(save.vib===0||!navigator.vibrate)return;navigator.vibrate(p)}catch(e){}}
 {const _hp=hurtPlayer;hurtPlayer=function(amt,src){const h0=G?G.hp:0;const r=_hp.apply(this,arguments);if(G&&G.hp<h0)buzz(G.hp<G.maxhp*.3?[40,30,40]:25);return r}}
 {const _kp=typeof kazanPour==='function'?kazanPour:null;if(_kp)kazanPour=function(k){buzz(70);return _kp.apply(this,arguments)}}

@@ -3639,7 +3639,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795806581';
+const BUILD_ID='1795807132';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
@@ -3689,17 +3689,19 @@ function dmgSheet(){const body=$('#shBody');if(!body)return;const cards=[...body
 {const _rs=renderSheet;renderSheet=function(){const r=_rs.apply(this,arguments);try{if(sheetOpen==='utvrdjenje')dmgSheet();btnDecor($('#shBody'))}catch(e){}return r}}
 {const _ra=refreshAfford;refreshAfford=function(){const r=_ra.apply(this,arguments);btnDecor($('#shBody'));return r}}
 if(typeof updateBpop==='function'){const _ub=updateBpop;updateBpop=function(){const r=_ub.apply(this,arguments);try{const bp=$('#bpop');if(bp&&vsel){const B=BUILD.find(x=>x.id===vsel);if(B){const btn=[...bp.querySelectorAll('button')].find(b=>/Dogradi|Sagradi|Popravi/.test(b.dataset.lbl||b.textContent));if(btn){btn._cost=dmgd(vsel)?repairCost(vsel):B.cost(save.b[vsel]);btnDecor(bp)}}}}catch(e){}return r}}
-/* ---------- BAŠTA (probna verzija): plac, leje, baštovan, melem i hrana ---------- */
+/* ---------- BAŠTA: plac, leje, baštovan, melem i obroci ---------- */
 const BASTA={unlockOg:3,buy:{zar:400,kamen:300},maxLvl:5,
- up:l=>({zar:nice(500*1.9**(l-1)),kamen:nice(350*1.8**(l-1)),gvozdje:l>=2?nice(20*1.8**(l-2)):0}),
+ up:l=>({zar:nice(600*2.7**(l-1)),kamen:nice(420*2.6**(l-1)),gvozdje:l>=2?nice(60*2.6**(l-2)):0}),upOg:l=>3+l*2,
  beds:l=>1+l,cap:l=>10+l*10,upk:.6};
 /* g = vreme rasta u minutima, y = prinos, p = proizvod */
 const CROPS=[
- {id:'kamilica',n:'Kamilica',p:'melem',g:60,y:3,seed:{zar:40},lvl:1,col:'#f6f0c8',d:'Brzo raste, daje melem za rane.'},
- {id:'zito',n:'Žito',p:'hrana',g:90,y:4,seed:{zar:60},lvl:1,col:'#e3b94a',d:'Hleb za vojsku.'},
- {id:'hajducka',n:'Hajdučka trava',p:'melem',g:180,y:8,seed:{zar:110,kamen:20},lvl:2,col:'#f2f2f2',d:'Jaka trava za teške rane.'},
- {id:'proso',n:'Proso',p:'hrana',g:240,y:11,seed:{zar:140,kamen:30},lvl:3,col:'#c9a24a',d:'Hrani vojsku dugo.'},
- {id:'nana',n:'Nana',p:'melem',g:120,y:5,seed:{zar:80},lvl:2,col:'#6fbf5a',d:'Melem i čaj za oporavak.'}];
+ {id:'kamilica',n:'Kamilica',p:'melem',g:360,y:4,seed:{zar:60},lvl:1,col:'#f6f0c8',d:'Brzo raste, daje melem za rane.'},
+ {id:'zito',n:'Žito',p:'hrana',g:480,y:6,seed:{zar:80},lvl:1,col:'#e3b94a',d:'Hleb za vojsku.'},
+ {id:'nana',n:'Nana',p:'melem',g:600,y:7,seed:{zar:120},lvl:2,col:'#6fbf5a',d:'Melem i čaj za oporavak.'},
+ {id:'hajducka',n:'Hajdučka trava',p:'melem',g:960,y:12,seed:{zar:180,kamen:40},lvl:2,col:'#f2f2f2',d:'Jaka trava za teške rane.'},
+ {id:'proso',n:'Proso',p:'hrana',g:1440,y:18,seed:{zar:220,kamen:60},lvl:3,col:'#c9a24a',d:'Hrani vojsku dugo.'}];
+function pl(n,a,b,c){const d=n%10,dd=n%100;return d===1&&dd!==11?a:d>=2&&d<=4&&(dd<12||dd>14)?b:c}
+function unit(p,n){return p==='melem'?pl(n,'melem','melema','melema'):pl(n,'obrok','obroka','obroka')}
 const FED={mul:1.25,battles:3};
 const CROP_SVG={kamilica:'<svg viewBox="0 0 40 40"><path d="M20 38V22" stroke="#4f8a34" stroke-width="2.5"/>'+[0,45,90,135,180,225,270,315].map(a=>`<ellipse cx="20" cy="9" rx="3.2" ry="7" fill="#fbf6e2" stroke="#c9bd90" stroke-width=".6" transform="rotate(${a} 20 16)"/>`).join('')+'<circle cx="20" cy="16" r="4.2" fill="#e8b830"/></svg>',
  zito:'<svg viewBox="0 0 40 40"><path d="M20 39V6" stroke="#9a8a3a" stroke-width="2"/>'+[8,13,18,23].map(y=>`<ellipse cx="16" cy="${y}" rx="3" ry="5" fill="#e3b94a" transform="rotate(-25 16 ${y})"/><ellipse cx="24" cy="${y}" rx="3" ry="5" fill="#d8aa3a" transform="rotate(25 24 ${y})"/>`).join('')+'</svg>',
@@ -3732,10 +3734,10 @@ setInterval(()=>{if(save.basta){bTick();if(sheetOpen==='basta'&&state==='hub'){c
 function bSig(){const B=save.basta;return B?B.beds.map(b=>b.c+(bedRipe(b)?'r':'')).join()+B.worker+B.melem+B.hrana+B.fed+(B.care||'')+(careNow()?1:0)+Math.floor(save.res.zar/20):''}
 function bLive(){document.querySelectorAll('#shBody [data-bed]').forEach(el=>{const b=save.basta.beds[+el.dataset.bed];if(!b||!b.c)return;const c=cropOf(b.c),p=bedPct(b);const bar=el.querySelector('.bbar b');if(bar)bar.style.width=(p*100)+'%';
  const t=el.querySelector('.bt');if(t&&!bedRipe(b)){const left=Math.max(0,c.g*60-(b.p||0));t.textContent=!save.basta.worker?'stoji, nema baštovana':!careNow()?'stoji, danas niko nije radio':`zri još ${fmtT(left/(careNow().mul||1))}`}})}
-function fmtT(s){const M=Math.max(1,Math.ceil(s/60)),h=Math.floor(M/60),m=M%60;return h?(m?`${h} h ${m} min`:`${h} h`):`${m} min`}
+function fmtT(s){const M=Math.max(1,Math.ceil(s/60)),h=Math.floor(M/60),m=M%60;const hs=`${h} ${pl(h,'sat','sata','sati')}`;return h?(m?`${hs} ${m} min`:hs):`${m} min`}
 function bHarvest(i){const B=save.basta,b=B.beds[i];if(!bedRipe(b))return;const c=cropOf(b.c),cap=BASTA.cap(B.lvl);const room=cap-(B[c.p]||0);const got=Math.min(c.y,room);
  if(got<=0){notify(`Ambar je pun (${cap}). Potroši ${c.p==='melem'?'melem':'hranu'} ili dogradi baštu.`,true);return}
- B[c.p]=(B[c.p]||0)+got;b.c=null;b.p=0;b.ripeAt=0;persist();sfx.coin&&sfx.coin();notify(`Obrano: <b>${c.n}</b>, +${got} ${c.p==='melem'?'melema':'hrane'}.`);renderSheet()}
+ B[c.p]=(B[c.p]||0)+got;b.c=null;b.p=0;b.ripeAt=0;persist();sfx.coin&&sfx.coin();notify(`Obrano: <b>${c.n}</b>, +${got} ${unit(c.p,got)}.`);renderSheet()}
 function bPlant(i,id){const B=save.basta,b=B.beds[i],c=cropOf(id);if(!c||b.c||!canPay(c.seed)||B.lvl<c.lvl)return;pay(c.seed);b.c=id;b.p=0;b.ripeAt=0;B.last=Date.now();persist();sfx.build&&sfx.build();renderSheet();renderHub()}
 function bFeed(){const B=save.basta,S=soldiers().filter(s=>!isBusy(s.name)),need=Math.max(1,S.length);if(B.fed>0||B.hrana<need)return;B.hrana-=need;B.fed=FED.battles;persist();sfx.build&&sfx.build();notify(`Vojska je nahranjena: <b>+${Math.round((FED.mul-1)*100)}% zdravlja</b> u sledeće ${FED.battles} bitke.`);renderSheet()}
 function melemCost(n){return Math.max(1,Math.ceil(woundLeft(n)/60000/4))}
@@ -3766,8 +3768,8 @@ function sheetBasta(body){$('#shTitle').textContent='Bašta';const B=save.basta;
   const bb=$('#bBuy');if(bb)bb.onclick=()=>{if(!canPay(BASTA.buy))return;pay(BASTA.buy);bInit();persist();sfx.build&&sfx.build();fortFx=1.2;notify('Kupljen je plac. Posadi prve leje i pošalji baštovana.');renderSheet();renderHub()};return}
  bInit();bTick();const cap=BASTA.cap(B.lvl);$('#shSub').textContent=`Bašta ${B.lvl}. nivo · ${B.beds.length} leje · ambar ${cap}`;
  const S=soldiers().filter(s=>!(typeof isWounded==='function'&&isWounded(s.name)));
- let h=`<div class="bsum"><div><b>${B.melem}</b>melem / ${cap}</div><div><b>${B.hrana}</b>hrana / ${cap}</div><div class="${B.fed?'fed':''}"><b>${B.fed?'+'+Math.round((FED.mul-1)*100)+'%':'—'}</b>${B.fed?`još ${B.fed} ${B.fed===1?'bitka':'bitke'}`:'vojska gladna'}</div></div>`;
- h+=`<p class="bhelp" style="margin:0 0 12px">Obrano bilje ide u <b>ambar</b> (brojevi gore). <b>Melem</b> trošiš da ranjenog vojnika odmah vratiš u boj (dole, „Leči melemom“, ili u ambulanti). <b>Hranu</b> trošiš dugmetom „Nahrani vojsku“: sita vojska ima +25% zdravlja u sledeće 3 bitke.</p>`;
+ let h=`<div class="bsum"><div><b>${B.melem}</b>melem / ${cap}</div><div><b>${B.hrana}</b>obroka / ${cap}</div><div class="${B.fed?'fed':''}"><b>${B.fed?'+'+Math.round((FED.mul-1)*100)+'%':'—'}</b>${B.fed?`još ${B.fed} ${B.fed===1?'bitka':'bitke'}`:'vojska gladna'}</div></div>`;
+ h+=`<p class="bhelp" style="margin:0 0 12px">Biljke rastu od 6 sati do ceo dan, zato ih posadi pre nego što ostaviš igru. Obrano ide u <b>ambar</b> (brojevi gore). <b>Melem</b> trošiš da ranjenog vojnika odmah vratiš u boj (dole, „Leči melemom“, ili u ambulanti). <b>Obroke</b> trošiš dugmetom „Nahrani vojsku“: sita vojska ima +25% zdravlja u sledeće 3 bitke.</p>`;
  const CN=careNow();
  h+=`<div class="bcard"><h3>Baštovan <small>${B.worker?'U BAŠTI':'NEMA GA'}</small></h3><div></div><p>${B.worker?`<b>${esc(B.worker)}</b> brine o bašti i za to vreme ne ide u boj.`:'Pošalji jednog vojnika u baštu. Dok je baštovan, ne ide u boj.'}</p>
   <div class="act bwork"><select id="bWk"><option value="">— niko —</option>${S.map(s=>`<option ${B.worker===s.name?'selected':''} value="${esc(s.name)}">${esc(s.name)} (${s.uname})</option>`).join('')}</select></div></div>`;
@@ -3777,19 +3779,19 @@ function sheetBasta(body){$('#shTitle').textContent='Bašta';const B=save.basta;
   !B.worker?'<div class="req" style="grid-column:1/-1">Najpre pošalji baštovana</div>':
   `<div class="clist" style="grid-column:1/-1">${CARE.map(c=>`<div class="seed"><div class="si" style="font-size:26px">${c.ic}</div><div><b>${c.n}</b><small>${c.d}<br>Trošak: ${Object.entries(c.cost).map(([k,v])=>v+' '+RES_GEN[k]).join(', ')}</small></div><button class="btn sm ${canPay(c.cost)?'primary':''}" ${canPay(c.cost)?'':'disabled'} data-cost='${JSON.stringify(c.cost)}' data-care="${c.k}">Odredi</button></div>`).join('')}</div>`}</div>`;
  B.beds.forEach((b,i)=>{const c=cropOf(b.c);
-  if(!c){h+=`<div class="bcard"><h3>Leja ${i+1} <small>PRAZNA</small></h3><div></div><p class="bhelp">Leja je jedan red u bašti. U nju sadiš jednu biljku, a kad sazri, obereš je. Izaberi šta ćeš posaditi:</p><div class="bseeds">${CROPS.map(x=>{const lk=x.lvl>B.lvl,ok=!lk&&canPay(x.seed);return `<div class="seed${lk?' lock':''}"><div class="si">${CROP_SVG[x.id]||''}</div><div><b>${x.n}</b><small>Daje <i>${x.y} ${x.p==='melem'?'melema':'hrane'}</i> · raste ${fmtT(x.g*60)}<br>Seme: ${Object.entries(x.seed).map(([k,v])=>v+' '+RES_GEN[k]).join(', ')}</small></div>${lk?`<span class="req" style="width:auto;padding:6px 8px">Bašta ${x.lvl}. nivo</span>`:`<button class="btn sm ${ok?'primary':''}" ${ok?'':'disabled'} data-cost='${JSON.stringify(x.seed)}' data-plant="${i}:${x.id}">Posadi</button>`}</div>`}).join('')}</div></div>`;return}
+  if(!c){h+=`<div class="bcard"><h3>Leja ${i+1} <small>PRAZNA</small></h3><div></div><p class="bhelp">Leja je jedan red u bašti. U nju sadiš jednu biljku, a kad sazri, obereš je. Izaberi šta ćeš posaditi:</p><div class="bseeds">${CROPS.map(x=>{const lk=x.lvl>B.lvl,ok=!lk&&canPay(x.seed);return `<div class="seed${lk?' lock':''}"><div class="si">${CROP_SVG[x.id]||''}</div><div><b>${x.n}</b><small>Daje <i>${x.y} ${unit(x.p,x.y)}</i> · raste ${fmtT(x.g*60)}<br>Seme: ${Object.entries(x.seed).map(([k,v])=>v+' '+RES_GEN[k]).join(', ')}</small></div>${lk?`<span class="req" style="width:auto;padding:6px 8px">Bašta ${x.lvl}. nivo</span>`:`<button class="btn sm ${ok?'primary':''}" ${ok?'':'disabled'} data-cost='${JSON.stringify(x.seed)}' data-plant="${i}:${x.id}">Posadi</button>`}</div>`}).join('')}</div></div>`;return}
   const p=bedPct(b),ripe=p>=1;const left=Math.max(0,c.g*60-(b.p||0));const spoil=ripe&&b.ripeAt?Math.max(0,Math.max(3*3600*1000,c.g*60*1000)-(Date.now()-b.ripeAt))/1000:0;
   h+=`<div class="bcard" data-bed="${i}"><div class="bed" style="grid-column:1/-1"><div class="ic">${CROP_SVG[c.id]||''}</div><div><h3 style="margin:0">Leja ${i+1}: ${c.n} <small>${ripe?'ZRELO':'RASTE'}</small></h3><div class="bbar"><b style="width:${p*100}%"></b></div>
    <div class="bt">${ripe?(CN&&CN.keep?'zrelo, ne vene danas':`oberi u roku od ${fmtT(spoil)}, inače vene`):!B.worker?'stoji, nema baštovana':!CN?'stoji, danas niko nije radio':`zri još ${fmtT(left/CN.mul)}`}</div></div></div>
-   ${ripe?`<div class="act"><button class="btn green sm" data-harv="${i}" style="width:100%">Oberi: +${c.y} ${c.p==='melem'?'melema':'hrane'} u ambar</button></div>`:''}</div>`});
+   ${ripe?`<div class="act"><button class="btn green sm" data-harv="${i}" style="width:100%">Oberi: +${c.y} ${unit(c.p,c.y)} u ambar</button></div>`:''}</div>`});
  const nS=Math.max(1,soldiers().filter(s=>!isBusy(s.name)).length);
- h+=`<div class="bcard"><h3>Nahrani vojsku</h3><div></div><p>Svaki vojnik pojede jedan obrok (${nS} hrane). Nahranjena vojska ima <b>+${Math.round((FED.mul-1)*100)}% zdravlja</b> u sledeće ${FED.battles} bitke. Ne može dok traje prethodni obrok.</p>
-  <div class="act">${B.fed?`<span class="req">Vojska je sita još ${B.fed} ${B.fed===1?'bitku':'bitke'}</span>`:`<button class="btn primary sm" id="bFeed" ${B.hrana>=nS?'':'disabled'} style="width:100%">${B.hrana>=nS?`Nahrani (${nS} hrane)`:`Nedostaje ${nS-B.hrana} hrane`}</button>`}</div></div>`;
+ h+=`<div class="bcard"><h3>Nahrani vojsku</h3><div></div><p>Svakom vojniku treba po jedan obrok. Sad imaš <b>${nS} ${pl(nS,'vojnika','vojnika','vojnika')} spremnih za boj</b>, pa treba <b>${nS} ${unit('hrana',nS)}</b>. Sita vojska ima <b>+${Math.round((FED.mul-1)*100)}% zdravlja</b> u sledeće ${FED.battles} bitke.</p>
+  <div class="act">${B.fed?`<span class="req">Vojska je sita još ${B.fed} ${B.fed===1?'bitku':'bitke'}</span>`:`<button class="btn primary sm" id="bFeed" ${B.hrana>=nS?'':'disabled'} style="width:100%">${B.hrana>=nS?`Nahrani (${nS} ${unit('hrana',nS)})`:`Nedostaje ${nS-B.hrana} ${unit('hrana',nS-B.hrana)}`}</button>`}</div></div>`;
  const W=soldiers().filter(s=>isWounded(s.name));
  if(W.length)h+=`<div class="bcard"><h3>Leči melemom</h3><div></div><p>Ranjenog vojnika odmah vraćaš u boj. Jedan melem za svaka 4 minuta oporavka.</p>${W.map(s=>{const c=melemCost(s.name);return`<div class="act"><span style="flex:1"><b>${esc(s.name)}</b> <small>još ${fmtT(woundLeft(s.name)/1000)}</small></span><button class="btn sm ${B.melem>=c?'green':''}" ${B.melem>=c?'':'disabled'} data-melem="${esc(s.name)}">${B.melem>=c?`Melem ×${c}`:`Nedostaje ${c-B.melem} melema`}</button></div>`}).join('')}</div>`;
  if(B.lvl<BASTA.maxLvl){const uc=BASTA.up(B.lvl),nx=CROPS.filter(x=>x.lvl===B.lvl+1).map(x=>x.n);
   h+=`<div class="bcard"><h3>Dogradi baštu <small>NIVO ${B.lvl}</small></h3><div></div><div class="eff">Sledeći nivo: <b>${BASTA.beds(B.lvl+1)}</b> leje, ambar <b>${BASTA.cap(B.lvl+1)}</b>${nx.length?`, novo seme: <b>${nx.join(', ')}</b>`:''}</div>
-   <div class="act">${costHtml(uc)}<button class="btn primary sm" ${canPay(uc)?'':'disabled'} data-cost='${JSON.stringify(uc)}' id="bUp">Dogradi</button></div></div>`}
+   <div class="act">${save.b.ognjiste<BASTA.upOg(B.lvl)?`<span class="req">Najpre dogradi ognjište do ${BASTA.upOg(B.lvl)}. nivoa</span>`:costHtml(uc)+`<button class="btn primary sm" ${canPay(uc)?'':'disabled'} data-cost='${JSON.stringify(uc)}' id="bUp">Dogradi</button>`}</div></div>`}
  body.innerHTML=h;
  const wk=$('#bWk');if(wk)wk.onchange=()=>{bTick();B.worker=wk.value||null;B.last=Date.now();persist();notify(B.worker?`<b>${esc(B.worker)}</b> je otišao u baštu.`:'Baštovan se vratio u vojsku.');renderSheet();renderHub()};
  body.querySelectorAll('[data-plant]').forEach(b=>b.onclick=()=>{const[i,id]=b.dataset.plant.split(':');bPlant(+i,id)});
@@ -3797,7 +3799,7 @@ function sheetBasta(body){$('#shTitle').textContent='Bašta';const B=save.basta;
  body.querySelectorAll('[data-harv]').forEach(b=>b.onclick=()=>bHarvest(+b.dataset.harv));
  body.querySelectorAll('[data-melem]').forEach(b=>b.onclick=()=>bHealM(b.dataset.melem));
  const fd=$('#bFeed');if(fd)fd.onclick=bFeed;
- const up=$('#bUp');if(up)up.onclick=()=>{const uc=BASTA.up(B.lvl);if(!canPay(uc))return;pay(uc);B.lvl++;bInit();persist();sfx.build&&sfx.build();fortFx=1.2;notify(`Bašta je sada ${B.lvl}. nivo.`);renderSheet();renderHub()}}
+ const up=$('#bUp');if(up)up.onclick=()=>{const uc=BASTA.up(B.lvl);if(!canPay(uc)||save.b.ognjiste<BASTA.upOg(B.lvl))return;pay(uc);B.lvl++;bInit();persist();sfx.build&&sfx.build();fortFx=1.2;notify(`Bašta je sada ${B.lvl}. nivo.`);renderSheet();renderHub()}}
 {const _rs=renderSheet;renderSheet=function(){if(sheetOpen==='basta'){const body=$('#shBody'),sc=body.scrollTop;sheetBasta(body);body.scrollTop=sc;try{btnDecor(body)}catch(e){}return}return _rs.apply(this,arguments)}}
 /* ---- plac u selu ---- */
 /* zajednički izgled placa: zaobljeno tlo, staza do puta, plot */
@@ -3840,11 +3842,11 @@ function plotEmpty(ctx,x0,y0,W,H,lb,gate){ctx.save();ctx.fillStyle='rgba(255,240
  ctx.font='700 15px Cinzel,serif';ctx.textAlign='center';ctx.textBaseline='middle';const tw=ctx.measureText(lb).width+26;ctx.fillStyle='rgba(30,18,10,.8)';ctx.beginPath();ctx.roundRect?ctx.roundRect(x0+W/2-tw/2,y0+H/2-15,tw,30,15):ctx.rect(x0+W/2-tw/2,y0+H/2-15,tw,30);ctx.fill();ctx.fillStyle='#ffe7b0';ctx.fillText(lb,x0+W/2,y0+H/2+1);ctx.restore()}
 {const _df=drawFortress;drawFortress=function(t){const r=_df.apply(this,arguments);return r}}
 {const _rs=renderSheet;renderSheet=function(){const r=_rs.apply(this,arguments);try{if(sheetOpen==='utvrdjenje'){const body=$('#shBody');if(!body.querySelector('.bastaL')){const d=document.createElement('div');d.className='bcard bastaL';const B=save.basta;
- d.innerHTML=`<h3>Bašta <small>${B?B.lvl+'. NIVO':'NOVO'}</small></h3><div></div><p>${B?`Melem ${B.melem}, hrana ${B.hrana}. ${B.worker?'Baštovan radi.':'Nema baštovana, leje stoje.'}${B.beds.some(bedRipe)?' <b>Ima zrelih leja!</b>':''}`:'Plac uz selo za lekovito bilje i hranu za vojsku.'}</p><div class="act"><button class="btn sm ${B&&B.beds.some(bedRipe)?'green':'primary'}" style="width:100%">Otvori baštu</button></div>`;
+ d.innerHTML=`<h3>Bašta <small>${B?B.lvl+'. NIVO':'NOVO'}</small></h3><div></div><p>${B?`Melem ${B.melem}, obroka ${B.hrana}. ${B.worker?'Baštovan radi.':'Nema baštovana, leje stoje.'}${B.beds.some(bedRipe)?' <b>Ima zrelih leja!</b>':''}`:'Plac uz selo za lekovito bilje i hranu za vojsku.'}</p><div class="act"><button class="btn sm ${B&&B.beds.some(bedRipe)?'green':'primary'}" style="width:100%">Otvori baštu</button></div>`;
  d.querySelector('button').onclick=()=>openSheet('basta');const sum=body.querySelector('.dmgsum');let at=body.firstChild;while(at&&(at.classList&&(at.classList.contains('dmgsum')||at.classList.contains('dmgc'))))at=at.nextSibling;body.insertBefore(d,at)}}}catch(e){}return r}}
 /* ---------- AMBULANTA (probna verzija): ležajevi, sestre, lekarka ---------- */
 const AMBU={unlockOg:6,buy:{zar:1500,kamen:1200,gvozdje:150},maxLvl:5,
- up:l=>({zar:nice(1200*1.8**(l-1)),kamen:nice(900*1.75**(l-1)),gvozdje:nice(120*1.8**(l-1))}),
+ up:l=>({zar:nice(1500*2.6**(l-1)),kamen:nice(1100*2.5**(l-1)),gvozdje:nice(150*2.5**(l-1))}),upOg:l=>6+l,
  beds:l=>1+l,speed:l=>1.25+l*.25,admit:l=>({zar:40+l*10}),
  sestra:{cost:{zar:900,gvozdje:60},plata:.5,add:.5,max:2,lvl:2},
  lekarka:{cost:{zar:3000,kamen:800,gvozdje:300},plata:1.2,add:1,max:1,lvl:4},
@@ -3893,11 +3895,11 @@ function sheetAmb(body){const A=save.amb,E=AMB_ERA[ambEra()];$('#shTitle').textC
   <div class="staff"><div class="si">${NURSE_SVG}</div><div><b>Medicinska sestra ${A.sestre}/${S.max}</b><small>Leči +${String(S.add).replace('.',',')}× brže. Plata ${String(S.plata).replace('.',',')} žara/min dok ima bolesnih.</small></div>${A.lvl<S.lvl?`<span class="req" style="width:auto;padding:6px 8px">${S.lvl}. nivo</span>`:A.sestre>=S.max?'<span class="req" style="width:auto;padding:6px 8px;border-style:solid">puno</span>':`<button class="btn sm ${canPay(S.cost)?'primary':''}" ${canPay(S.cost)?'':'disabled'} data-cost='${JSON.stringify(S.cost)}' data-hire="sestra">Primi</button>`}</div>
   <div class="staff"><div class="si">${DOC_SVG}</div><div><b>Lekarka ${A.lekarka}/${L.max}</b><small>Leči +${L.add}× brže. Plata ${String(L.plata).replace('.',',')} žara/min dok ima bolesnih.</small></div>${A.lvl<L.lvl?`<span class="req" style="width:auto;padding:6px 8px">${L.lvl}. nivo</span>`:A.lekarka>=L.max?'<span class="req" style="width:auto;padding:6px 8px;border-style:solid">tu je</span>':`<button class="btn sm ${canPay(L.cost)?'primary':''}" ${canPay(L.cost)?'':'disabled'} data-cost='${JSON.stringify(L.cost)}' data-hire="lekarka">Primi</button>`}</div>
   ${A._noPay?'<p style="color:#a3291a;font-weight:700">Nema žara za plate, osoblje ne radi.</p>':''}</div></div>`;
- if(A.lvl<AMBU.maxLvl){const uc=AMBU.up(A.lvl);h+=`<div class="bcard"><h3>Dogradi <small>NIVO ${A.lvl}</small></h3><div></div><div class="eff">Sledeći nivo: <b>${AMBU.beds(A.lvl+1)}</b> ležaja, leči <b>${String(AMBU.speed(A.lvl+1)).replace('.',',')}×</b> brže${A.lvl+1===S.lvl?', može se primiti medicinska sestra':''}${A.lvl+1===L.lvl?', može se primiti lekarka':''}</div><div class="act">${costHtml(uc)}<button class="btn primary sm" ${canPay(uc)?'':'disabled'} data-cost='${JSON.stringify(uc)}' id="aUp">Dogradi</button></div></div>`}
+ if(A.lvl<AMBU.maxLvl){const uc=AMBU.up(A.lvl);h+=`<div class="bcard"><h3>Dogradi <small>NIVO ${A.lvl}</small></h3><div></div><div class="eff">Sledeći nivo: <b>${AMBU.beds(A.lvl+1)}</b> ležaja, leči <b>${String(AMBU.speed(A.lvl+1)).replace('.',',')}×</b> brže${A.lvl+1===S.lvl?', može se primiti medicinska sestra':''}${A.lvl+1===L.lvl?', može se primiti lekarka':''}</div><div class="act">${save.b.ognjiste<AMBU.upOg(A.lvl)?`<span class="req">Najpre dogradi ognjište do ${AMBU.upOg(A.lvl)}. nivoa</span>`:costHtml(uc)+`<button class="btn primary sm" ${canPay(uc)?'':'disabled'} data-cost='${JSON.stringify(uc)}' id="aUp">Dogradi</button>`}</div></div>`}
  body.innerHTML=h;
  body.querySelectorAll('[data-adm]').forEach(b=>b.onclick=()=>ambAdmit(b.dataset.adm));
  body.querySelectorAll('[data-hire]').forEach(b=>b.onclick=()=>ambHire(b.dataset.hire));
- const up=$('#aUp');if(up)up.onclick=()=>{const uc=AMBU.up(A.lvl);if(!canPay(uc))return;pay(uc);A.lvl++;persist();sfx.build&&sfx.build();fortFx=1.2;notify(`Ambulanta je sada ${A.lvl}. nivo.`);renderSheet();renderHub()}}
+ const up=$('#aUp');if(up)up.onclick=()=>{const uc=AMBU.up(A.lvl);if(!canPay(uc)||save.b.ognjiste<AMBU.upOg(A.lvl))return;pay(uc);A.lvl++;persist();sfx.build&&sfx.build();fortFx=1.2;notify(`Ambulanta je sada ${A.lvl}. nivo.`);renderSheet();renderHub()}}
 {const _rs=renderSheet;renderSheet=function(){if(sheetOpen==='amb'){const body=$('#shBody'),sc=body.scrollTop;sheetAmb(body);body.scrollTop=sc;try{btnDecor(body)}catch(e){}return}return _rs.apply(this,arguments)}}
 /* kartica u Utvrđenju */
 {const _rs=renderSheet;renderSheet=function(){const r=_rs.apply(this,arguments);try{if(sheetOpen==='utvrdjenje'){const body=$('#shBody');if(!body.querySelector('.ambL')){const A=save.amb,d=document.createElement('div');d.className='bcard ambL';const W=soldiers().filter(s=>isWounded(s.name)&&!ambIn(s.name)).length;

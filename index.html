@@ -4508,7 +4508,7 @@ function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
  vhit.push({id:'kamenolom',x:P.kamenolom[0]-50,y:P.kamenolom[1]-62,w:110,h:70,bx:P.kamenolom[0]-6,by:P.kamenolom[1]-68});
  vhit.push({id:'rudnik',x:P.rudnik[0]-64,y:P.rudnik[1]-62,w:128,h:84,bx:P.rudnik[0],by:P.rudnik[1]-68});
  // junaci
- const hs=[curHero(),...HEROES.filter(h=>heroOk(h)&&h.id!==curHero().id)].slice(0,6);const hpos=[[0,74],[-58,46],[58,44],[-104,56],[104,54],[-30,92]];
+ const hs=[curHero(),...HEROES.filter(h=>heroOk(h)&&h.id!==curHero().id)].slice(0,6);const hpos=[[-64,26],[64,24],[-116,30],[116,28],[-34,44],[34,44]];
  hs.forEach((h,i)=>{const[x,y]=hpos[i];vhit.push({id:'hero:'+h.id,x:cx+x-12,y:gy+y-50,w:24,h:52,hx:cx+x});items.push({y:gy+y,f:()=>{drawHero(ctx,cx+x,gy+y,1.5,h,x>0?-1:1,0,false,t+i,1);
   if(save.hero===h.id){ctx.fillStyle='rgba(240,181,74,.9)';poly(ctx,[cx+x-4,gy+y-70+Math.sin(t*4)*2,cx+x+4,gy+y-70+Math.sin(t*4)*2,cx+x,gy+y-63+Math.sin(t*4)*2]);ctx.fill()}}})});
  // vojska oko ognjišta

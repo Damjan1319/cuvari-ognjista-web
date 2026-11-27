@@ -3637,6 +3637,12 @@ setTimeout(()=>{const _er=endRun;endRun=function(win){const c=G&&G.cfg,w0=Object
 setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=save._healSeen||{};let ch=0;
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
+/* ---------- automatsko učitavanje nove verzije ---------- */
+const BUILD_ID='1795796528';
+function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
+ fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
+  if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
+setTimeout(updCheck,2500);document.addEventListener('visibilitychange',()=>{if(!document.hidden)updCheck()});setInterval(updCheck,10*60000);
 /* ---------- vrste bitaka po istoriji: opsada, dvoboj, juriš, zaseda; talasi; blagoslovi ---------- */
 const MODEX={13:'glasnik',35:'glasnik',32:'zbeg',36:'zbeg',40:'oslobodi',45:'oslobodi',20:'drzi',47:'drzi',1:'dvoboj',16:'juris',18:'dvoboj',22:'opsada',27:'opsada',28:'opsada',30:'zaseda',33:'dvoboj',34:'zaseda',37:'zaseda',46:'juris'};
 const CHAMP={1:'Tihomir, Nemanjin brat',18:'Sultanov telohranitelj',33:'Turski delija'};
@@ -4444,7 +4450,7 @@ function dayState(){const o='auto';let h;if(o===undefined||o==='auto'){const n=n
  let d;if(h>=21.5||h<5)d=1;else if(h<8)d=1-(h-5)/3;else if(h<18)d=0;else d=(h-18)/3.5;d=clamp(d,0,1);
  const w=(h>=5&&h<9)||(h>=17.5&&h<21.5)?Math.max(0,1-Math.abs(d-.45)*2.2):0;return{d,w,sun:clamp((h-5.5)/(20.5-5.5),0,1),h}}
 let vcam={x:900,y:600,z:1,zmin:.5},vsel=null,vhit=[],forest=null;
-function vfit(){const z=CW>=CH?Math.min(CW/1120,CH/740):CW/640;vcam.zmin=Math.max(.35,z*.8);vcam.z=clamp(z,vcam.zmin,2.4);vcam.x=VIL.cx;vcam.y=VIL.gy-30;vclamp()}
+function vfit(){const z=CW>=CH?Math.min(CW/1180,CH/760):CW/780;vcam.zmin=Math.max(.35,z*.8);vcam.z=clamp(z,vcam.zmin,2.4);vcam.x=VIL.cx;vcam.y=VIL.gy-10;vclamp()}
 function vclamp(){const vw=CW/vcam.z,vh=CH/vcam.z;vcam.x=vw>=VIL.W?VIL.W/2:clamp(vcam.x,vw/2,VIL.W-vw/2);vcam.y=vh>=VIL.H?VIL.H/2:clamp(vcam.y,vh/2,VIL.H-vh/2)}
 const s2w=(px,py)=>({x:(px/scale-CW/2)/vcam.z+vcam.x,y:(py/scale-CH/2)/vcam.z+vcam.y});
 function forestInit(){forest=[];const r2=mulberry32(91);const{cx,gy}=VIL;
@@ -4482,7 +4488,7 @@ function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
  g=ctx.createRadialGradient(cx,gy,0,cx,gy,170);g.addColorStop(0,'rgba(150,124,88,.95)');g.addColorStop(.75,'rgba(128,104,72,.8)');g.addColorStop(1,'rgba(128,104,72,0)');ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(cx,gy+6,180,66,0,0,7);ctx.fill();
  ctx.strokeStyle='rgba(140,116,84,.95)';ctx.lineWidth=24;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cx,gy+40);ctx.quadraticCurveTo(cx+18,gy+260,cx-10,VIL.H+40);ctx.stroke();
  ctx.strokeStyle='rgba(96,78,56,.6)';ctx.lineWidth=1;for(let i=0;i<30;i++){const yy=gy+150+i*16;ctx.beginPath();ctx.moveTo(cx-8+Math.sin(i)*4,yy);ctx.lineTo(cx-4+Math.sin(i)*4,yy+3);ctx.stroke()}
- const rx=345,ry=128;const items=[];
+ const rx=400,ry=134,gz=gy+16;const items=[];
  if(!forest)forestInit();for(const f of forest)items.push({y:f.y,f:()=>f.k==='pine'?pine(ctx,f.x,f.y,f.s,f.v):boulder(ctx,f.x,f.y,f.s)});
  const sel=id=>vsel===id;
  // ognjište sa stegom
@@ -4496,9 +4502,9 @@ function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
   const wv=Math.sin(t*3)*4;ctx.fillStyle=save.tribe.color;ctx.beginPath();ctx.moveTo(x,y-88);ctx.quadraticCurveTo(x+18,y-90+wv,x+34,y-86);ctx.lineTo(x+32,y-60+wv*.5);ctx.quadraticCurveTo(x+16,y-64-wv,x,y-62);ctx.fill();
   ctx.fillStyle='rgba(0,0,0,.2)';ctx.beginPath();ctx.moveTo(x+16,y-89+wv*.5);ctx.lineTo(x+34,y-86);ctx.lineTo(x+32,y-60+wv*.5);ctx.lineTo(x+16,y-64-wv*.5);ctx.fill()}});
  // dom odreda
- const ds=1.05+b.ognjiste*.05;items.push({y:gy-118,f:()=>house(ctx,cx-20,gy-118,ds,{w:92,h:30,d:38,big:true,shingle:b.ognjiste>=4,damaged:dmgd('ognjiste')},t)});
- vhit.push({id:'ognjiste',x:cx-20-50*ds,y:gy-118-90*ds,w:120*ds,h:92*ds,bx:cx+2,by:gy-118-96*ds});
- const hp=[[228,30],[-112,-80],[112,-84],[-270,-26],[275,-18],[150,74],[-160,78],[60,104],[-70,108]];
+ const ds=1.05+b.ognjiste*.05;items.push({y:gy-84,f:()=>house(ctx,cx-20,gy-84,ds,{w:92,h:30,d:38,big:true,shingle:b.ognjiste>=4,damaged:dmgd('ognjiste')},t)});
+ vhit.push({id:'ognjiste',x:cx-20-50*ds,y:gy-84-90*ds,w:120*ds,h:92*ds,bx:cx+2,by:gy-84-96*ds});
+ const hp=[[228,30],[-160,-66],[150,-70],[-270,-26],[275,-18],[150,74],[-160,78],[60,104],[-70,108]];
  for(let i=0;i<Math.min(hp.length,b.ognjiste);i++){const[x,y]=hp[i];items.push({y:gy+y,f:()=>house(ctx,cx+x,gy+y,.82,{w:46+(i%3)*6,h:24+(i%2)*4,lit:dk>.35&&(i+Math.floor(t*.15))%5!==0,shingle:i%4===3},t)})}
  const P={kovacnica:[cx-222,gy+20],kamenolom:[cx-190,gy-72],rudnik:[cx+200,gy-76]};
  items.push({y:gy+20,f:()=>b.kovacnica?forge(ctx,P.kovacnica[0],P.kovacnica[1],.92,b.kovacnica,t,dmgd('kovacnica')):plot(P.kovacnica[0],P.kovacnica[1],1)});
@@ -4517,19 +4523,19 @@ function drawFortress(t){const k=scale*dpr;const b=save.b;fortLights=[];vhit=[];
    drawEnemy(ctx,e,t);if(vcam.z>1.15||n<=4){ctx.font="700 9.5px 'EB Garamond',serif";ctx.textAlign='center';ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillText(sd.name,x+.7,y-56.3);ctx.fillStyle='#f6e7c4';ctx.fillText(sd.name,x,y-57)}}})})}
  // kule
  const ta=[-2.55,-.6,2.72,.4];
- for(let i=0;i<Math.min(4,b.kula);i++){const a=ta[i],x=cx+Math.cos(a)*rx,y=gy+Math.sin(a)*ry;items.push({y:y+1,f:()=>tower(ctx,x,y,.8,t,save.tribe.color,dmgd('kula')&&i===0)});vhit.push({id:'kula',x:x-20,y:y-112,w:44,h:116,bx:x,by:y-122})}
- if(!b.kula){const a=ta[0],x=cx+Math.cos(a)*rx+40,y=gy+Math.sin(a)*ry+30;items.push({y,f:()=>plot(x,y,1)});vhit.push({id:'kula',x:x-36,y:y-20,w:72,h:34,bx:x,by:y-24})}
+ for(let i=0;i<Math.min(4,b.kula);i++){const a=ta[i],x=cx+Math.cos(a)*rx,y=gz+Math.sin(a)*ry;items.push({y:y+1,f:()=>tower(ctx,x,y,.8,t,save.tribe.color,dmgd('kula')&&i===0)});vhit.push({id:'kula',x:x-20,y:y-112,w:44,h:116,bx:x,by:y-122})}
+ if(!b.kula){const a=ta[0],x=cx+Math.cos(a)*rx+40,y=gz+Math.sin(a)*ry+30;items.push({y,f:()=>plot(x,y,1)});vhit.push({id:'kula',x:x-36,y:y-20,w:72,h:34,bx:x,by:y-24})}
  // palisada / zid
  const Z=b.zidine,zd=dmgd('zidine'),n=120;
- for(let i=0;i<n;i++){const a=i/n*6.283;if(Math.abs(a-Math.PI/2)<.1)continue;if(Z===0&&i%3)continue;if(zd&&(i%17===3||i%17===4))continue;const x=cx+Math.cos(a)*rx,y=gy+Math.sin(a)*ry;
+ for(let i=0;i<n;i++){const a=i/n*6.283;if(Math.abs(a-Math.PI/2)<.1)continue;if(Z===0&&i%3)continue;if(zd&&(i%17===3||i%17===4))continue;const x=cx+Math.cos(a)*rx,y=gz+Math.sin(a)*ry;
   items.push({y,f:()=>{if(Z>=5){const h=30+Z*2;block(ctx,x,y,11.5,h,5,['#7a7484','#5a5462','#45404d']);if(i%2)block(ctx,x,y-h,11.5,6,5,['#8a8494','#5f5968','#4a4552'])}
-   else{const h=Z===0?15:22+Z*5;stake(ctx,x,y,h,Z===0?5:7.5,i);if(Z>0){const a2=(i+1)/n*6.283,x2=cx+Math.cos(a2)*rx,y2=gy+Math.sin(a2)*ry;limb(ctx,x,y-h*.62,x2,y2-h*.62,1.6,'#3a2716')}}}})}
+   else{const h=Z===0?15:22+Z*5;stake(ctx,x,y,h,Z===0?5:7.5,i);if(Z>0){const a2=(i+1)/n*6.283,x2=cx+Math.cos(a2)*rx,y2=gz+Math.sin(a2)*ry;limb(ctx,x,y-h*.62,x2,y2-h*.62,1.6,'#3a2716')}}}})}
  const gh=Z>=5?54+Z*2:40+Z*5;
- items.push({y:gy+ry+2,f:()=>{const x=cx,y=gy+ry;const h=gh;for(const d of[-24,24]){ctx.fillStyle=lg(ctx,x+d-5,0,x+d+5,0,Z>=5?['#8a8494','#4a4552']:['#8a6844','#3e2814']);ctx.fillRect(x+d-5,y-h,10,h)}
+ items.push({y:gz+ry+2,f:()=>{const x=cx,y=gz+ry;const h=gh;for(const d of[-24,24]){ctx.fillStyle=lg(ctx,x+d-5,0,x+d+5,0,Z>=5?['#8a8494','#4a4552']:['#8a6844','#3e2814']);ctx.fillRect(x+d-5,y-h,10,h)}
   ctx.fillStyle=Z>=5?'#5a5462':'#5a3e24';ctx.fillRect(x-30,y-h-6,60,8);ctx.fillStyle='rgba(255,255,255,.08)';ctx.fillRect(x-30,y-h-6,60,2);
   ctx.fillStyle='#4a3220';poly(ctx,[x-19,y-2,x-30,y+6,x-30,y-h*.7,x-19,y-h*.72]);ctx.fill();poly(ctx,[x+19,y-2,x+30,y+6,x+30,y-h*.7,x+19,y-h*.72]);ctx.fill();
   for(const d of[-24,24]){ctx.fillStyle='#ffb648';const fh=7+Math.sin(t*12+d)*2;poly(ctx,[x+d-2.5,y-h-6,x+d,y-h-6-fh,x+d+2.5,y-h-6]);ctx.fill();fortLights.push({x:x+d,y:y-h-8,r:60})}}});
- vhit.push({id:'zidine',x:cx-36,y:gy+ry-gh-12,w:72,h:gh+20,bx:cx,by:gy+ry-gh-22});
+ vhit.push({id:'zidine',x:cx-36,y:gz+ry-gh-12,w:72,h:gh+20,bx:cx,by:gz+ry-gh-22});
  // označena zgrada
  if(vsel&&!vsel.startsWith('hero:')){for(const h of vhit)if(h.id===vsel){const p=.5+.5*Math.sin(t*5);ctx.strokeStyle=`rgba(255,215,120,${.45+.4*p})`;ctx.lineWidth=2.5;ctx.setLineDash([8,6]);ctx.lineDashOffset=-t*20;ell(ctx,h.x+h.w/2,h.y+h.h,h.w*.62,h.w*.2);ctx.stroke();ctx.setLineDash([])}}
  items.sort((a,b2)=>a.y-b2.y).forEach(it=>it.f());

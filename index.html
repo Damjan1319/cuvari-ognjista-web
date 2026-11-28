@@ -1330,6 +1330,58 @@ function heroCatchUp(silent){save.heroSeen=save.heroSeen||{};const top=heroTop()
 /* deljenje iskustva: junaci koji nisu u boju uče pola */
 setTimeout(()=>{const _er=endRun;endRun=function(win){const id=G&&G.hero&&G.hero.id,h=id&&save.heroes[id],b=h?heroTotXp(h):0;const r=_er.apply(this,arguments);
  try{if(h){const gain=heroTotXp(h)-b;if(gain>0){let any=0;for(const H of HEROES){if(H.id===id||!heroOk(H))continue;const o=save.heroes[H.id];if(!o)continue;const l0=o.lvl;heroAddXp(o,Math.round(gain*XP_SHARE));if(o.lvl>l0)any=1}if(any)persist()}}}catch(e){}return r}},260);
+/* ---------- napadi na selo: vojska brani, najava, lična odbrana; raznovrsne bitke za izgubljena mesta ---------- */
+/* 1) vojska ulazi u odbranu */
+function armyDef(){if(typeof soldiers!=='function')return 0;const busy=typeof isBusy==='function'?isBusy:(typeof isWounded==='function'?isWounded:()=>false);let s=0;
+ for(const v of soldiers()){if(busy(v.name))continue;s+=(3+(v.lvl||1)*2.5)*(v.unit==='strel'?1.3:1)}return Math.round(s*(save.basta&&save.basta.fed>0?1.1:1))}
+{const _d=defense;defense=function(){return _d()+armyDef()}}
+/* 2) napadač se bira unapred, da može da se najavi */
+function raidPick(){ensureRivals();const L=save.rivals;if(!L||!L.length)return null;const rv=L[Math.floor(R()*L.length)];const mercy=save.raidLoss?.85:1;
+ save.raidNext={name:rv.name,fac:rv.fac,atk:Math.round(rv.def*(.85+R()*.3)*mercy)};return save.raidNext}
+function raidGap(){return (40+R()*50)*60000}
+simulateRaid=function(silent){const now=Date.now();const rv=save.raidNext||raidPick();save.raidNext=null;if(!rv)return;
+ if(save._lostBatch&&rv.atk<1e9)return;const atk=rv.atk,def=defense()*(.9+R()*.2);let txt;
+ if(def>=atk){const tr=8+Math.floor(R()*8);save.trophies+=tr;save.raidLoss=0;txt=`<b>${esc(rv.name)}</b> napade utvrđenje. Vojska i zidine su ga odbile. <b class="w">+${tr}</b> trofeja`;save.log.unshift({t:now,txt,w:true})}
+ else{const lost={};for(const k of RES){lost[k]=Math.floor(save.res[k]*.06);save.res[k]-=lost[k]}const tr=5+Math.floor(R()*6);save.trophies=Math.max(0,save.trophies-tr);const hit=damageBuildings(1);save.raidLoss=1;save._lostBatch=1;
+  txt=`<b>${esc(rv.name)}</b> provali u utvrđenje i odnese ${lost.zar} žara i ${lost.kamen} kamena${hit.length?`. Oštećeno: ${hit.join(', ')}`:''}. <b class="l">-${tr}</b> trofeja. Sledeći napad stiže kasnije.`;save.log.unshift({t:now,txt,w:false})}
+ save.log=save.log.slice(0,12);if(state==='hub'){notify(txt,!/odbile/.test(txt));sfx.alarm&&sfx.alarm();renderHub()}}
+/* raspored: ređi napadi, posle poraza duži predah, najviše jedan poraz dok nisi bio u igri */
+function raidTick(now,silent){if(!save.tribe)return;if(!save.nextRaid)save.nextRaid=now+raidGap();
+ if(now>=save.nextRaid&&!save.vdefOn){save._lostBatch=0;let n=0;while(now>=save.nextRaid&&n<3){simulateRaid(silent);save.nextRaid+=raidGap()+(save.raidLoss?30*60000:0);n++}if(now>=save.nextRaid)save.nextRaid=now+raidGap();save._lostBatch=0}
+ if(!save.raidNext&&save.nextRaid-now<12*60000)raidPick()}
+/* 3) najava u selu */
+{const st=document.createElement('style');st.textContent=`#raidBar{position:fixed;left:10px;right:10px;top:calc(118px + env(safe-area-inset-top));z-index:7;display:none;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:linear-gradient(180deg,rgba(60,16,10,.94),rgba(34,10,6,.94));box-shadow:0 0 0 1.5px #a33a20,0 6px 18px rgba(0,0,0,.5);color:#ffe7c8;max-width:520px;margin:0 auto}
+#raidBar.on{display:flex}#raidBar .ri{flex:none;width:34px;height:34px;border-radius:50%;background:#7a1a0c;display:grid;place-items:center;font-size:18px;box-shadow:0 0 0 2px #e8a040}
+#raidBar .rt{flex:1;min-width:0;font:600 13px/1.3 'Alegreya Sans',sans-serif}#raidBar .rt b{color:#fff}#raidBar .rt small{display:block;font-size:12px;color:#f0c8a0}
+#raidBar .rt i{font-style:normal;font-weight:800}#raidBar .rt .g{color:#9fe08a}#raidBar .rt .y{color:#ffd36a}#raidBar .rt .r{color:#ff8a6a}
+#raidBar button{flex:none;padding:8px 10px!important;font-size:12px!important;white-space:nowrap}
+body.playing #raidBar,body.sheet-open #raidBar{display:none!important}`;document.head.appendChild(st);
+ const d=document.createElement('div');d.id='raidBar';d.innerHTML='<div class="ri">⚔</div><div class="rt"></div><button class="btn primary sm" id="raidGo">Brani lično</button>';document.body.appendChild(d);
+ d.querySelector('#raidGo').onclick=()=>{if(typeof ac==='function')ac();vdefStart()}}
+function raidBarUpd(){const d=$('#raidBar');if(!d)return;{let y=0;for(const id of['resBox','hubG','tribeBox']){const e=document.getElementById(id);if(e&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'){const r=e.getBoundingClientRect();if(r.height>0&&r.bottom<innerHeight*.5)y=Math.max(y,r.bottom)}}if(y)d.style.top=(y+8)+'px'}const rv=save.raidNext,now=Date.now();const on=state==='hub'&&!sheetOpen&&rv&&save.nextRaid&&save.nextRaid-now<12*60000&&save.nextRaid>now&&!save.vdefOn;d.classList.toggle('on',!!on);if(!on)return;
+ const s=Math.max(0,Math.round((save.nextRaid-now)/1000)),mm=Math.floor(s/60),ss=String(s%60).padStart(2,'0'),def=defense(),r=def/rv.atk,est=r>=1.12?['g','jaka odbrana']:r>=.92?['y','izjednačeno']:['r','slaba odbrana'];
+ const t=`<b>${esc(rv.name)}</b> stiže za <b>${mm}:${ss}</b><small>Tvoja odbrana ${def} prema njihovih ~${rv.atk}: <i class="${est[0]}">${est[1]}</i>. Brani lično za dupli plen.</small>`;
+ const el=d.querySelector('.rt');const tt=(typeof cirOn!=='undefined'&&cirOn)?toCir(t):t;if(el.innerHTML!==tt)el.innerHTML=tt}
+setInterval(raidBarUpd,1000);
+/* lična odbrana sela: opsada kapije sela */
+function vdefCfg(){const rv=save.raidNext||raidPick();const top=topLevel();const c=campCfg(clamp(top-2,0,NL-1));const L=c.L;
+ Object.assign(c,{kind:'vdef',type:'opsada',mode:'opsada',need:0,boss:null,name:`Odbrana sela: ${rv.name}`,fac:rv.fac||c.fac,vdefRv:rv,
+  story:`${rv.name} je pred tvojim selom. Stani pred kapiju i odbij ih. Kad zagusti, priđi kazanu sa smolom. Ako odbraniš selo, plen je dupli.`,seed:hashStr('vdef'+Date.now())});
+ c.goal=Math.min(8,4+Math.floor(L/8));c.par=c.goal*38;c.bonus=0;c.shape='square';[c.W,c.H]=[1900,1500];c.walls=0;c.rocks=Math.round((c.rocks||8)*.5);
+ c.reward={zar:nice(c.reward.zar*1.6),kamen:nice(c.reward.kamen*1.6),gvozdje:nice((c.reward.gvozdje||0)*1.6),xp:c.reward.xp};return c}
+function vdefStart(){save.vdefOn=1;persist();intro(vdefCfg())}
+{const _er=endRun;endRun=function(win){const c=G&&G.cfg;const r=_er.apply(this,arguments);try{if(c&&c.kind==='vdef'){save.vdefOn=0;const rv=c.vdefRv;save.raidNext=null;save.nextRaid=Date.now()+raidGap();
+  if(win){const tr=18+Math.floor(R()*10);save.trophies+=tr;save.raidLoss=0;notify(`Lično si odbranio selo od <b>${esc(rv.name)}</b>. <b class="w">+${tr}</b> trofeja i dupli plen.`)}
+  else{save._lostBatch=0;save.raidNext={...rv,atk:1e9};simulateRaid(true);save.nextRaid=Date.now()+raidGap()+30*60000}persist()}}catch(e){}return r}}
+{const _g=goHub;goHub=function(){if(save.vdefOn)save.vdefOn=0;return _g.apply(this,arguments)}}
+/* 4) izgubljena mesta: ne samo "izdrži", nego prava bitka za povratak */
+{const _dc=defCfg;defCfg=function(i){const c=_dc(i);const L=c.L,place=LNAMES[i],foe=(LFOE[i]||[0,'Neprijatelji'])[1];const ms=['drzi','oslobodi','opsada','juris'];const m=ms[hashStr('lost'+i)%ms.length];
+ c.type=m;c.mode=m;c.need=0;
+ if(m==='drzi'){c.goal=100;c.par=75;c.spawnEvery=Math.max(2.4,c.spawnEvery*.7);c.name=`Povrati: ${place}`;c.story=`${foe} se utvrdio u mestu ${place}. Uđi u zlatni krug i drži ga dok ne pređe pod tvoj barjak.`}
+ if(m==='oslobodi'){c.goal=Math.min(6,3+Math.floor(L/15));c.par=60+c.goal*20;c.name=`Oslobodi: ${place}`;c.story=`${foe} je zauzeo ${place} i porobio ljude. Razbij kaveze i vrati ih kućama.`}
+ if(m==='opsada'){c.goal=Math.min(8,4+Math.floor(L/8));c.par=c.goal*38;c.bonus=0;c.shape='square';[c.W,c.H]=[1900,1500];c.walls=0;c.rocks=Math.round((c.rocks||8)*.5);c.name=`Odbrana: ${place}`;c.story=`${foe} juriša na kapiju mesta ${place}. Brani kapiju, a kad zagusti, prospi smolu iz kazana.`}
+ if(m==='juris'){c.goal=Math.min(7,3+Math.floor(L/10));c.par=70+c.goal*10;c.spawnEvery=Math.max(2,c.spawnEvery*.5);c.name=`Obori barjake: ${place}`;c.story=`${foe} je istakao barjake nad mestom ${place}. Obori barjaktare i mesto je opet tvoje.`}
+ return c}}
 
 /* ---------- ikonice ---------- */
 const GD=`<defs>
@@ -3676,7 +3728,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795864024';
+const BUILD_ID='1795867393';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
@@ -4390,6 +4442,7 @@ function endRun(win){const c=G.cfg,hid=G.hero.id;state='result';
  if(c.kind==='war'){btn(nb,'Tok rata','primary',()=>{goHub();openSheet('rat')})}
  else if(c.kind==='daily'){if(dlyState().tries<DTRIES)btn(nb,'Novi pokušaj','primary',()=>intro(dailyCfg()))}
  else if(c.kind==='def'){if(isLost(c.idx))btn(nb,'Pokušaj opet','primary',()=>start(defCfg(c.idx)));else btn(nb,'Pohod','primary',()=>{goHub();openSheet('pohod')})}
+ else if(c.kind==='vdef'){}
  else btn(nb,win?'Iznova':'Pokušaj opet',win?'':'primary',()=>start(c.kind==='raid'?raidCfg(c.rival):campCfg(c.idx)));
  if(win&&c.kind==='camp'&&c.idx<NL-1)btn(nb,'Sledeća bitka','primary',()=>intro(campCfg(c.idx+1)));
  show('sResult')}
@@ -4402,7 +4455,7 @@ function goHub(){if(typeof joyEl!=='undefined')joyEl.style.display='none';decora
 
 let pendingCfg=null;
 function intro(c){pendingCfg=c;closeSheet();const hs=save.heroes[curHero().id];
- $('#iKick').textContent=c.kind==='camp'?`${REGIONS[c.reg].name} · ${c.year||''} · ${c.real?'stvarna bitka':'mesto iz istorije'}`:c.kind==='raid'?`Napad na tvrđavu`:c.kind==='war'?`Rat protiv: ${save.war?save.war.enemy.name:""}`:c.kind==="def"?`${REGIONS[c.reg].name}, odbrana teritorije`:`Bitka dana, ${c.try+1}. pokušaj od ${DTRIES}`;
+ $('#iKick').textContent=c.kind==='camp'?`${REGIONS[c.reg].name} · ${c.year||''} · ${c.real?'stvarna bitka':'mesto iz istorije'}`:c.kind==='raid'?`Napad na tvrđavu`:c.kind==='war'?`Rat protiv: ${save.war?save.war.enemy.name:""}`:c.kind==="def"?`${REGIONS[c.reg].name}, odbrana teritorije`:c.kind==="vdef"?`Napad na tvoje selo`:`Bitka dana, ${c.try+1}. pokušaj od ${DTRIES}`;
  $('#iName').textContent=c.name;$('#goBtn').textContent=c.spect?'Gledaj bitku':'U boj';$('#goQuick').style.display=c.spect?'':'none';$('#iStory').textContent=c.story;{const nt=$('#iNote');const t=c.kind==='camp'||c.kind==='def'?LNOTE[c.idx]:'';const pt=t?PLACES[c.idx][2]:null;nt.innerHTML=t?`<small>${PTYPE[pt]}: ${Object.entries(PINC[pt]).map(([k,v])=>`${icon(k)} +${String(v).replace('.',',')}/m`).join(' ')}${c.kind==='camp'&&!owned(c.idx)?' kad ga osvojiš':''}</small>`:'';nt.style.display=t?'':'none'}$('#iGoal').textContent=goalTxt(c);
  const prev=c.kind==='camp'?(save.stars[c.idx]||0):0;
  $('#iCrit').innerHTML=critList(c).map((t,k)=>`<li class="${prev>k?'ok':''}"><em>${ST(prev>k)}</em>${t}</li>`).join('');
@@ -4484,7 +4537,7 @@ function notify(html,bad){const box=$('#notes');const n=document.createElement('
  while($('#notes').children.length>3)$('#notes').lastElementChild.remove()}
 function tickHub(silent){const now=Date.now();const dt=Math.min((now-save.lastTick)/60000,60*24);save.lastTick=now;
  for(const k of RES){const r=RATE[k](save.b);if(r>0&&save.res[k]<cap(k))save.res[k]=Math.min(cap(k),save.res[k]+r*dt)}
- if(save.tribe&&save.nextRaid&&now>=save.nextRaid){let n=0;while(now>=save.nextRaid&&n<3){simulateRaid(silent);save.nextRaid+=(12+R()*20)*60000;n++}if(now>=save.nextRaid)save.nextRaid=now+15*60000}
+ if(typeof raidTick==='function')raidTick(now,silent);else if(save.tribe&&save.nextRaid&&now>=save.nextRaid){let n=0;while(now>=save.nextRaid&&n<3){simulateRaid(silent);save.nextRaid+=(12+R()*20)*60000;n++}if(now>=save.nextRaid)save.nextRaid=now+15*60000}
  ensureRivals();ensureMembers();processWar(silent);darkTick(now,silent);persist()}
 function simulateRaid(silent){ensureRivals();const rv=save.rivals[Math.floor(R()*save.rivals.length)];if(!rv)return;
  const atk=rv.def*(.8+R()*.4),def=defense()*(.85+R()*.3);let txt;

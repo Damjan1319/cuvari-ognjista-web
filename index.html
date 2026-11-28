@@ -1361,12 +1361,12 @@ body.playing #raidBar,body.sheet-open #raidBar{display:none!important}`;document
 function raidBarUpd(){const d=$('#raidBar');if(!d)return;{let y=0;for(const id of['resBox','hubG','tribeBox']){const e=document.getElementById(id);if(e&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'){const r=e.getBoundingClientRect();if(r.height>0&&r.bottom<innerHeight*.5)y=Math.max(y,r.bottom)}}if(y)d.style.top=(y+8)+'px'}const rv=save.raidNext,now=Date.now();const on=state==='hub'&&!sheetOpen&&rv&&save.nextRaid&&save.nextRaid-now<12*60000&&save.nextRaid>now&&!save.vdefOn;d.classList.toggle('on',!!on);if(!on)return;
  const s=Math.max(0,Math.round((save.nextRaid-now)/1000)),mm=Math.floor(s/60),ss=String(s%60).padStart(2,'0'),def=defense(),r=def/rv.atk,est=r>=1.12?['g','jaka odbrana']:r>=.92?['y','izjednačeno']:['r','slaba odbrana'];
  const t=`<b>${esc(rv.name)}</b> stiže za <b>${mm}:${ss}</b><small>Tvoja odbrana ${def} prema njihovih ~${rv.atk}: <i class="${est[0]}">${est[1]}</i>. Brani lično za dupli plen.</small>`;
- const el=d.querySelector('.rt');const tt=(typeof cirOn!=='undefined'&&cirOn)?toCir(t):t;if(el.innerHTML!==tt)el.innerHTML=tt}
+ const el=d.querySelector('.rt');const tt=(typeof cirOn!=='undefined'&&cirOn)?t.split(/(<[^>]*>)/).map((q,i)=>i%2?q:toCir(q)).join(''):t;if(el._k!==tt){el._k=tt;el.innerHTML=tt}}
 setInterval(raidBarUpd,1000);
 /* lična odbrana sela: opsada kapije sela */
 function vdefCfg(){const rv=save.raidNext||raidPick();const top=topLevel();const c=campCfg(clamp(top-2,0,NL-1));const L=c.L;
  Object.assign(c,{kind:'vdef',type:'opsada',mode:'opsada',need:0,boss:null,name:`Odbrana sela: ${rv.name}`,fac:rv.fac||c.fac,vdefRv:rv,
-  story:`${rv.name} je pred tvojim selom. Stani pred kapiju i odbij ih. Kad zagusti, priđi kazanu sa smolom. Ako odbraniš selo, plen je dupli.`,seed:hashStr('vdef'+Date.now())});
+  story:`${rv.name} je pred tvojim selom. Iza tebe su tvoje kuće i ognjište. Stani pred kapiju sela i odbij ih. Kad zagusti, priđi kazanu sa smolom. Ako odbraniš selo, plen je dupli.`,W:Math.max(c.W||0,1900),H:Math.max(c.H||0,1650),seed:hashStr('vdef'+Date.now())});
  c.goal=Math.min(8,4+Math.floor(L/8));c.par=c.goal*38;c.bonus=0;c.shape='square';[c.W,c.H]=[1900,1500];c.walls=0;c.rocks=Math.round((c.rocks||8)*.5);
  c.reward={zar:nice(c.reward.zar*1.6),kamen:nice(c.reward.kamen*1.6),gvozdje:nice((c.reward.gvozdje||0)*1.6),xp:c.reward.xp};return c}
 function vdefStart(){save.vdefOn=1;persist();intro(vdefCfg())}
@@ -2609,7 +2609,7 @@ function blocked(x,y){if(G.obst.some(r=>Math.hypot(r.x-x,r.y-y)<r.r*.8))return t
 function burst(x,y,c,n,sp=160,s=2.5,life=.7){if(G&&G.parts.length>(LOWFX?110:380))return;if(LOWFX)n=Math.ceil(n*.5);for(let i=0;i<n;i++){const a=R()*6.283,v=sp*(.3+R()*.7);G.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:life*(.6+R()*.6),max:life,c,s:s*(.6+R()*.8)})}}
 function floatTxt(x,y,txt,col,big){if(typeof txt==='number'){const m=G.floats.find(f=>typeof f.txt==='number'&&f.col===col&&f.life>.45&&Math.abs(f.x-x)<34&&Math.abs(f.y-y)<30);if(m){m.txt+=txt;m.life=Math.max(m.life,.8);return}}
  if(G.floats.length>14)G.floats.splice(0,G.floats.length-14);G.floats.push({x:x+(R()-.5)*10,y,txt,col,life:.9,big})}
-function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');if(G)G.toastT=2.2}
+function toast(t){const el=$('#toast');el.textContent=t;try{let y=0;for(const q of document.querySelectorAll('.mplate,#bossbar.on,#raidBar.on')){const r=q.getBoundingClientRect();if(r.height&&getComputedStyle(q).display!=='none'&&r.top<innerHeight*.45)y=Math.max(y,r.bottom)}if(y)el.style.setProperty('top',(y+10)+'px','important');else el.style.removeProperty('top')}catch(_){}el.classList.add('on');if(G)G.toastT=2.2}
 
 function dmgEnemy(e,d,kx=0,ky=0){if(e.hp<=0)return;e.hp-=d;e.hitT=.12;e.kx+=kx;e.ky+=ky;floatTxt(e.x,enemyTop(e)+4,Math.round(d),'#ffd9a0');sfx.ehit();
  if(e.home)e.aggro=4;
@@ -2872,7 +2872,7 @@ function renderGame(t){const k=scale*dpr,p=G.p;
  // obrisi stena u tami
  ctx.strokeStyle='rgba(205,195,225,.13)';ctx.lineWidth=1.3;
  for(const o of G.obst){if(!inView(o.x,o.y))continue;if(o.kind==='rock')shapePath(ctx,o,0,0);else{ctx.beginPath();ctx.arc(o.x,o.y,o.r,0,7)}ctx.stroke()}
- for(const w of G.walls){if(w.kind==='stake'||!inView(w.x+w.w/2,w.y+w.h/2,Math.max(w.w,w.h)))continue;ctx.strokeRect(w.x,w.y,w.w,w.h)}
+ for(const w of G.walls){if(w.kind==='stake'||w.kind==='vgate'||w.kind==='vdec'||!inView(w.x+w.w/2,w.y+w.h/2,Math.max(w.w,w.h)))continue;ctx.strokeRect(w.x,w.y,w.w,w.h)}
  ctx.globalCompositeOperation='lighter';
  let g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,G.light);g.addColorStop(0,'rgba(255,160,60,.15)');g.addColorStop(1,'rgba(255,160,60,0)');ctx.fillStyle=g;ctx.fillRect(p.x-G.light,p.y-G.light,G.light*2,G.light*2);
  for(const b of G.beacons){if(!inView(b.x,b.y,160))continue;if(b.lit){g=ctx.createRadialGradient(b.x,b.y,0,b.x,b.y,150);g.addColorStop(0,'rgba(255,170,70,.18)');g.addColorStop(1,'rgba(255,170,70,0)');ctx.fillStyle=g;ctx.fillRect(b.x-150,b.y-150,300,300);
@@ -3728,7 +3728,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795867393';
+const BUILD_ID='1795872788';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
@@ -4035,7 +4035,7 @@ setTimeout(()=>{const _er=endRun;endRun=function(win){const r=_er.apply(this,arg
 /* ---------- vrste bitaka po istoriji: opsada, dvoboj, juriš, zaseda; talasi; blagoslovi ---------- */
 const MODEX={13:'glasnik',35:'glasnik',32:'zbeg',36:'zbeg',40:'oslobodi',45:'oslobodi',20:'drzi',47:'drzi',1:'dvoboj',16:'juris',18:'dvoboj',22:'opsada',27:'opsada',28:'opsada',30:'zaseda',33:'dvoboj',34:'zaseda',37:'zaseda',46:'juris'};
 const CHAMP={1:'Tihomir, Nemanjin brat',18:'Sultanov telohranitelj',33:'Turski delija'};
-const MODE_TXT={opsada:'Opsada. Braniš grad: neprijatelji nadiru u talasima i jurišaju na kapiju. Stani pred kapiju, a kad zagusti, priđi kazanu sa smolom.',
+const MODE_TXT={vdef:'Odbrana sela. Iza kapije su tvoje kuće i ognjište. Neprijatelj juriša na kapiju sela: stani pred nju i ne puštaj ih unutra. Kad zagusti, priđi kazanu sa smolom.',opsada:'Opsada. Braniš grad: neprijatelji nadiru u talasima i jurišaju na kapiju. Stani pred kapiju, a kad zagusti, priđi kazanu sa smolom.',
  dvoboj:'Dvoboj. Jedan na jedan, kao u pesmi. Kad protivnik zamahne, pojavi se crveni luk: skloni se, pa udri dok je iscrpljen.',
  juris:'Juriš konjice. Junak je brz kao vihor i gazi sve pred sobom. Obori njihove barjaktare pre nego što se vojska pribere.',
  zaseda:'Zaseda. Karavan sa plenom prolazi drumom pod stražom. Razbij kola pre nego što umaknu sa druge strane mape.',
@@ -4187,6 +4187,8 @@ const BL_RAR=[{n:'',c:'#d6a955',w:6},{n:'RETKO',c:'#7aa6d8',w:3},{n:'ZLATNO',c:'
 #bless .bc svg{width:46px;height:46px;padding:7px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#4a2a18,#1e100a);box-shadow:0 0 0 2px var(--rc,#d6a955)}
 #bless .bc em{position:absolute;top:-9px;left:50%;transform:translateX(-50%);font:700 9.5px Cinzel,serif;letter-spacing:.08em;font-style:normal;color:#1e100a;background:var(--rc);padding:2px 8px;border-radius:8px;white-space:nowrap}
 #bless.arm .bc{opacity:.55;filter:saturate(.6);pointer-events:none}#bless .bc{transition:opacity .3s,filter .3s,transform .12s}#bless .hint{font:600 12px 'Alegreya Sans',sans-serif;color:#c9b08a;letter-spacing:.04em}#bless.arm .hint:after{content:' …'}
+#bless{justify-content:safe center;overflow-y:auto;padding:14px 0;box-sizing:border-box}#bless>*{flex-shrink:0}#bless .hint{position:static!important;transform:none!important;display:block!important;width:auto!important;margin-top:6px;text-align:center;padding:0 16px;opacity:1}
+@media (max-height:520px){#bless{gap:8px}#bless .bc{padding:9px 7px}#bless .bc svg{width:36px;height:36px;padding:5px}#bless .bc b{margin:5px 0 3px;font-size:12.5px}#bless .bc span{font-size:12.5px}#bless .sub{font-size:13.5px}}
 @keyframes blIn{from{opacity:0}to{opacity:1}}`;document.head.appendChild(st);const d=document.createElement('div');d.id='bless';document.body.appendChild(d)}
 function blessPick(){const ok=b=>!(G.blTaken||[]).includes(b.k);const pk=a=>a.length?a.splice(Math.floor(R()*a.length),1)[0]:null;
  const c0=BLESS.filter(b=>b.r===0&&ok(b)),c1=BLESS.filter(b=>b.r===1&&ok(b)),c2=BLESS.filter(b=>b.r===2&&ok(b));
@@ -4325,8 +4327,8 @@ function buzz(p){try{if(save.vib===0||!navigator.vibrate)return;navigator.vibrat
 {const _hp=hurtPlayer;hurtPlayer=function(amt,src){const h0=G?G.hp:0;const r=_hp.apply(this,arguments);if(G&&G.hp<h0)buzz(G.hp<G.maxhp*.3?[40,30,40]:25);return r}}
 {const _kp=typeof kazanPour==='function'?kazanPour:null;if(_kp)kazanPour=function(k){buzz(70);return _kp.apply(this,arguments)}}
 setTimeout(()=>{const sb=document.getElementById('sndBtn');if(sb&&!document.getElementById('vibBtn')&&navigator.vibrate){const b=document.createElement('button');b.id='vibBtn';b.className=sb.className;const sy=()=>b.textContent=save.vib===0?'Treperenje: isključeno':'Treperenje: uključeno';sy();b.onclick=()=>{save.vib=save.vib===0?1:0;persist();sy();buzz(30)};(document.getElementById('musBtn')||sb).after(b)}},50);
-const MODE_NAME={opsada:'Opsada',dvoboj:'Dvoboj',juris:'Juriš konjice',zaseda:'Zaseda',glasnik:'Glasnik',zbeg:'Zbeg',oslobodi:'Oslobodi zarobljene',drzi:'Zauzmi i drži',nalet:'Nalet'};
-{const _s=start;start=function(c){const r=_s.apply(this,arguments);try{const m=c&&c.type;if(G&&MODE_NAME[m]&&!(save.seenMode&&save.seenMode[m])&&typeof tutShow==='function'){save.seenMode=save.seenMode||{};save.seenMode[m]=1;persist();
+const MODE_NAME={vdef:'Odbrana sela',opsada:'Opsada',dvoboj:'Dvoboj',juris:'Juriš konjice',zaseda:'Zaseda',glasnik:'Glasnik',zbeg:'Zbeg',oslobodi:'Oslobodi zarobljene',drzi:'Zauzmi i drži',nalet:'Nalet'};
+{const _s=start;start=function(c){const r=_s.apply(this,arguments);try{const m=c&&(c.kind==='vdef'?'vdef':c.type);if(G&&MODE_NAME[m]&&!(save.seenMode&&save.seenMode[m])&&typeof tutShow==='function'){save.seenMode=save.seenMode||{};save.seenMode[m]=1;persist();
  setTimeout(()=>{if(state!=='play')return;tutShow('!',`<b style="display:inline;font-size:13px">${MODE_NAME[m]}.</b> ${(MODE_TXT[m]||'').replace(/^[^.]*\.\s*/,'')}`);{const tb=document.querySelector('#tutBox .tx>b');if(tb)tb.textContent='NOVA VRSTA BITKE'};setTimeout(()=>{if(typeof tutHide==='function')tutHide()},9000)},900)}}catch(e){}return r}}
 
 /* --- ćirilica kao izbor --- */
@@ -4912,6 +4914,64 @@ function updateBpop(){const el=$('#bpop');if(!vsel||state!=='hub'||sheetOpen){el
  else if(!capOk)act.insertAdjacentHTML('beforeend','<span class="req">Najpre dogradi ognjište</span>');
  else{act.insertAdjacentHTML('beforeend',costHtml(c));const b=document.createElement('button');b.className='btn sm primary';b.disabled=!canPay(c);b.textContent=l?'Dogradi':'Sagradi';b.onclick=()=>upgradeBuilding(vsel);act.appendChild(b)}
  act.prepend(info);el.classList.add('on')}
+// Odbrana sela: tvoje selo na mapi bitke (palisada, kapija, kuće, ognjište)
+{const _s=start;start=function(c){const r=_s.apply(this,arguments);try{if(G&&c&&c.kind==='vdef'&&G.castle)vselSetup()}catch(e){console.warn(e)}return r}}
+function vselSetup(){const K=G.castle,b=save.b||{};const rx=330,ry=200;
+ K.y=Math.min(K.y,G.H-ry*2-150);const V={x:K.x,y:K.y+ry,rx,ry};G.vsel=V;K.vill=1;G.bossLabel='Kapija sela';const bn=$('#bossName');if(bn)bn.textContent=G.bossLabel;
+ const inR=(x,y,m)=>((x-V.x)/(rx+m))**2+((y-V.y)/(ry+m))**2<1;
+ G.obst=G.obst.filter(o=>!inR(o.x,o.y,90+o.r)&&Math.hypot(o.x-K.x,o.y-K.y)>220);
+ G.walls=G.walls.filter(w=>!inR(w.x+w.w/2,w.y+w.h/2,110)&&Math.hypot(w.x+w.w/2-K.x,w.y+w.h/2-K.y)>240);
+ G.structs=(G.structs||[]).filter(s=>!inR(s.x,s.y,80));
+ // palisada sa otvorom za kapiju (sever)
+ const n=44;for(let i=0;i<n;i++){const a=i/n*6.283;const d=Math.abs(((a+Math.PI/2)%6.283+6.283)%6.283);if(Math.min(d,6.283-d)<.26)continue;
+  const x=V.x+Math.cos(a)*rx,y=V.y+Math.sin(a)*ry;G.walls.push({x:x-15,y:y-15,w:30,h:30,kind:'stake',seed:i,vs:1})}
+ // kapija zatvara otvor
+ G.walls.push({x:K.x-84,y:K.y-14,w:168,h:28,kind:'vgate'});
+ // kuće i objekti u selu (dekor + sudar)
+ const hn=Math.max(2,Math.min(6,b.ognjiste||2));const H=[[-150,40],[150,40],[-235,-20],[235,-20],[-90,120],[90,120]];
+ V.items=[{k:'hall',x:V.x,y:V.y-20,w:150,s:1.1+(b.ognjiste||1)*.05}];for(let i=0;i<hn;i++)V.items.push({k:'house',x:V.x+H[i][0],y:V.y+H[i][1],w:70,i});
+ if(b.kovacnica)V.items.push({k:'forge',x:V.x-215,y:V.y+95,w:110,l:b.kovacnica});
+ V.fire={x:V.x,y:V.y+62};
+ for(const it of V.items){const hw=it.w*.42;G.walls.push({x:it.x-hw,y:it.y-34,w:hw*2,h:40,kind:'vdec'})}
+ G.walls.push({x:V.fire.x-20,y:V.fire.y-12,w:40,h:22,kind:'vdec'});
+ // kazani pored kapije, junak ispred kapije
+ G.kazani=[{x:K.x-175,y:K.y-50,cd:0,fill:0},{x:K.x+175,y:K.y-50,cd:0,fill:0}];
+ G.p.x=K.x;G.p.y=K.y-150;for(const a of G.allies||[]){a.x=K.x+(R()-.5)*260;a.y=K.y-110-R()*80}
+ if(typeof makeFloor==='function')makeFloor()}
+// zid sa kind vgate/vdec se ne crta u podu (crtamo ga sami)
+{const _w=drawWall;drawWall=function(f,w){if(w.kind==='vgate'||w.kind==='vdec')return;return _w.apply(this,arguments)}}
+{const _m=modeDs;modeDs=function(ds,t){const V=G&&G.vsel,K=G&&G.castle;if(!V||!K)return _m.apply(this,arguments);
+ const dmg=1-K.hp/K.max;
+ for(const it of V.items){if(typeof inView==='function'&&!inView(it.x,it.y,200))continue;ds.push({y:it.y,f:()=>{const g=ctx;g.fillStyle='rgba(0,0,0,.3)';ell(g,it.x,it.y+2,it.w*.5,it.w*.14);g.fill();
+  if(it.k==='hall')house(g,it.x,it.y,it.s,{w:92,h:30,d:38,big:true,shingle:(save.b.ognjiste||0)>=4,damaged:dmg>.7},t);
+  else if(it.k==='forge'&&typeof forge==='function')forge(g,it.x,it.y,1,it.l,t,false);
+  else house(g,it.x,it.y,.95,{w:46+(it.i%3)*6,h:24+(it.i%2)*4,lit:true,shingle:it.i%4===3,damaged:dmg>.55&&it.i%2===0},t)}})}
+ ds.push({y:V.fire.y,f:()=>vselFire(ctx,V.fire.x,V.fire.y,t)});
+ ds.push({y:K.y+14,f:()=>vselGate(ctx,K,t,dmg)})}}
+function vselFire(g,x,y,t){g.save();g.fillStyle='rgba(255,140,50,.16)';ell(g,x,y,70,24);g.fill();
+ for(let i=0;i<10;i++){const a=i/10*6.283;g.fillStyle='#57515e';ell(g,x+Math.cos(a)*20,y+Math.sin(a)*7,5.5,3.6);g.fill()}
+ for(let i=0;i<3;i++){const fh=26+Math.sin(t*11+i*2)*6,w=13-i*4;g.fillStyle=['rgba(255,100,35,.92)','rgba(255,185,75,.92)','rgba(255,245,200,.96)'][i];
+  g.beginPath();g.moveTo(x-w,y);g.quadraticCurveTo(x-w*.6,y-fh*.6,x+Math.sin(t*9+i)*3,y-fh);g.quadraticCurveTo(x+w*.6,y-fh*.6,x+w,y);g.fill()}g.restore()}
+function vselGate(g,K,t,dmg){const x=K.x,y=K.y;g.save();if(K.hitT>0&&!LOWFX)g.filter='brightness(1.35)';
+ g.fillStyle='rgba(0,0,0,.35)';ell(g,x,y+8,120,20);g.fill();
+ // dve kule
+ for(const s of[-1,1]){const tx=x+s*74;vselTower(g,tx,y,s)}
+ // vrata od dasaka
+ const gw=118,gh=60;g.fillStyle='#3a2414';g.fillRect(x-gw/2-4,y-gh-6,gw+8,gh+8);
+ for(let i=0;i<10;i++){g.fillStyle=i%2?'#7a5232':'#6a4628';g.fillRect(x-gw/2+i*gw/10,y-gh,gw/10-1,gh)}
+ g.fillStyle='#2a1a0e';g.fillRect(x-gw/2,y-gh*.72,gw,7);g.fillRect(x-gw/2,y-gh*.3,gw,7);
+ g.fillStyle='#9a9088';for(const yy of[y-gh*.72+3.5,y-gh*.3+3.5])for(const xx of[x-gw/2+8,x+gw/2-8]){g.beginPath();g.arc(xx,yy,2.4,0,7);g.fill()}
+ // oštećenje: pukotine i dim
+ if(dmg>.35){g.strokeStyle='#140a04';g.lineWidth=2;g.beginPath();g.moveTo(x-20,y-gh);g.lineTo(x-6,y-gh*.55);g.lineTo(x-24,y-gh*.2);g.stroke()}
+ if(dmg>.6&&!LOWFX){for(let i=0;i<3;i++){const p=(t*.5+i/3)%1;g.fillStyle=`rgba(60,50,45,${.45*(1-p)})`;g.beginPath();g.arc(x-30+i*30+Math.sin(t+i)*8,y-gh-p*90,10+p*18,0,7);g.fill()}}
+ g.restore()}
+function vselTower(g,x,y,s){// drvena osmatračnica
+ g.fillStyle='rgba(0,0,0,.3)';ell(g,x,y+4,26,8);g.fill();
+ for(const dx of[-14,14]){g.fillStyle=lg(g,x+dx-4,0,x+dx+4,0,['#8a6844','#5b3d22']);g.fillRect(x+dx-4,y-96,8,98)}
+ g.strokeStyle='#4a3020';g.lineWidth=3;g.beginPath();g.moveTo(x-14,y-10);g.lineTo(x+14,y-60);g.moveTo(x+14,y-10);g.lineTo(x-14,y-60);g.stroke();
+ g.fillStyle='#6b4a2c';g.fillRect(x-22,y-104,44,10);g.fillStyle='#7a5434';for(let i=0;i<5;i++)g.fillRect(x-20+i*8.5,y-124,6,20);
+ g.fillStyle='#5e2a1a';g.beginPath();g.moveTo(x-26,y-122);g.lineTo(x,y-146);g.lineTo(x+26,y-122);g.fill();
+ if(s<0){g.strokeStyle='#3a2716';g.lineWidth=2;g.beginPath();g.moveTo(x,y-146);g.lineTo(x,y-176);g.stroke();g.fillStyle=(save.tribe&&save.tribe.color)||'#b8323a';const w=Math.sin(Date.now()/300)*3;g.beginPath();g.moveTo(x,y-176);g.quadraticCurveTo(x+12,y-178+w,x+24,y-174);g.lineTo(x+22,y-160+w*.5);g.quadraticCurveTo(x+11,y-163-w,x,y-161);g.fill()}}
 
 const VIL={W:1800,H:1180,cx:900,gy:640};
 const mixC=(a,b,k)=>a.map((v,i)=>Math.round(v+(b[i]-v)*k));const rgb=c=>`rgb(${c})`;

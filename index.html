@@ -2542,7 +2542,8 @@ function collide(o){let hit=false;
  return hit}
 function blocked(x,y){if(G.obst.some(r=>Math.hypot(r.x-x,r.y-y)<r.r*.8))return true;return G.walls.some(w=>x>w.x&&x<w.x+w.w&&y>w.y&&y<w.y+w.h)}
 function burst(x,y,c,n,sp=160,s=2.5,life=.7){if(G&&G.parts.length>(LOWFX?110:380))return;if(LOWFX)n=Math.ceil(n*.5);for(let i=0;i<n;i++){const a=R()*6.283,v=sp*(.3+R()*.7);G.parts.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:life*(.6+R()*.6),max:life,c,s:s*(.6+R()*.8)})}}
-function floatTxt(x,y,txt,col,big){G.floats.push({x:x+(R()-.5)*10,y,txt,col,life:.9,big})}
+function floatTxt(x,y,txt,col,big){if(typeof txt==='number'){const m=G.floats.find(f=>typeof f.txt==='number'&&f.col===col&&f.life>.45&&Math.abs(f.x-x)<34&&Math.abs(f.y-y)<30);if(m){m.txt+=txt;m.life=Math.max(m.life,.8);return}}
+ if(G.floats.length>14)G.floats.splice(0,G.floats.length-14);G.floats.push({x:x+(R()-.5)*10,y,txt,col,life:.9,big})}
 function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');if(G)G.toastT=2.2}
 
 function dmgEnemy(e,d,kx=0,ky=0){if(e.hp<=0)return;e.hp-=d;e.hitT=.12;e.kx+=kx;e.ky+=ky;floatTxt(e.x,enemyTop(e)+4,Math.round(d),'#ffd9a0');sfx.ehit();
@@ -2848,11 +2849,11 @@ function renderGame(t){const k=scale*dpr,p=G.p;
  hud()}
 
 function worldText(inView){
- if(!G.spect){const p=G.p,r=Math.max(0,G.hp/G.maxhp),w=46,y=p.y-((typeof H3D!=='undefined'&&H3D[G.hero.id]&&H3D[G.hero.id].ok&&save.h3d!==0)?64:58),x=p.x;ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(x-w/2-1.5,y-1.5,w+3,8);
+ if(!G.spect&&G.hp<G.maxhp*.999){const p=G.p,r=Math.max(0,G.hp/G.maxhp),w=46,y=p.y-((typeof H3D!=='undefined'&&H3D[G.hero.id]&&H3D[G.hero.id].ok&&save.h3d!==0)?64:58),x=p.x;ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(x-w/2-1.5,y-1.5,w+3,8);
   ctx.fillStyle=r>.5?'#6fcf4a':r>.25?'#e8c040':'#e5483a';ctx.fillRect(x-w/2,y,w*r,5);ctx.fillStyle='rgba(255,255,255,.25)';ctx.fillRect(x-w/2,y,w*r,1.5);
   ctx.strokeStyle='#d9b26a';ctx.lineWidth=.8;ctx.strokeRect(x-w/2-1.5,y-1.5,w+3,8);
-  ctx.textAlign='center';ctx.font="800 8px 'EB Garamond',serif";ctx.fillStyle='rgba(0,0,0,.8)';ctx.fillText(Math.max(0,Math.ceil(G.hp)),x+.5,y-2.5);ctx.fillStyle='#fff3d6';ctx.fillText(Math.max(0,Math.ceil(G.hp)),x,y-3)}
- ctx.textAlign='center';for(const a of G.allies){if(!inView(a.x,a.y))continue;const y=a.y-(save.h3d!==0?50:42),w=26;ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(a.x-w/2-1,y-1,w+2,5);ctx.fillStyle='#7fbf6a';ctx.fillRect(a.x-w/2,y,w*Math.max(0,a.hp/a.max),3);
+  ctx.textAlign='center'}
+ ctx.textAlign='center';for(const a of G.allies){if(!inView(a.x,a.y))continue;if(a.hp>=a.max*.999||Math.hypot(a.x-G.p.x,a.y-G.p.y)<34)continue;const y=a.y-(save.h3d!==0?50:42),w=22;ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(a.x-w/2-1,y-1,w+2,5);ctx.fillStyle='#7fbf6a';ctx.fillRect(a.x-w/2,y,w*Math.max(0,a.hp/a.max),3);
   if(G.allies.length<=4){ctx.font="700 9px 'EB Garamond',serif";ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillText(a.name,a.x+.6,y-3.4);ctx.fillStyle='#e8f4d8';ctx.fillText(a.name,a.x,y-4)}}
  ctx.textAlign='center';ctx.lineJoin='round';for(const f of G.floats){const pop=1+Math.max(0,f.life-.72)*2.6;ctx.globalAlpha=Math.min(1,f.life*2);ctx.font=`800 ${Math.round((f.big?13:10.5)*pop)}px Cinzel,serif`;ctx.lineWidth=3;ctx.strokeStyle='rgba(30,10,4,.85)';ctx.strokeText(f.txt,f.x,f.y);ctx.fillStyle=f.col;ctx.fillText(f.txt,f.x,f.y)}ctx.globalAlpha=1;if(typeof fxVig==='function')fxVig();}
 function hud(){const c=G.cfg;
@@ -3662,7 +3663,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795855790';
+const BUILD_ID='1795858198';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
@@ -4290,8 +4291,8 @@ function nCampPos(){const p=G.p;for(let i=0;i<40;i++){const a=R()*6.283,d=420+R(
 function nNewCamp(){const q=nCampPos();G.zone={x:q.x,y:q.y,r:78,p:0,camp:1};G.campT=26}
 {const _s=start;start=function(c){const r=_s.apply(this,arguments);if(G&&c&&c.type==='nalet'&&N2ON()){G.n2=1;G.bag=0;G.bank=0;G.drops=[];G.picks=[];G.pickT=8;G.evT=15;G.evK=0;G.volleys=[];G.besT=0;G.stitT=0;G.extraT=0;nNewCamp();
  const el=$('#nalet');if(el&&!el.querySelector('.bg')){el.querySelector('.sc').insertAdjacentHTML('afterend','<span class="bg" title="Plen"></span>')}
- setTimeout(()=>{if(G&&state==='play'){toast('Plen nosi u logor (zlatni krug) da ga sačuvaš!');G.toastT=3}},1200)}return r}}
-{const st=document.createElement('style');st.textContent=`#nalet .bg{font-size:13px;color:#ffe7a0;background:#3a2414;border:1px solid #8a6430;border-radius:3px;padding:1px 7px;white-space:nowrap}#nalet .bg.full{background:#2f6a22;animation:bgP .8s ease-in-out infinite}@keyframes bgP{50%{transform:scale(1.12)}}#nalet .sc:before{content:'✓ ';font-size:12px;opacity:.8}`;document.head.appendChild(st)}
+ const g0=G;setTimeout(()=>{if(G&&G===g0&&state==='play'){toast('Plen nosi u logor (zlatni krug) da ga sačuvaš!');G.toastT=3}},1200)}document.body.classList.toggle('n2',!!(G&&G.n2));return r}}
+{const st=document.createElement('style');st.textContent=`#nalet .bg{font-size:13px;color:#ffe7a0;background:#3a2414;border:1px solid #8a6430;border-radius:3px;padding:1px 7px;white-space:nowrap}#nalet .bg.full{background:#2f6a22;animation:bgP .8s ease-in-out infinite}@keyframes bgP{50%{transform:scale(1.12)}}body.n2 #nalet .sc:before{content:'✓ ';font-size:12px;opacity:.8}body:not(.n2) #nalet .bg{display:none!important}`;document.head.appendChild(st)}
 /* poeni od obaranja idu u torbu */
 {const _dm=dmgEnemy;dmgEnemy=function(e,d,kx,ky){if(!G||!G.n2)return _dm.apply(this,arguments);const s0=G.score||0;const dd=G.besT>0?d*2:d;const r=_dm.call(this,e,dd,kx,ky);const gain=(G.score||0)-s0;if(gain>0){G.score=s0;G.bag+=gain}return r}}
 {const _h=hurtPlayer;hurtPlayer=function(amt,src){const before=G?G.hp:0;const r=_h.apply(this,arguments);try{if(G&&G.n2&&G.hp<before&&G.bag>0&&G.stitT<=0){const lost=Math.round(G.bag*.25);G.bag-=lost;const a=R()*6.283;G.drops.push({x:clamp(G.p.x+Math.cos(a)*70,40,G.W-40),y:clamp(G.p.y+Math.sin(a)*70,40,G.H-40),v:Math.round(lost*.6),t:6});floatTxt(G.p.x,G.p.y-62,'-'+lost+' plena','#ff9a6a',true)}}catch(e){}return r}}

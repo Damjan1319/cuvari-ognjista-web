@@ -1316,6 +1316,8 @@ setTimeout(()=>{abSide();const sb=document.getElementById('sndBtn');if(sb&&!docu
  b.onclick=()=>{save.abLeft=save.abLeft?0:1;persist();abSide();lab();if(typeof joyIdle==='function')joyIdle()};
  const after=document.getElementById('helpBtn')||document.getElementById('cirBtn')||sb;after.after(b)}},150);
 
+{const st=document.createElement('style');st.textContent=`.hcard2{min-width:0;max-width:100%}.hcard2 .bars{min-width:0;overflow:hidden}.allyc{white-space:nowrap;overflow:hidden;flex-shrink:1;min-width:0}.allyc .an{font:700 13px 'Alegreya Sans',sans-serif;color:#bff0a0}.allyc .an s{text-decoration:none;color:#cbb48a;font-weight:600}#hud .hud-top{max-width:100vw;box-sizing:border-box}`;document.head.appendChild(st)}
+
 /* ---------- ikonice ---------- */
 const GD=`<defs>
 <radialGradient id="gZar" cx=".45" cy=".62" r=".6"><stop offset="0" stop-color="#fff7cf"/><stop offset=".4" stop-color="#ffbe45"/><stop offset="1" stop-color="#d0501a"/></radialGradient>
@@ -2851,7 +2853,7 @@ function worldText(inView){
   ctx.strokeStyle='#d9b26a';ctx.lineWidth=.8;ctx.strokeRect(x-w/2-1.5,y-1.5,w+3,8);
   ctx.textAlign='center';ctx.font="800 8px 'EB Garamond',serif";ctx.fillStyle='rgba(0,0,0,.8)';ctx.fillText(Math.max(0,Math.ceil(G.hp)),x+.5,y-2.5);ctx.fillStyle='#fff3d6';ctx.fillText(Math.max(0,Math.ceil(G.hp)),x,y-3)}
  ctx.textAlign='center';for(const a of G.allies){if(!inView(a.x,a.y))continue;const y=a.y-(save.h3d!==0?50:42),w=26;ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(a.x-w/2-1,y-1,w+2,5);ctx.fillStyle='#7fbf6a';ctx.fillRect(a.x-w/2,y,w*Math.max(0,a.hp/a.max),3);
-  ctx.font="700 9px 'EB Garamond',serif";ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillText(a.name,a.x+.6,y-3.4);ctx.fillStyle='#e8f4d8';ctx.fillText(a.name,a.x,y-4)}
+  if(G.allies.length<=4){ctx.font="700 9px 'EB Garamond',serif";ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillText(a.name,a.x+.6,y-3.4);ctx.fillStyle='#e8f4d8';ctx.fillText(a.name,a.x,y-4)}}
  ctx.textAlign='center';ctx.lineJoin='round';for(const f of G.floats){const pop=1+Math.max(0,f.life-.72)*2.6;ctx.globalAlpha=Math.min(1,f.life*2);ctx.font=`800 ${Math.round((f.big?13:10.5)*pop)}px Cinzel,serif`;ctx.lineWidth=3;ctx.strokeStyle='rgba(30,10,4,.85)';ctx.strokeText(f.txt,f.x,f.y);ctx.fillStyle=f.col;ctx.fillText(f.txt,f.x,f.y)}ctx.globalAlpha=1;if(typeof fxVig==='function')fxVig();}
 function hud(){const c=G.cfg;
  $('#hpB').style.width=Math.max(0,G.hp/G.maxhp*100)+'%';$('#hpT').textContent=`${Math.max(0,Math.ceil(G.hp))} / ${G.maxhp}`;
@@ -2862,7 +2864,7 @@ function hud(){const c=G.cfg;
  const mel=$('#mission');if(mel._m!==m){mel._m=m;mel.innerHTML=m}
  if(G.bossRef)$('#bossB').style.width=Math.max(0,G.bossRef.hp/G.bossRef.max*100)+'%';
  $('#lootT').textContent=G.lootZ;if((G._mT=(G._mT||0)+1)%4===0)drawMini();
- if((G._aT=(G._aT||0)+1)%10===0){const all=G.allies,f=G.fallen||[];$('#allyC').innerHTML=(all.length||f.length)?`<i class="ic">${SVG.ally}</i>`+all.map(a=>`<span class="mb" title="${esc(a.name)}"><b style="width:${Math.max(0,a.hp/a.max*100)}%"></b></span>`).join('')+f.map(()=>'<span class="mb dead"><b></b></span>').join(''):''}$('#clock').textContent=fmt(G.t);
+ if((G._aT=(G._aT||0)+1)%10===0){const all=G.allies,f=G.fallen||[];$('#allyC').innerHTML=(all.length||f.length)?`<i class="ic">${SVG.ally}</i>`+(all.length+f.length>6?`<span class="an">${all.length}${f.length?`<s>/${all.length+f.length}</s>`:''}</span>`:all.map(a=>`<span class="mb" title="${esc(a.name)}"><b style="width:${Math.max(0,a.hp/a.max*100)}%"></b></span>`).join('')+f.map(()=>'<span class="mb dead"><b></b></span>').join('')):''}$('#clock').textContent=fmt(G.t);
  const ab=$('#abBtn');ab.style.setProperty('--cd',(G.p.cd/G.hero.cd*100)+'%');ab.classList.toggle('ready',G.p.cd<=0);{const v=G.p.cd>0?String(Math.ceil(G.p.cd)):'';if(ab.dataset.cd!==v)ab.dataset.cd=v}}
 
 /* ---------- bogatstvo mape ---------- */
@@ -3660,7 +3662,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795819720';
+const BUILD_ID='1795855790';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}

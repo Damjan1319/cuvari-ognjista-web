@@ -1317,6 +1317,19 @@ setTimeout(()=>{abSide();const sb=document.getElementById('sndBtn');if(sb&&!docu
  const after=document.getElementById('helpBtn')||document.getElementById('cirBtn')||sb;after.after(b)}},150);
 
 {const st=document.createElement('style');st.textContent=`.hcard2{min-width:0;max-width:100%}.hcard2 .bars{min-width:0;overflow:hidden}.allyc{white-space:nowrap;overflow:hidden;flex-shrink:1;min-width:0}.allyc .an{font:700 13px 'Alegreya Sans',sans-serif;color:#bff0a0}.allyc .an s{text-decoration:none;color:#cbb48a;font-weight:600}#hud .hud-top{max-width:100vw;box-sizing:border-box}`;document.head.appendChild(st)}
+/* ---------- junaci: novi junak ne kreće od nule, odred deli iskustvo ---------- */
+const XP_SHARE=.5;
+function heroTotXp(h){let t=h.xp||0;for(let l=1;l<(h.lvl||1);l++)t+=xpNeed(l);return t}
+function heroAddXp(h,x){h.xp=(h.xp||0)+x;while(h.lvl<maxHeroLvl()&&h.xp>=xpNeed(h.lvl)){h.xp-=xpNeed(h.lvl);h.lvl++}if(h.lvl>=maxHeroLvl())h.xp=Math.min(h.xp,xpNeed(h.lvl))}
+function heroTop(){return Math.max(1,...HEROES.filter(heroOk).map(h=>(save.heroes[h.id]||{}).lvl||1))}
+/* novi junak se pridružuje blizu nivoa najjačeg */
+function heroCatchUp(silent){save.heroSeen=save.heroSeen||{};const top=heroTop(),start=Math.min(maxHeroLvl(),Math.max(1,Math.round(top*.9)));const got=[];
+ for(const H of HEROES){if(!heroOk(H)||save.heroSeen[H.id])continue;save.heroSeen[H.id]=1;const h=save.heroes[H.id];if(h&&h.lvl<start){h.lvl=start;h.xp=0;got.push(H)}}
+ if(got.length){try{persist()}catch(e){}if(!silent)got.forEach(H=>notify(`<b>${H.name}</b> se pridružio odredu na <b>${start}. nivou</b>. Odmah je spreman za boj.`));else notify(`Junaci su sustigli najjačeg: ${got.map(H=>'<b>'+H.name+'</b>').join(', ')} sada su na <b>${start}. nivou</b>. Od sada i junaci koji ne idu u boj uče pola iskustva.`)}return got}
+{const _g=goHub;goHub=function(){const r=_g.apply(this,arguments);try{const first=!save.heroSeen;heroCatchUp(first);if(first){save.heroSeen=save.heroSeen||{};HEROES.forEach(H=>{if(heroOk(H))save.heroSeen[H.id]=1});persist()}}catch(e){}return r}}
+/* deljenje iskustva: junaci koji nisu u boju uče pola */
+setTimeout(()=>{const _er=endRun;endRun=function(win){const id=G&&G.hero&&G.hero.id,h=id&&save.heroes[id],b=h?heroTotXp(h):0;const r=_er.apply(this,arguments);
+ try{if(h){const gain=heroTotXp(h)-b;if(gain>0){let any=0;for(const H of HEROES){if(H.id===id||!heroOk(H))continue;const o=save.heroes[H.id];if(!o)continue;const l0=o.lvl;heroAddXp(o,Math.round(gain*XP_SHARE));if(o.lvl>l0)any=1}if(any)persist()}}}catch(e){}return r}},260);
 
 /* ---------- ikonice ---------- */
 const GD=`<defs>
@@ -3663,7 +3676,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795858198';
+const BUILD_ID='1795864024';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
@@ -4544,7 +4557,7 @@ function sheetPohod(body){$('#shTitle').textContent='Pohod kroz istoriju';const 
  body.querySelectorAll('[data-reg]').forEach(b=>b.onclick=()=>{pohodReg=+b.dataset.reg;renderSheet()});
  body.querySelectorAll('[data-lv]').forEach(b=>b.onclick=()=>{ac();const i=+b.dataset.lv;intro(isLost(i)?defCfg(i):campCfg(i))});
  body.querySelectorAll('[data-tn]').forEach(g=>g.addEventListener('click',()=>{const i=+g.dataset.tn;if(isLost(i)){ac();intro(defCfg(i))}else if(i<=topLevel()){ac();intro(campCfg(i))}}))}
-function sheetJunaci(body){$('#shTitle').textContent='Junaci';$('#shSub').textContent=`Najviši nivo ${maxHeroLvl()}, veštine do ${maxUp()}`;
+function sheetJunaci(body){$('#shTitle').textContent='Junaci';$('#shSub').textContent=`Najviši nivo ${maxHeroLvl()}, veštine do ${maxUp()}. Junaci koji ne idu u boj uče pola iskustva.`;
  if(heroTab!=='zli'&&heroTab!=='vojska'&&(!heroTab||!HEROES.find(h=>h.id===heroTab)))heroTab=curHero().id;
  const md=(heroTab==='vojska'?'vojska':heroTab==='zli'?'zli':'junaci');body.innerHTML=`<div class="seg"><button data-md="junaci" class="${md==='junaci'?'on':''}">Junaci</button><button data-md="vojska" class="${md==='vojska'?'on':''}">Vojska</button><button data-md="zli" class="${md==='zli'?'on':''}">Neprijatelji</button></div><div class="hstrip" id="htabs"></div><div id="hbody"></div>`;
  body.querySelectorAll('[data-md]').forEach(b=>b.onclick=()=>{const m=b.dataset.md;heroTab=m==='junaci'?curHero().id:m;renderSheet()});

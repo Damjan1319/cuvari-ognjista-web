@@ -3728,7 +3728,7 @@ setInterval(()=>{if(!save.wounded)return;const now=Date.now();save._healSeen=sav
  for(const k in save.wounded){const t=save.wounded[k];if(t<=now&&!save._healSeen[k+t]){save._healSeen[k+t]=1;ch=1;logAdd(`<b>${esc(k)}</b> je ozdravio i ponovo ide u boj.`,'good')}}
  if(ch){for(const k in save._healSeen){const t=+k.replace(/^\D+/,'');if(t&&now-t>864e5)delete save._healSeen[k]}try{persist()}catch(e){}}},15000);
 /* ---------- automatsko učitavanje nove verzije ---------- */
-const BUILD_ID='1795872788';
+const BUILD_ID='1795881275';
 function updCheck(){if(location.protocol!=='https:'||(typeof state!=='undefined'&&(state==='play'||state==='pause')))return;
  fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():'').then(t=>{const m=t.match(/const BUILD_ID='(\d+)'/);
   if(m&&+m[1]>+BUILD_ID){let k='';try{k=sessionStorage.getItem('cuvari-upd')}catch(e){}if(k===m[1])return;try{sessionStorage.setItem('cuvari-upd',m[1])}catch(e){}try{persist()}catch(e){}location.replace(location.pathname+'?v='+m[1]+location.hash)}}).catch(()=>{})}
@@ -4362,7 +4362,7 @@ function nNewCamp(){const q=nCampPos();G.zone={x:q.x,y:q.y,r:78,p:0,camp:1};G.ca
 {const st=document.createElement('style');st.textContent=`#nalet .bg{font-size:13px;color:#ffe7a0;background:#3a2414;border:1px solid #8a6430;border-radius:3px;padding:1px 7px;white-space:nowrap}#nalet .bg.full{background:#2f6a22;animation:bgP .8s ease-in-out infinite}@keyframes bgP{50%{transform:scale(1.12)}}body.n2 #nalet .sc:before{content:'✓ ';font-size:12px;opacity:.8}body:not(.n2) #nalet .bg{display:none!important}`;document.head.appendChild(st)}
 /* poeni od obaranja idu u torbu */
 {const _dm=dmgEnemy;dmgEnemy=function(e,d,kx,ky){if(!G||!G.n2)return _dm.apply(this,arguments);const s0=G.score||0;const dd=G.besT>0?d*2:d;const r=_dm.call(this,e,dd,kx,ky);const gain=(G.score||0)-s0;if(gain>0){G.score=s0;G.bag+=gain}return r}}
-{const _h=hurtPlayer;hurtPlayer=function(amt,src){const before=G?G.hp:0;const r=_h.apply(this,arguments);try{if(G&&G.n2&&G.hp<before&&G.bag>0&&G.stitT<=0){const lost=Math.round(G.bag*.25);G.bag-=lost;const a=R()*6.283;G.drops.push({x:clamp(G.p.x+Math.cos(a)*70,40,G.W-40),y:clamp(G.p.y+Math.sin(a)*70,40,G.H-40),v:Math.round(lost*.6),t:6});floatTxt(G.p.x,G.p.y-62,'-'+lost+' plena','#ff9a6a',true)}}catch(e){}return r}}
+{const _h=hurtPlayer;hurtPlayer=function(amt,src){const before=G?G.hp:0;const r=_h.apply(this,arguments);try{if(G&&G.n2&&G.hp<before&&G.bag>0&&G.stitT<=0){const lost=Math.round(G.bag*.25);G.bag-=lost;const a=R()*6.283;G.drops.push({x:clamp(G.p.x+Math.cos(a)*70,40,G.W-40),y:clamp(G.p.y+Math.sin(a)*70,40,G.H-40),v:Math.round(lost*.6),t:6});floatTxt(G.p.x,G.p.y-118,'-'+lost+' plena','#ff9a6a',true)}}catch(e){}return r}}
 {const _u=update;update=function(dt){if(!G||state!=='play'||!G.n2||G.choice)return _u.call(this,dt);const c=G.cfg,p=G.p;
  const r=_u.call(this,dt);if(!G||state!=='play')return r;
  /* logor */const Z=G.zone;G.campT-=dt;if(Z&&Math.hypot(p.x-Z.x,p.y-Z.y)<Z.r){if(G.bag>0){const bonus=Math.min(.3,G.bag/4000),v=Math.round(G.bag*(1+bonus));G.bank+=v;floatTxt(Z.x,Z.y-60,`Sačuvano +${num(v)}${bonus>=.05?` (+${Math.round(bonus*100)}%)`:''}`,'#a8f08c',true);burst(Z.x,Z.y,'#ffd27a',30,220,3);sfx.coin&&sfx.coin();G.bag=0;nNewCamp();toast('Novi logor je dalje, prati strelicu');G.toastT=1.6}}
@@ -4972,6 +4972,19 @@ function vselTower(g,x,y,s){// drvena osmatračnica
  g.fillStyle='#6b4a2c';g.fillRect(x-22,y-104,44,10);g.fillStyle='#7a5434';for(let i=0;i<5;i++)g.fillRect(x-20+i*8.5,y-124,6,20);
  g.fillStyle='#5e2a1a';g.beginPath();g.moveTo(x-26,y-122);g.lineTo(x,y-146);g.lineTo(x+26,y-122);g.fill();
  if(s<0){g.strokeStyle='#3a2716';g.lineWidth=2;g.beginPath();g.moveTo(x,y-146);g.lineTo(x,y-176);g.stroke();g.fillStyle=(save.tribe&&save.tribe.color)||'#b8323a';const w=Math.sin(Date.now()/300)*3;g.beginPath();g.moveTo(x,y-176);g.quadraticCurveTo(x+12,y-178+w,x+24,y-174);g.lineTo(x+22,y-160+w*.5);g.quadraticCurveTo(x+11,y-163-w,x,y-161);g.fill()}}
+// HUD raspored na uspravnom ekranu: tabla zadatka levo ispod junaka, mapa desno pored nje (bez preklapanja)
+function hudLay(){const top=document.querySelector('#hud .hud-top'),pl=document.querySelector('#hud .mplate'),mi=$('#mini');if(!top||!pl||!mi)return;
+ const port=innerWidth<=640&&innerHeight>innerWidth;document.body.classList.toggle('hudP',port);
+ if(!port){pl.style.maxWidth='';mi.style.top='';return}
+ const mw=mi.getBoundingClientRect().width||100;const tw=top.getBoundingClientRect().width;pl.style.maxWidth=Math.max(170,tw-mw-12)+'px';
+ const t=pl.offsetTop;if(mi.style.top!==t+'px')mi.style.top=t+'px'}
+{const st=document.createElement('style');st.textContent=`body.hudP #hud .mplate{justify-self:start!important;box-sizing:border-box}
+body.hudP #mini{bottom:auto!important;transform:none!important;margin-top:2px}
+body.hudP #nalet{max-width:100%;box-sizing:border-box}
+body.hudP #hud .mplate .bossbar{width:auto!important;max-width:100%;margin-left:0;margin-right:0}`;document.head.appendChild(st)}
+addEventListener('resize',()=>setTimeout(hudLay,60));
+{const _s=start;start=function(c){const r=_s.apply(this,arguments);setTimeout(hudLay,30);setTimeout(hudLay,400);return r}}
+setInterval(()=>{if(typeof state!=='undefined'&&state==='play')hudLay()},700);
 
 const VIL={W:1800,H:1180,cx:900,gy:640};
 const mixC=(a,b,k)=>a.map((v,i)=>Math.round(v+(b[i]-v)*k));const rgb=c=>`rgb(${c})`;
